@@ -20,98 +20,45 @@ func main() {
 		MinVersion: 1,
 	})
 	
-	file.AddElement(&nfo.Sprites{
-		{
-			Filename: "platforms_a_8bpp.png",
-			X:        0,
-			Y:        0,
-			Width:    64,
-			Height:   55,
-			XRel:     -64/2,
-			YRel:     -55/2,
-		},
-		{
-			Filename: "platforms_b_8bpp.png",
-			X:        0,
-			Y:        0,
-			Width:    64,
-			Height:   55,
-			XRel:     -64/2,
-			YRel:     -55/2,
-		},
-		{
-			Filename: "platforms_a_8bpp.png",
-			X:        72,
-			Y:        0,
-			Width:    64,
-			Height:   55,
-			XRel:     -64/2,
-			YRel:     -55/2,
-		},
-		{
-			Filename: "platforms_b_8bpp.png",
-			X:        72,
-			Y:        0,
-			Width:    64,
-			Height:   55,
-			XRel:     -64/2,
-			YRel:     -55/2,
-		},
-	})
+	station1 := nfo.Station{
+		SpriteFilename: "platforms_a",
+		ClassID:        "TWF0",
+		ClassName:      "British Stations",
+		ObjectName:     "Platform A",
+		ID: 0,
+	}
 
-	def := &nfo.Definition{StationID: 0}
-	def.AddProperty(&nfo.ClassID{ID: "TWF0"})
-	def.AddProperty(&nfo.SpriteLayout{
-		EastWest:   nfo.SpriteDirection{
-			GroundSprite: 1012,
-			Foreground:   nfo.BoundingBox{X: 16, Y: 5, Z: 5},
-			Background:   nfo.BoundingBox{X: 16, Y: 5, Z: 3},
-		},
-		NorthSouth: nfo.SpriteDirection{
-			GroundSprite: 1011,
-			Foreground:   nfo.BoundingBox{X: 16, Y: 5, Z: 5},
-			Background:   nfo.BoundingBox{X: 16, Y: 5, Z: 3},
-		},
-	})
+	station1.WriteToFile(&file)
 
-	file.AddElement(def)
-	
-	file.AddElement(&nfo.StationSet{
-		SetID:         0,
-		NumLittleSets: 0,
-		NumLotsSets:   1,
-		SpriteSets:    []int{0},
-	})
+	station2 := nfo.Station{
+		SpriteFilename: "platforms_sf",
+		ClassID:        "TWF0",
+		ClassName:      "British Stations",
+		ObjectName:     "Simon Foster Platform",
+		ID: 1,
+	}
 
-	file.AddElement(&nfo.StationSet{
-		SetID:         1,
-		NumLittleSets: 0,
-		NumLotsSets:   1,
-		SpriteSets:    []int{0},
-	})
-	
-	file.AddElement(&nfo.GraphicSetAssignment{
-		IDs:               []int {0},
-		CargoSpecificSets: []nfo.CargoToSet{{
-			CargoType: 254,
-			Set:       1,
-		}},
-		DefaultSet:        0,
-	})
+	station2.WriteToFile(&file)
 
-	file.AddElement(&nfo.TextString{
-		LanguageFile:   255,
-		StationId:      0,
-		TextStringType: nfo.TextStringTypeStationName,
-		Text:           "Station Tile",
-	})
+	station3 := nfo.Station{
+		SpriteFilename: "ramp_ne",
+		ClassID:        "TWF0",
+		ClassName:      "British Stations",
+		ObjectName:     "Ramp (NE)",
+		ID: 2,
+	}
 
-	file.AddElement(&nfo.TextString{
-		LanguageFile:   255,
-		StationId:      0,
-		TextStringType: nfo.TextStringTypeClassName,
-		Text:           "Timberwolf",
-	})
+	station3.WriteToFile(&file)
+
+	station4 := nfo.Station{
+		SpriteFilename: "ramp_sw",
+		ClassID:        "TWF0",
+		ClassName:      "British Stations",
+		ObjectName:     "Ramp (SW)",
+		ID: 3,
+	}
+
+	station4.WriteToFile(&file)
 
 	file.Output()
 }

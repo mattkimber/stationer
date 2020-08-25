@@ -26,7 +26,7 @@ func (s *Sprites) GetLines() []string {
 
 
 	for idx, spr := range *s {
-		result[idx+1] = fmt.Sprintf("%s 8bpp %d %d %d %d %d %d normal chunked", "sprites/" + spr.Filename, spr.X, spr.Y,  spr.Width, spr.Height,spr.XRel, spr.YRel)
+		result[idx+1] = fmt.Sprintf("%s 8bpp %d %d %d %d %d %d normal chunked", "1x/" + spr.Filename, spr.X, spr.Y,  spr.Width, spr.Height,spr.XRel, spr.YRel)
 	}
 
 	return result
