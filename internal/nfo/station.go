@@ -14,6 +14,10 @@ const (
 	SPRITE_WIDTH_WITH_PADDING = 72
 	SPRITE_WIDTH = 64
 	SPRITE_HEIGHT = 55
+
+	CUSTOM_SPRITE = 0x42D
+	COMPANY_COLOUR_SPRITE = 0x842D
+	TRANSPARENT_SPRITE = 0x322442D
 )
 
 func (s *Station) WriteToFile(file *File) {
@@ -65,13 +69,17 @@ func (s *Station) WriteToFile(file *File) {
 	def.AddProperty(&SpriteLayout{
 		EastWest:   SpriteDirection{
 			GroundSprite: 1012,
-			Foreground:   BoundingBox{YOffset: 16 - 5, X: 16, Y: 5, Z: 2},
-			Background:   BoundingBox{X: 16, Y: 5, Z: 3},
+			Sprites: []BoundingBox{
+				{YOffset: 16 - 5, X: 16, Y: 5, Z: 2, SpriteNumber: CUSTOM_SPRITE + 0},
+				{X: 16, Y: 5, Z: 3, SpriteNumber: CUSTOM_SPRITE + 1},
+			},
 		},
 		NorthSouth: SpriteDirection{
 			GroundSprite: 1011,
-			Foreground:   BoundingBox{XOffset: 16 - 5, X: 5, Y: 16, Z: 2},
-			Background:   BoundingBox{X: 5, Y: 16, Z: 3},
+			Sprites: []BoundingBox{
+				{XOffset: 16 - 5, X: 5, Y: 16, Z: 3, SpriteNumber: CUSTOM_SPRITE + 2},
+				{X: 5, Y: 16, Z: 3, SpriteNumber: CUSTOM_SPRITE + 3},
+			},
 		},
 	})
 

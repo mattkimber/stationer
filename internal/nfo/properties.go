@@ -1,6 +1,9 @@
 package nfo
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 const (
 	BOUNDING_BOX_BYTES = 10
@@ -32,12 +35,12 @@ type BoundingBox struct {
 	X int
 	Y int
 	Z int
+	SpriteNumber int
 }
 
 type SpriteDirection struct {
 	GroundSprite int
-	Foreground BoundingBox
-	Background BoundingBox
+	Sprites []BoundingBox
 }
 
 type SpriteLayout struct {
@@ -46,35 +49,40 @@ type SpriteLayout struct {
 }
 
 func (sl *SpriteLayout) GetBytes() int {
-	return (BOUNDING_BOX_BYTES * 4) +
+	boundingBoxes := len(sl.EastWest.Sprites) + len(sl.NorthSouth.Sprites)
+
+	return (BOUNDING_BOX_BYTES * boundingBoxes) +
 		(TILE_DIRECTION_END_BYTES * 2) +
 		(GROUNDSPRITE_BYTES * 2) + 2
 }
 
-func (bb *BoundingBox) GetString(coda int) string {
-	return fmt.Sprintf("%s %s %s %s %s %s %s %s 00 00",
+func (bb *BoundingBox) GetString() string {
+	return fmt.Sprintf("%s %s %s %s %s %s %s",
 		GetByte(bb.XOffset),
 		GetByte(bb.YOffset),
 		GetByte(bb.ZOffset),
 		GetByte(bb.X),
 		GetByte(bb.Y),
 		GetByte(bb.Z),
-		GetByte(coda),
-		GetByte(132),
+		GetWord(bb.SpriteNumber),
 	)
 }
 
-func (sd *SpriteDirection) GetString(bg_coda int, fg_coda int) string {
-	return fmt.Sprintf("%s %s %s 80",
+func (sd *SpriteDirection) GetString() string {
+	sb := strings.Builder{}
+	for _, bb := range sd.Sprites {
+		sb.WriteString(bb.GetString())
+	}
+
+	return fmt.Sprintf("%s %s 80",
 		GetWord(sd.GroundSprite),
-		sd.Background.GetString(bg_coda),
-		sd.Foreground.GetString(fg_coda),
+		sb.String(),
 	)
 }
 
 func (sl *SpriteLayout) GetString() string {
 	return fmt.Sprintf("09 02 %s %s",
-		sl.EastWest.GetString(45, 46),
-		sl.NorthSouth.GetString(47, 48),
+		sl.EastWest.GetString(),
+		sl.NorthSouth.GetString(),
 		)
 }

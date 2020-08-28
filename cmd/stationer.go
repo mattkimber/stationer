@@ -60,5 +60,25 @@ func main() {
 
 	station4.WriteToFile(&file)
 
+	station5 := nfo.Station{
+		SpriteFilename: "platforms_busy",
+		ClassID:        "TWF0",
+		ClassName:      "British Stations",
+		ObjectName:     "Busy Platform (test)",
+		ID: 4,
+	}
+
+	station5.WriteToFile(&file)
+
+	station5 = nfo.Station{
+		SpriteFilename: "platforms_modern",
+		ClassID:        "TWF0",
+		ClassName:      "British Stations",
+		ObjectName:     "Modern Platform (test)",
+		ID: 5,
+	}
+
+	station5.WriteToFile(&file)
+
 	file.Output()
 }
