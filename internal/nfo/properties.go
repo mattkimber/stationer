@@ -16,6 +16,7 @@ type Property interface {
 	GetString() string
 }
 
+// CLass ID
 type ClassID struct {
 	ID string
 }
@@ -27,6 +28,21 @@ func (c *ClassID) GetBytes() int {
 func (c *ClassID) GetString() string {
 	return fmt.Sprintf("08 \"%s\" ", c.ID)
 }
+
+// Little/lots threshold
+type LittleLotsThreshold struct {
+	Amount int
+}
+
+func (l *LittleLotsThreshold) GetBytes() int {
+	return 3
+}
+
+func (l *LittleLotsThreshold) GetString() string {
+	return fmt.Sprintf("10 %s ", GetWord(l.Amount))
+}
+
+
 
 type BoundingBox struct {
 	XOffset int
@@ -64,7 +80,7 @@ func (bb *BoundingBox) GetString() string {
 		GetByte(bb.X),
 		GetByte(bb.Y),
 		GetByte(bb.Z),
-		GetWord(bb.SpriteNumber),
+		GetDouble(bb.SpriteNumber),
 	)
 }
 
@@ -75,7 +91,7 @@ func (sd *SpriteDirection) GetString() string {
 	}
 
 	return fmt.Sprintf("%s %s 80",
-		GetWord(sd.GroundSprite),
+		GetDouble(sd.GroundSprite),
 		sb.String(),
 	)
 }

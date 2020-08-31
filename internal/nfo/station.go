@@ -18,54 +18,50 @@ const (
 	CUSTOM_SPRITE = 0x42D
 	COMPANY_COLOUR_SPRITE = 0x842D
 	TRANSPARENT_SPRITE = 0x322442D
+
+	MAX_LOAD_STATE = 5
+	LITTLE_SETS = 4
+	LOTS_SETS = 2
 )
+
+func GetSprite(filename string, num int) Sprite {
+	xrel := -(SPRITE_WIDTH/2)-10
+
+	if num >= 2 {
+		xrel = 11-(SPRITE_WIDTH/2)
+	}
+
+	return Sprite{
+		Filename: filename,
+		X:        SPRITE_WIDTH_WITH_PADDING*num,
+		Y:        0,
+		Width:    SPRITE_WIDTH,
+		Height:   SPRITE_HEIGHT,
+		XRel:     xrel,
+		YRel:     -(SPRITE_HEIGHT/2)-1,
+	}
+}
 
 func (s *Station) WriteToFile(file *File) {
 
-	filename := fmt.Sprintf("%s_8bpp.png", s.SpriteFilename)
+	file.AddElement(&Spritesets{NumSets: MAX_LOAD_STATE + 1, NumSprites: 4})
 
-	file.AddElement(&Sprites{
-		{
-			Filename: filename,
-			X:        0,
-			Y:        0,
-			Width:    SPRITE_WIDTH,
-			Height:   SPRITE_HEIGHT,
-			XRel:     -(SPRITE_WIDTH/2)-10,
-			YRel:     -(SPRITE_HEIGHT/2)-1,
-		},
-		{
-			Filename: filename,
-			X:        SPRITE_WIDTH_WITH_PADDING*1,
-			Y:        0,
-			Width:    SPRITE_WIDTH,
-			Height:   SPRITE_HEIGHT,
-			XRel:     -(SPRITE_WIDTH/2)-10,
-			YRel:     -(SPRITE_HEIGHT/2)-1,
-		},
-		{
-			Filename: filename,
-			X:        SPRITE_WIDTH_WITH_PADDING*2,
-			Y:        0,
-			Width:    SPRITE_WIDTH,
-			Height:   SPRITE_HEIGHT,
-			XRel:     11-(SPRITE_WIDTH/2),
-			YRel:     -(SPRITE_HEIGHT/2)-1,
+	for i := 0; i <= MAX_LOAD_STATE; i++ {
+		filename := fmt.Sprintf("%s_%d_8bpp.png", s.SpriteFilename, i)
 
-		},
-		{
-			Filename: filename,
-			X:        SPRITE_WIDTH_WITH_PADDING*3,
-			Y:        0,
-			Width:    SPRITE_WIDTH,
-			Height:   SPRITE_HEIGHT,
-			XRel:     11-(SPRITE_WIDTH/2),
-			YRel:     -(SPRITE_HEIGHT/2)-1,
-		},
-	})
+		file.AddElement(&Sprites{
+			GetSprite(filename, 0),
+			GetSprite(filename, 1),
+			GetSprite(filename, 2),
+			GetSprite(filename, 3),
+		})
+	}
 
 	def := &Definition{StationID: s.ID}
 	def.AddProperty(&ClassID{ID: s.ClassID})
+	def.AddProperty(&LittleLotsThreshold{Amount: 200})
+
+
 	def.AddProperty(&SpriteLayout{
 		EastWest:   SpriteDirection{
 			GroundSprite: 1012,
@@ -87,9 +83,9 @@ func (s *Station) WriteToFile(file *File) {
 
 	file.AddElement(&StationSet{
 		SetID:         0,
-		NumLittleSets: 0,
-		NumLotsSets:   1,
-		SpriteSets:    []int{0},
+		NumLittleSets: LITTLE_SETS*3,
+		NumLotsSets:   LOTS_SETS,
+		SpriteSets:    []int{0,1,1,1,2,2,2,2,3,3,3,3,4,5},
 	})
 
 	file.AddElement(&StationSet{
@@ -102,10 +98,10 @@ func (s *Station) WriteToFile(file *File) {
 	file.AddElement(&GraphicSetAssignment{
 		IDs:               []int {s.ID},
 		CargoSpecificSets: []CargoToSet{{
-			CargoType: 254,
-			Set:       1,
+			CargoType: 0,
+			Set:       0,
 		}},
-		DefaultSet:        0,
+		DefaultSet:        1,
 	})
 
 	file.AddElement(&TextString{

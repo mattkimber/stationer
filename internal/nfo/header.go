@@ -34,7 +34,7 @@ func (h *Header) GetLines() []string {
 
 	bytes := ACTION_LENGTH + VERSION_LENGTH + GRFID_LENGTH + len(h.SetName) + NULL_LENGTH + len(h.Description) + NULL_LENGTH
 
-	action14 := fmt.Sprintf("* 0 14 \"C\" \"INFO\" \"B\" \"PALS\" 01 00 \"D\" \"B\" \"VRSN\" 04 00 %s \"B\" \"MINV\" 04 00 %s 00 00", GetWord(h.Version), GetWord(h.MinVersion))
+	action14 := fmt.Sprintf("* 0 14 \"C\" \"INFO\" \"B\" \"PALS\" 01 00 \"D\" \"B\" \"VRSN\" 04 00 %s \"B\" \"MINV\" 04 00 %s 00 00", GetDouble(h.Version), GetDouble(h.MinVersion))
 
 	action8 := fmt.Sprintf("* %d %s %s \"%s\" %s \"%s\" %s \"%s\" %s",
 		bytes,

@@ -19,66 +19,52 @@ func main() {
 		Version: 1,
 		MinVersion: 1,
 	})
-	
-	station1 := nfo.Station{
-		SpriteFilename: "platforms_a",
-		ClassID:        "TWF0",
-		ClassName:      "British Stations",
-		ObjectName:     "Platform A",
-		ID: 0,
+
+	file.AddElement(&nfo.CargoTypeTable{Cargos: []string{"PASS", "MAIL"}})
+
+	stations := []nfo.Station{
+		{
+			SpriteFilename: "concrete_empty",
+			ClassID:        "TWF0",
+			ClassName:      "Concrete Platforms",
+			ObjectName:     "Platform",
+		},
+		{
+			SpriteFilename: "concrete_sign",
+			ClassID:        "TWF0",
+			ClassName:      "Concrete Platforms",
+			ObjectName:     "Platform with sign",
+		},
+		{
+			SpriteFilename: "concrete_benches",
+			ClassID:        "TWF0",
+			ClassName:      "Concrete Platforms",
+			ObjectName:     "Platform with benches",
+		},
+		{
+			SpriteFilename: "modern_empty",
+			ClassID:        "TWF1",
+			ClassName:      "Modern Platforms",
+			ObjectName:     "Platform",
+		},
+		{
+			SpriteFilename: "modern_sign",
+			ClassID:        "TWF1",
+			ClassName:      "Modern Platforms",
+			ObjectName:     "Platform with sign",
+		},
+		{
+			SpriteFilename: "modern_benches",
+			ClassID:        "TWF1",
+			ClassName:      "Modern Platforms",
+			ObjectName:     "Platform with benches",
+		},
 	}
 
-	station1.WriteToFile(&file)
-
-	station2 := nfo.Station{
-		SpriteFilename: "platforms_sf",
-		ClassID:        "TWF0",
-		ClassName:      "British Stations",
-		ObjectName:     "Simon Foster Platform",
-		ID: 1,
+	for idx, station := range stations {
+		station.ID = idx
+		station.WriteToFile(&file)
 	}
-
-	station2.WriteToFile(&file)
-
-	station3 := nfo.Station{
-		SpriteFilename: "ramp_ne",
-		ClassID:        "TWF0",
-		ClassName:      "British Stations",
-		ObjectName:     "Ramp (NE)",
-		ID: 2,
-	}
-
-	station3.WriteToFile(&file)
-
-	station4 := nfo.Station{
-		SpriteFilename: "ramp_sw",
-		ClassID:        "TWF0",
-		ClassName:      "British Stations",
-		ObjectName:     "Ramp (SW)",
-		ID: 3,
-	}
-
-	station4.WriteToFile(&file)
-
-	station5 := nfo.Station{
-		SpriteFilename: "platforms_busy",
-		ClassID:        "TWF0",
-		ClassName:      "British Stations",
-		ObjectName:     "Busy Platform (test)",
-		ID: 4,
-	}
-
-	station5.WriteToFile(&file)
-
-	station5 = nfo.Station{
-		SpriteFilename: "platforms_modern",
-		ClassID:        "TWF0",
-		ClassName:      "British Stations",
-		ObjectName:     "Modern Platform (test)",
-		ID: 5,
-	}
-
-	station5.WriteToFile(&file)
 
 	file.Output()
 }

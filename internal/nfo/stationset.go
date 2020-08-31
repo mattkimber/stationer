@@ -20,7 +20,7 @@ func (s *StationSet) GetLines() []string {
 	)
 
 	for _, set := range s.SpriteSets {
-		result += fmt.Sprintf(" %s", GetShort(set))
+		result += fmt.Sprintf(" %s", GetWord(set))
 	}
 
 	return []string { result }

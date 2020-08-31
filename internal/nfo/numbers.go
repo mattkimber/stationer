@@ -2,7 +2,7 @@ package nfo
 
 import "fmt"
 
-func GetWord(value int) string {
+func GetDouble(value int) string {
 	a := value & 0xFF
 	b := value >> 8 & 0xFF
 	c := value >> 16 & 0xFF
@@ -15,7 +15,7 @@ func GetByte(value int) string {
 	return fmt.Sprintf("%02X", a)
 }
 
-func GetShort(value int) string {
+func GetWord(value int) string {
 	a := value & 0xFF
 	b := value >> 8 & 0xFF
 	return fmt.Sprintf("%02X %02X", a, b)

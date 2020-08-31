@@ -31,7 +31,7 @@ func (gsa *GraphicSetAssignment) GetLines() []string {
 		}
 		csets += GetByte(cset.CargoType)
 		csets += " "
-		csets += GetShort(cset.Set)
+		csets += GetWord(cset.Set)
 	}
 
 	result := fmt.Sprintf("* %d 03 04 %s %s %s %s %s",
@@ -40,7 +40,7 @@ func (gsa *GraphicSetAssignment) GetLines() []string {
 		ids,
 		GetByte(len(gsa.CargoSpecificSets)),
 		csets,
-		GetShort(gsa.DefaultSet),
+		GetWord(gsa.DefaultSet),
 	)
 
 	return []string {result}
