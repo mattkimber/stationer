@@ -19,7 +19,7 @@ const (
 	COMPANY_COLOUR_SPRITE = 0x842D
 	TRANSPARENT_SPRITE = 0x322442D
 
-	MAX_LOAD_STATE = 5
+	MAX_LOAD_STATE = 6
 	LITTLE_SETS = 4
 	LOTS_SETS = 2
 )
@@ -84,8 +84,8 @@ func (s *Station) WriteToFile(file *File) {
 	file.AddElement(&StationSet{
 		SetID:         0,
 		NumLittleSets: LITTLE_SETS*3,
-		NumLotsSets:   LOTS_SETS,
-		SpriteSets:    []int{0,1,1,1,2,2,2,2,3,3,3,3,4,5},
+		NumLotsSets:   LOTS_SETS*2,
+		SpriteSets:    []int{0,1,1,1,2,2,2,2,3,3,3,3,4,4,5,5,5,6},
 	})
 
 	file.AddElement(&StationSet{
