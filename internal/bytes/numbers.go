@@ -1,4 +1,4 @@
-package nfo
+package bytes
 
 import "fmt"
 

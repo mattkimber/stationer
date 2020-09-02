@@ -1,6 +1,9 @@
 package nfo
 
-import "fmt"
+import (
+	"fmt"
+	bytes2 "github.com/mattkimber/stationer/internal/bytes"
+)
 
 const (
 	TextStringTypeStationName = 0xC5
@@ -18,9 +21,9 @@ func (ts *TextString) GetLines() []string {
 	bytes := 7 + len(ts.Text)
 	result := fmt.Sprintf("* %d 04 48 %s 01 %s %s \"%s\" 00",
 		bytes,
-		GetByte(ts.LanguageFile),
-		GetByte(ts.StationId),
-		GetByte(ts.TextStringType),
+		bytes2.GetByte(ts.LanguageFile),
+		bytes2.GetByte(ts.StationId),
+		bytes2.GetByte(ts.TextStringType),
 		ts.Text,
 		)
 	return []string { result }

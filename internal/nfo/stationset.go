@@ -1,6 +1,9 @@
 package nfo
 
-import "fmt"
+import (
+	"fmt"
+	bytes2 "github.com/mattkimber/stationer/internal/bytes"
+)
 
 type StationSet struct {
 	SetID int
@@ -14,13 +17,13 @@ func (s *StationSet) GetLines() []string {
 
 	result := fmt.Sprintf("* %d 02 04 %s %s %s",
 		bytes,
-		GetByte(s.SetID),
-		GetByte(s.NumLittleSets),
-		GetByte(s.NumLotsSets),
+		bytes2.GetByte(s.SetID),
+		bytes2.GetByte(s.NumLittleSets),
+		bytes2.GetByte(s.NumLotsSets),
 	)
 
 	for _, set := range s.SpriteSets {
-		result += fmt.Sprintf(" %s", GetWord(set))
+		result += fmt.Sprintf(" %s", bytes2.GetWord(set))
 	}
 
 	return []string { result }

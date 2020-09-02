@@ -1,6 +1,9 @@
 package nfo
 
-import "fmt"
+import (
+	"fmt"
+	bytes2 "github.com/mattkimber/stationer/internal/bytes"
+)
 
 type CargoTypeTable struct {
 
@@ -19,8 +22,8 @@ func (ct *CargoTypeTable) GetLines() []string {
 
 	result := fmt.Sprintf("* %d 00 08 %s %s 00 09 %s",
 		bytes,
-		GetByte(1), // Changing 1 property
-		GetByte(len(ct.Cargos)), // n cargo types
+		bytes2.GetByte(1),              // Changing 1 property
+		bytes2.GetByte(len(ct.Cargos)), // n cargo types
 		output)
 
 	return []string { result }

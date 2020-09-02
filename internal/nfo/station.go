@@ -1,6 +1,9 @@
 package nfo
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/mattkimber/stationer/internal/nfo/properties"
+)
 
 type Station struct {
 	ID int
@@ -8,6 +11,8 @@ type Station struct {
 	ClassID string
 	ClassName string
 	ObjectName string
+	PlatformConfiguration properties.PlatformLayout
+	UseCompanyColour bool
 }
 
 const (
@@ -21,7 +26,7 @@ const (
 
 	MAX_LOAD_STATE = 6
 	LITTLE_SETS = 4
-	LOTS_SETS = 2
+	LOTS_SETS = 3
 )
 
 func GetSprite(filename string, num int) Sprite {
@@ -42,6 +47,14 @@ func GetSprite(filename string, num int) Sprite {
 	}
 }
 
+func (s *Station) GetBaseSpriteNumber() int {
+	if s.UseCompanyColour {
+		return COMPANY_COLOUR_SPRITE
+	}
+
+	return CUSTOM_SPRITE
+}
+
 func (s *Station) WriteToFile(file *File) {
 
 	file.AddElement(&Spritesets{NumSets: MAX_LOAD_STATE + 1, NumSprites: 4})
@@ -58,34 +71,39 @@ func (s *Station) WriteToFile(file *File) {
 	}
 
 	def := &Definition{StationID: s.ID}
-	def.AddProperty(&ClassID{ID: s.ClassID})
-	def.AddProperty(&LittleLotsThreshold{Amount: 200})
+	def.AddProperty(&properties.ClassID{ID: s.ClassID})
+	def.AddProperty(&properties.LittleLotsThreshold{Amount: 200})
 
-
-	def.AddProperty(&SpriteLayout{
-		EastWest:   SpriteDirection{
+	def.AddProperty(&properties.SpriteLayout{
+		EastWest:   properties.SpriteDirection{
 			GroundSprite: 1012,
-			Sprites: []BoundingBox{
-				{YOffset: 16 - 5, X: 16, Y: 5, Z: 2, SpriteNumber: CUSTOM_SPRITE + 0},
-				{X: 16, Y: 5, Z: 3, SpriteNumber: CUSTOM_SPRITE + 1},
+			Sprites: []properties.BoundingBox{
+				{YOffset: 16 - 5, X: 16, Y: 5, Z: 2, SpriteNumber: s.GetBaseSpriteNumber() + 0},
+				{X: 16, Y: 5, Z: 3, SpriteNumber: s.GetBaseSpriteNumber() + 1},
 			},
 		},
-		NorthSouth: SpriteDirection{
+		NorthSouth: properties.SpriteDirection{
 			GroundSprite: 1011,
-			Sprites: []BoundingBox{
-				{XOffset: 16 - 5, X: 5, Y: 16, Z: 3, SpriteNumber: CUSTOM_SPRITE + 2},
-				{X: 5, Y: 16, Z: 3, SpriteNumber: CUSTOM_SPRITE + 3},
+			Sprites: []properties.BoundingBox{
+				{XOffset: 16 - 5, X: 5, Y: 16, Z: 3, SpriteNumber: s.GetBaseSpriteNumber() + 2},
+				{X: 5, Y: 16, Z: 3, SpriteNumber: s.GetBaseSpriteNumber() + 3},
 			},
 		},
 	})
+
+	defaultLayout := properties.PlatformLayout{}
+	if s.PlatformConfiguration != defaultLayout {
+		def.AddProperty(&properties.AllowedLengths{Bitmask: s.PlatformConfiguration.Lengths})
+		def.AddProperty(&properties.AllowedPlatforms{Bitmask: s.PlatformConfiguration.Platforms})
+	}
 
 	file.AddElement(def)
 
 	file.AddElement(&StationSet{
 		SetID:         0,
 		NumLittleSets: LITTLE_SETS*3,
-		NumLotsSets:   LOTS_SETS*2,
-		SpriteSets:    []int{0,1,1,1,2,2,2,2,3,3,3,3,4,4,5,5,5,6},
+		NumLotsSets:   LOTS_SETS*3,
+		SpriteSets:    []int{0,1,1,1,2,2,2,2,3,3,3,3,3,4,4,4,5,5,5,5,6},
 	})
 
 	file.AddElement(&StationSet{

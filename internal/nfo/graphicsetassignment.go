@@ -1,6 +1,9 @@
 package nfo
 
-import "fmt"
+import (
+	"fmt"
+	bytes2 "github.com/mattkimber/stationer/internal/bytes"
+)
 
 type GraphicSetAssignment struct {
 	IDs []int
@@ -21,7 +24,7 @@ func (gsa *GraphicSetAssignment) GetLines() []string {
 		if len(ids) > 0 {
 			ids += " "
 		}
-		ids += GetByte(id)
+		ids += bytes2.GetByte(id)
 	}
 
 	csets := ""
@@ -29,18 +32,18 @@ func (gsa *GraphicSetAssignment) GetLines() []string {
 		if len(csets) > 0 {
 			csets += " "
 		}
-		csets += GetByte(cset.CargoType)
+		csets += bytes2.GetByte(cset.CargoType)
 		csets += " "
-		csets += GetWord(cset.Set)
+		csets += bytes2.GetWord(cset.Set)
 	}
 
 	result := fmt.Sprintf("* %d 03 04 %s %s %s %s %s",
 		bytes,
-		GetByte(len(gsa.IDs)),
+		bytes2.GetByte(len(gsa.IDs)),
 		ids,
-		GetByte(len(gsa.CargoSpecificSets)),
+		bytes2.GetByte(len(gsa.CargoSpecificSets)),
 		csets,
-		GetWord(gsa.DefaultSet),
+		bytes2.GetWord(gsa.DefaultSet),
 	)
 
 	return []string {result}

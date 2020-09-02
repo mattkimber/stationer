@@ -2,6 +2,7 @@ package nfo
 
 import (
 	"fmt"
+	bytes2 "github.com/mattkimber/stationer/internal/bytes"
 	"log"
 )
 
@@ -34,18 +35,18 @@ func (h *Header) GetLines() []string {
 
 	bytes := ACTION_LENGTH + VERSION_LENGTH + GRFID_LENGTH + len(h.SetName) + NULL_LENGTH + len(h.Description) + NULL_LENGTH
 
-	action14 := fmt.Sprintf("* 0 14 \"C\" \"INFO\" \"B\" \"PALS\" 01 00 \"D\" \"B\" \"VRSN\" 04 00 %s \"B\" \"MINV\" 04 00 %s 00 00", GetDouble(h.Version), GetDouble(h.MinVersion))
+	action14 := fmt.Sprintf("* %d 14 \"C\" \"INFO\" \"B\" \"PALS\" 01 00 \"D\" \"B\" \"VRSN\" 04 00 %s \"B\" \"MINV\" 04 00 %s 00 00", 38, bytes2.GetDouble(h.Version), bytes2.GetDouble(h.MinVersion))
 
 	action8 := fmt.Sprintf("* %d %s %s \"%s\" %s \"%s\" %s \"%s\" %s",
 		bytes,
-		GetByte(HEADER_ACTION),
-		GetByte(NFO_VERSION),
+		bytes2.GetByte(HEADER_ACTION),
+		bytes2.GetByte(NFO_VERSION),
 		h.Initials,
-		GetByte(h.SetID),
+		bytes2.GetByte(h.SetID),
 		h.SetName,
-		GetByte(0),
+		bytes2.GetByte(0),
 		h.Description,
-		GetByte(0),
+		bytes2.GetByte(0),
 	)
 	return []string{ action14, action8 }
 }
