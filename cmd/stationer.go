@@ -81,6 +81,13 @@ func main() {
 				ObjectName:     "Platform with benches",
 			},
 			{
+				SpriteFilename: class.Filename + "_bare_shelter_traditional",
+				ClassID:        class.ClassID,
+				ClassName:      class.ClassName,
+				ObjectName:     "Shelter (traditional)",
+				UseCompanyColour: true,
+			},
+			{
 				SpriteFilename: class.Filename + "_ramp_ne",
 				ClassID:        class.ClassID,
 				ClassName:      class.ClassName,
