@@ -85,6 +85,7 @@ func main() {
 				ClassID:        class.ClassID,
 				ClassName:      class.ClassName,
 				ObjectName:     "Shelter (traditional)",
+				MaxLoadState: 5,
 				UseCompanyColour: true,
 			},
 			{
@@ -110,6 +111,7 @@ func main() {
 				SpriteFilename: class.Filename + "_ramp_ne",
 				ClassID:        class.ClassID,
 				ClassName:      class.ClassName,
+				MaxLoadState: 5,
 				ObjectName:     "Ramp (NE)",
 				PlatformConfiguration: rampConfiguration,
 			},
@@ -117,6 +119,7 @@ func main() {
 				SpriteFilename: class.Filename + "_ramp_sw",
 				ClassID:        class.ClassID,
 				ClassName:      class.ClassName,
+				MaxLoadState: 5,
 				ObjectName:     "Ramp (SW)",
 				PlatformConfiguration: rampConfiguration,
 			},

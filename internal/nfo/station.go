@@ -140,7 +140,7 @@ func (s *Station) WriteToFile(file *File) {
 		})
 
 		for _, obj := range s.AdditionalObjects {
-			filename := fmt.Sprintf("%s_8bpp.png", obj.SpriteFilename)
+			filename := fmt.Sprintf("%s_%d_8bpp.png", obj.SpriteFilename, i)
 			file.AddElement(&Sprites{
 				GetSprite(filename, 0, obj.InvertDirection != true),
 				GetSprite(filename, 1, obj.InvertDirection != false),
