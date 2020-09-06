@@ -1,6 +1,6 @@
 # TODO list
 
-[ ] Standard templates for "objects over track" (footbridge, roof)
+[x] Standard templates for "objects over track" (footbridge, roof)
 
 [x] Cargo amount sprites
 

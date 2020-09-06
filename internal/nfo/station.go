@@ -13,26 +13,33 @@ type Station struct {
 	ObjectName string
 	PlatformConfiguration properties.PlatformLayout
 	UseCompanyColour bool
+	MaxLoadState int
+	AdditionalObjects []AdditionalObject
+	PlatformHeight int
 }
 
 const (
 	SPRITE_WIDTH_WITH_PADDING = 72
 	SPRITE_WIDTH = 64
 	SPRITE_HEIGHT = 55
+	DEFAULT_PLATFORM_HEIGHT = 3
 
 	CUSTOM_SPRITE = 0x42D
 	COMPANY_COLOUR_SPRITE = 0x842D
 	TRANSPARENT_SPRITE = 0x322442D
 
-	MAX_LOAD_STATE = 6
+	DEFAULT_MAX_LOAD_STATE = 6
 	LITTLE_SETS = 4
 	LOTS_SETS = 3
+
+	EAST_WEST = 0
+	NORTH_SOUTH = 1
 )
 
-func GetSprite(filename string, num int) Sprite {
+func GetSprite(filename string, num int, swap bool) Sprite {
 	xrel := -(SPRITE_WIDTH/2)-10
 
-	if num >= 2 {
+	if swap {
 		xrel = 11-(SPRITE_WIDTH/2)
 	}
 
@@ -55,20 +62,92 @@ func (s *Station) GetBaseSpriteNumber() int {
 	return CUSTOM_SPRITE
 }
 
+func GetSpriteSets(max int) []int {
+	switch max {
+	case 5:
+		return []int{0,1,1,1,2,2,2,2,3,3,3,3,3,4,4,4,5,5,5,5,5}
+	case 6:
+		return []int{0,1,1,1,2,2,2,2,3,3,3,3,3,4,4,4,5,5,5,5,6}
+	}
+
+	return []int{0}
+}
+
+func (s *Station) GetObjects(direction int) []properties.BoundingBox {
+	yOffset := 16 - 5
+	xOffset := 0
+	x, y := 16, 5
+	base := 0
+
+	if direction == NORTH_SOUTH {
+		xOffset = 16 - 5
+		yOffset = 0
+		x = 5
+		y = 16
+		base = 2
+	}
+
+	result := []properties.BoundingBox{
+		{YOffset: yOffset, XOffset: xOffset, X: x, Y: y, Z: s.PlatformHeight, SpriteNumber: s.GetBaseSpriteNumber() + base + 0},
+		{X: x, Y: y, Z: s.PlatformHeight, SpriteNumber: s.GetBaseSpriteNumber() + base + 1},
+	}
+
+	for idx, obj := range s.AdditionalObjects {
+		x, y := obj.SizeX, obj.SizeY
+		xOffset, yOffset := obj.X, obj.Y
+
+		if direction == NORTH_SOUTH {
+			x, y = obj.SizeY, obj.SizeX
+			xOffset, yOffset = obj.Y, obj.X
+
+		}
+
+		result = append(result, properties.BoundingBox{
+			XOffset:      xOffset,
+			YOffset:      yOffset,
+			ZOffset:      obj.Z,
+			X:            x,
+			Y:            y,
+			Z:            obj.SizeZ,
+			SpriteNumber: s.GetBaseSpriteNumber() + 4 + (idx*2) + direction,
+		})
+	}
+
+	return result
+}
+
 func (s *Station) WriteToFile(file *File) {
 
-	file.AddElement(&Spritesets{NumSets: MAX_LOAD_STATE + 1, NumSprites: 4})
+	if s.MaxLoadState == 0 {
+		s.MaxLoadState = DEFAULT_MAX_LOAD_STATE
+	}
 
-	for i := 0; i <= MAX_LOAD_STATE; i++ {
+	if s.PlatformHeight == 0 {
+		s.PlatformHeight = DEFAULT_PLATFORM_HEIGHT
+	}
+
+
+	file.AddElement(&Spritesets{NumSets: s.MaxLoadState + 1, NumSprites: 4 + (len(s.AdditionalObjects) * 2)})
+
+	for i := 0; i <= s.MaxLoadState; i++ {
 		filename := fmt.Sprintf("%s_%d_8bpp.png", s.SpriteFilename, i)
 
 		file.AddElement(&Sprites{
-			GetSprite(filename, 0),
-			GetSprite(filename, 1),
-			GetSprite(filename, 2),
-			GetSprite(filename, 3),
+			GetSprite(filename, 0, false),
+			GetSprite(filename, 1, false),
+			GetSprite(filename, 2, true),
+			GetSprite(filename, 3, true),
 		})
+
+		for _, obj := range s.AdditionalObjects {
+			filename := fmt.Sprintf("%s_8bpp.png", obj.SpriteFilename)
+			file.AddElement(&Sprites{
+				GetSprite(filename, 0, obj.InvertDirection != true),
+				GetSprite(filename, 1, obj.InvertDirection != false),
+			})
+		}
 	}
+
 
 	def := &Definition{StationID: s.ID}
 	def.AddProperty(&properties.ClassID{ID: s.ClassID})
@@ -77,17 +156,11 @@ func (s *Station) WriteToFile(file *File) {
 	def.AddProperty(&properties.SpriteLayout{
 		EastWest:   properties.SpriteDirection{
 			GroundSprite: 1012,
-			Sprites: []properties.BoundingBox{
-				{YOffset: 16 - 5, X: 16, Y: 5, Z: 2, SpriteNumber: s.GetBaseSpriteNumber() + 0},
-				{X: 16, Y: 5, Z: 3, SpriteNumber: s.GetBaseSpriteNumber() + 1},
-			},
+			Sprites: s.GetObjects(EAST_WEST),
 		},
 		NorthSouth: properties.SpriteDirection{
 			GroundSprite: 1011,
-			Sprites: []properties.BoundingBox{
-				{XOffset: 16 - 5, X: 5, Y: 16, Z: 3, SpriteNumber: s.GetBaseSpriteNumber() + 2},
-				{X: 5, Y: 16, Z: 3, SpriteNumber: s.GetBaseSpriteNumber() + 3},
-			},
+			Sprites: s.GetObjects(NORTH_SOUTH),
 		},
 	})
 
@@ -103,7 +176,7 @@ func (s *Station) WriteToFile(file *File) {
 		SetID:         0,
 		NumLittleSets: LITTLE_SETS*3,
 		NumLotsSets:   LOTS_SETS*3,
-		SpriteSets:    []int{0,1,1,1,2,2,2,2,3,3,3,3,3,4,4,4,5,5,5,5,6},
+		SpriteSets:    GetSpriteSets(s.MaxLoadState),
 	})
 
 	file.AddElement(&StationSet{
@@ -112,6 +185,7 @@ func (s *Station) WriteToFile(file *File) {
 		NumLotsSets:   1,
 		SpriteSets:    []int{0},
 	})
+
 
 	file.AddElement(&GraphicSetAssignment{
 		IDs:               []int {s.ID},
