@@ -7,14 +7,14 @@ import (
 
 const (
 	TextStringTypeStationName = 0xC5
-	TextStringTypeClassName = 0xC4
+	TextStringTypeClassName   = 0xC4
 )
 
 type TextString struct {
-	LanguageFile int
-	StationId int
+	LanguageFile   int
+	StationId      int
 	TextStringType int
-	Text string
+	Text           string
 }
 
 func (ts *TextString) GetLines() []string {
@@ -25,6 +25,6 @@ func (ts *TextString) GetLines() []string {
 		bytes2.GetByte(ts.StationId),
 		bytes2.GetByte(ts.TextStringType),
 		ts.Text,
-		)
-	return []string { result }
+	)
+	return []string{result}
 }

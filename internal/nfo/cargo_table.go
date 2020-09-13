@@ -6,10 +6,8 @@ import (
 )
 
 type CargoTypeTable struct {
-
 	Cargos []string
 }
-
 
 func (ct *CargoTypeTable) GetLines() []string {
 	bytes := 6
@@ -26,5 +24,5 @@ func (ct *CargoTypeTable) GetLines() []string {
 		bytes2.GetByte(len(ct.Cargos)), // n cargo types
 		output)
 
-	return []string { result }
+	return []string{result}
 }

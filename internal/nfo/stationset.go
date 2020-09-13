@@ -6,10 +6,10 @@ import (
 )
 
 type StationSet struct {
-	SetID int
+	SetID         int
 	NumLittleSets int
-	NumLotsSets int
-	SpriteSets []int
+	NumLotsSets   int
+	SpriteSets    []int
 }
 
 func (s *StationSet) GetLines() []string {
@@ -26,5 +26,5 @@ func (s *StationSet) GetLines() []string {
 		result += fmt.Sprintf(" %s", bytes2.GetWord(set))
 	}
 
-	return []string { result }
+	return []string{result}
 }

@@ -7,21 +7,21 @@ import (
 )
 
 const (
-	HEADER_ACTION = 8
-	NFO_VERSION = 8
-	ACTION_LENGTH = 1
+	HEADER_ACTION  = 8
+	NFO_VERSION    = 8
+	ACTION_LENGTH  = 1
 	VERSION_LENGTH = 1
-	GRFID_LENGTH = 4
-	NULL_LENGTH = 1
+	GRFID_LENGTH   = 4
+	NULL_LENGTH    = 1
 )
 
 type Header struct {
-	Initials string
-	SetID int
-	SetName string
+	Initials    string
+	SetID       int
+	SetName     string
 	Description string
-	Version int
-	MinVersion int
+	Version     int
+	MinVersion  int
 }
 
 func (h *Header) GetLines() []string {
@@ -48,5 +48,5 @@ func (h *Header) GetLines() []string {
 		h.Description,
 		bytes2.GetByte(0),
 	)
-	return []string{ action14, action8 }
+	return []string{action14, action8}
 }

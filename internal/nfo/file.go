@@ -29,6 +29,6 @@ func (f *File) Output() {
 	fmt.Printf("0 * 4 %s\n", bytes.GetDouble(len(lines)))
 
 	for idx, l := range lines {
-		fmt.Printf("%d %s\n", idx + 1, l)
+		fmt.Printf("%d %s\n", idx+1, l)
 	}
 }

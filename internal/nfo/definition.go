@@ -7,7 +7,7 @@ import (
 )
 
 type Definition struct {
-	StationID int
+	StationID  int
 	properties []properties2.Property
 }
 
@@ -36,5 +36,5 @@ func (d *Definition) GetLines() []string {
 		bytes2.GetByte(d.StationID),
 		output)
 
-	return []string { result }
+	return []string{result}
 }

@@ -8,9 +8,9 @@ type ClassID struct {
 }
 
 func (c *ClassID) GetBytes() int {
-return 1 + len(c.ID)
+	return 1 + len(c.ID)
 }
 
 func (c *ClassID) GetString() string {
-return fmt.Sprintf("08 \"%s\" ", c.ID)
+	return fmt.Sprintf("08 \"%s\" ", c.ID)
 }

@@ -11,8 +11,8 @@ func init() {
 }
 
 type StationClass struct {
-	Filename string
-	ClassID string
+	Filename  string
+	ClassID   string
 	ClassName string
 }
 
@@ -23,18 +23,16 @@ func main() {
 		SetID:       8,
 		SetName:     "Timberwolf's Stations",
 		Description: "A set of British-style railway stations",
-		Version: 1,
-		MinVersion: 1,
+		Version:     1,
+		MinVersion:  1,
 	})
 
 	file.AddElement(&nfo.CargoTypeTable{Cargos: []string{"PASS", "MAIL"}})
 
 	classes := []StationClass{
-		{ Filename: "concrete", ClassID: "TWF0", ClassName: "Concrete Platforms" },
-		{ Filename: "modern", ClassID: "TWF1", ClassName: "Modern Platforms" },
+		{Filename: "concrete", ClassID: "TWF0", ClassName: "Concrete Platforms"},
+		{Filename: "modern", ClassID: "TWF1", ClassName: "Modern Platforms"},
 	}
-
-	stations := make([]nfo.Station, 0)
 
 	rampConfiguration := properties.PlatformLayout{
 		Platforms: properties.PlatformBitmask{
@@ -47,7 +45,7 @@ func main() {
 			Enable7:    true,
 			EnableMore: true,
 		},
-		Lengths:   properties.PlatformBitmask{
+		Lengths: properties.PlatformBitmask{
 			Enable1:    true,
 			Enable2:    false,
 			Enable3:    false,
@@ -59,43 +57,52 @@ func main() {
 		},
 	}
 
+	stations := make([]nfo.Station, 0)
+
 	for _, class := range classes {
 		thisClass := []nfo.Station{
 			{
-				SpriteFilename: class.Filename + "_empty",
-				ClassID:        class.ClassID,
-				ClassName:      class.ClassName,
-				ObjectName:     "Platform",
-			},
-			{
-				SpriteFilename: class.Filename + "_sign",
-				ClassID:        class.ClassID,
-				ClassName:      class.ClassName,
-				ObjectName:     "Platform with sign",
+				SpriteFilename:   class.Filename + "_empty",
+				ClassID:          class.ClassID,
+				ClassName:        class.ClassName,
+				ObjectName:       "Platform",
 				UseCompanyColour: true,
+				HasFences:        true,
 			},
 			{
-				SpriteFilename: class.Filename + "_benches",
-				ClassID:        class.ClassID,
-				ClassName:      class.ClassName,
-				ObjectName:     "Platform with benches",
-			},
-			{
-				SpriteFilename: class.Filename + "_bare_shelter_traditional",
-				ClassID:        class.ClassID,
-				ClassName:      class.ClassName,
-				ObjectName:     "Shelter (traditional)",
-				MaxLoadState: 5,
+				SpriteFilename:   class.Filename + "_sign",
+				ClassID:          class.ClassID,
+				ClassName:        class.ClassName,
+				ObjectName:       "Platform with sign",
 				UseCompanyColour: true,
+				HasFences:        true,
 			},
 			{
-				SpriteFilename: class.Filename + "_bare_footbridge",
-				ClassID:        class.ClassID,
-				ClassName:      class.ClassName,
-				ObjectName:     "Footbridge",
+				SpriteFilename:   class.Filename + "_benches",
+				ClassID:          class.ClassID,
+				ClassName:        class.ClassName,
+				ObjectName:       "Platform with benches",
 				UseCompanyColour: true,
-				MaxLoadState: 5,
-				PlatformHeight: 16,
+				HasFences:        true,
+			},
+			{
+				SpriteFilename:   class.Filename + "_bare_shelter_traditional",
+				ClassID:          class.ClassID,
+				ClassName:        class.ClassName,
+				ObjectName:       "Shelter (traditional)",
+				MaxLoadState:     5,
+				UseCompanyColour: true,
+				HasFences:        true,
+			},
+			{
+				SpriteFilename:        class.Filename + "_bare_footbridge",
+				ClassID:               class.ClassID,
+				ClassName:             class.ClassName,
+				ObjectName:            "Footbridge",
+				UseCompanyColour:      true,
+				HasFences:             true,
+				MaxLoadState:          5,
+				PlatformHeight:        16,
 				PlatformConfiguration: rampConfiguration,
 				AdditionalObjects: []nfo.AdditionalObject{{
 					X:              5,
@@ -108,26 +115,30 @@ func main() {
 				}},
 			},
 			{
-				SpriteFilename: class.Filename + "_ramp_ne",
-				ClassID:        class.ClassID,
-				ClassName:      class.ClassName,
-				MaxLoadState: 5,
-				ObjectName:     "Ramp (NE)",
+				SpriteFilename:        class.Filename + "_ramp_ne",
+				ClassID:               class.ClassID,
+				ClassName:             class.ClassName,
+				MaxLoadState:          5,
+				ObjectName:            "Ramp (NE)",
 				PlatformConfiguration: rampConfiguration,
+				UseCompanyColour:      true,
+				HasFences:             true,
 			},
 			{
-				SpriteFilename: class.Filename + "_ramp_sw",
-				ClassID:        class.ClassID,
-				ClassName:      class.ClassName,
-				MaxLoadState: 5,
-				ObjectName:     "Ramp (SW)",
+				SpriteFilename:        class.Filename + "_ramp_sw",
+				ClassID:               class.ClassID,
+				ClassName:             class.ClassName,
+				MaxLoadState:          5,
+				ObjectName:            "Ramp (SW)",
 				PlatformConfiguration: rampConfiguration,
+				UseCompanyColour:      true,
+				HasFences:             true,
 			},
 		}
 
 		stations = append(stations, thisClass...)
-	}
 
+	}
 
 	for idx, station := range stations {
 		station.ID = idx

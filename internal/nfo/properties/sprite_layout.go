@@ -7,17 +7,17 @@ import (
 )
 
 type BoundingBox struct {
-	XOffset int
-	YOffset int
-	ZOffset int
-	X int
-	Y int
-	Z int
+	XOffset      int
+	YOffset      int
+	ZOffset      int
+	X            int
+	Y            int
+	Z            int
 	SpriteNumber int
 }
 
 func (bb *BoundingBox) GetString() string {
-	return fmt.Sprintf("%s %s %s %s %s %s %s ",
+	return fmt.Sprintf("\n      %s %s %s %s %s %s %s ",
 		bytes.GetByte(bb.XOffset),
 		bytes.GetByte(bb.YOffset),
 		bytes.GetByte(bb.ZOffset),
@@ -28,23 +28,46 @@ func (bb *BoundingBox) GetString() string {
 	)
 }
 
-
 type SpriteDirection struct {
 	GroundSprite int
-	Sprites []BoundingBox
+	Sprites      []BoundingBox
 }
 
-type SpriteLayout struct {
+type LayoutEntry struct {
 	EastWest   SpriteDirection
 	NorthSouth SpriteDirection
 }
 
+type SpriteLayout struct {
+	Entries []LayoutEntry
+}
+
 func (sl *SpriteLayout) GetBytes() int {
-	boundingBoxes := len(sl.EastWest.Sprites) + len(sl.NorthSouth.Sprites)
+	bytes := 2 // Bytes for the action 9 and num-entries
+	for _, entry := range sl.Entries {
+		bytes += entry.GetBytes()
+	}
+	return bytes
+}
+
+func (sl *SpriteLayout) GetString() string {
+	sb := strings.Builder{}
+
+	sb.WriteString(fmt.Sprintf("09 %s ", bytes.GetByte(len(sl.Entries)*2)))
+
+	for _, entry := range sl.Entries {
+		sb.WriteString(entry.GetString())
+	}
+
+	return sb.String()
+}
+
+func (le *LayoutEntry) GetBytes() int {
+	boundingBoxes := len(le.EastWest.Sprites) + len(le.NorthSouth.Sprites)
 
 	return (BOUNDING_BOX_BYTES * boundingBoxes) +
 		(TILE_DIRECTION_END_BYTES * 2) +
-		(GROUNDSPRITE_BYTES * 2) + 2
+		(GROUNDSPRITE_BYTES * 2)
 }
 
 func (sd *SpriteDirection) GetString() string {
@@ -53,15 +76,15 @@ func (sd *SpriteDirection) GetString() string {
 		sb.WriteString(bb.GetString())
 	}
 
-	return fmt.Sprintf("%s %s80 ",
+	return fmt.Sprintf("\n      %s %s\n      80 ",
 		bytes.GetDouble(sd.GroundSprite),
 		sb.String(),
 	)
 }
 
-func (sl *SpriteLayout) GetString() string {
-	return fmt.Sprintf("09 02 %s%s",
-		sl.EastWest.GetString(),
-		sl.NorthSouth.GetString(),
+func (le *LayoutEntry) GetString() string {
+	return fmt.Sprintf("%s%s",
+		le.EastWest.GetString(),
+		le.NorthSouth.GetString(),
 	)
 }

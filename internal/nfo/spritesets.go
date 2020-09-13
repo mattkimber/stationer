@@ -7,8 +7,8 @@ import (
 
 type Spritesets struct {
 	NumSprites int
-	NumSets int
-	ID int
+	NumSets    int
+	ID         int
 }
 
 func (s *Spritesets) GetLines() []string {

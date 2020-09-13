@@ -6,14 +6,14 @@ import (
 )
 
 type GraphicSetAssignment struct {
-	IDs []int
+	IDs               []int
 	CargoSpecificSets []CargoToSet
-	DefaultSet int
+	DefaultSet        int
 }
 
 type CargoToSet struct {
 	CargoType int
-	Set int
+	Set       int
 }
 
 func (gsa *GraphicSetAssignment) GetLines() []string {
@@ -46,5 +46,5 @@ func (gsa *GraphicSetAssignment) GetLines() []string {
 		bytes2.GetWord(gsa.DefaultSet),
 	)
 
-	return []string {result}
+	return []string{result}
 }
