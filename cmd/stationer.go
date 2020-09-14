@@ -140,10 +140,24 @@ func main() {
 
 	}
 
-	for idx, station := range stations {
-		station.ID = idx
+	objectID := 0
+
+	for _, station := range stations {
+		station.ID = objectID
 		station.WriteToFile(&file)
+		objectID = objectID + 1
 	}
+
+	building := nfo.Building{
+			SpriteFilename:  "suburban_flat_roof",
+			ID: objectID,
+			ClassID:         "TWFB",
+			ClassName:        "Non-track tiles",
+			ObjectName:       "Suburban Flat Roof Station",
+			UseCompanyColour: true,
+		}
+
+	building.WriteToFile(&file)
 
 	file.Output()
 }
