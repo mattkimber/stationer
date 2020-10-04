@@ -148,16 +148,28 @@ func main() {
 		objectID = objectID + 1
 	}
 
-	building := nfo.Building{
-			SpriteFilename:  "suburban_flat_roof",
-			ID: objectID,
-			ClassID:         "TWFB",
+	buildings := []nfo.Building{
+		{
+			SpriteFilename:   "suburban_flat_roof",
+			ClassID:          "TWFB",
 			ClassName:        "Non-track tiles",
 			ObjectName:       "Suburban Flat Roof Station",
 			UseCompanyColour: true,
-		}
+		},
+		{
+			SpriteFilename:   "rural",
+			ClassID:          "TWFB",
+			ClassName:        "Non-track tiles",
+			ObjectName:       "Rural Station",
+			UseCompanyColour: true,
+		},
+	}
 
-	building.WriteToFile(&file)
+	for _, building := range buildings {
+		building.ID = objectID
+		building.WriteToFile(&file)
+		objectID = objectID + 1
+	}
 
 	file.Output()
 }
