@@ -2,6 +2,7 @@ package nfo
 
 import (
 	"fmt"
+	"github.com/mattkimber/stationer/internal/nfo/callbacks"
 	"github.com/mattkimber/stationer/internal/nfo/properties"
 )
 
@@ -14,6 +15,7 @@ type Building struct {
 	Width int
 	Height int
 	UseCompanyColour      bool
+	HasCustomFoundations  bool
 }
 
 const (
@@ -75,6 +77,19 @@ func (s *Building) WriteToFile(file *File) {
 		GetBuildingSprite(filename, 1, false),
 	})
 
+	// Foundation sprites
+	if s.HasCustomFoundations {
+		file.AddElement(&Spritesets{ID: 1, NumSets: 1, NumSprites: 2})
+
+		filename := fmt.Sprintf("%s_foundation_8bpp.png", s.SpriteFilename)
+
+		// Non-fence sprites
+		file.AddElement(&Sprites{
+			GetBuildingSprite(filename, 0, false),
+			GetBuildingSprite(filename, 1, false),
+		})
+	}
+
 	def := &Definition{StationID: s.ID}
 	def.AddProperty(&properties.ClassID{ID: s.ClassID})
 
@@ -107,6 +122,9 @@ func (s *Building) WriteToFile(file *File) {
 	// Prevent train entering
 	def.AddProperty(&properties.PreventTrainEntryFlag{})
 
+	// Add flags
+	def.AddProperty(&properties.GeneralFlag{HasCustomFoundations: s.HasCustomFoundations})
+
 	file.AddElement(def)
 
 	file.AddElement(&StationSet{
@@ -116,10 +134,26 @@ func (s *Building) WriteToFile(file *File) {
 		SpriteSets:    []int{0},
 	})
 
+	spriteset := 0
+	if s.HasCustomFoundations {
+		file.AddElement(&StationSet{
+			SetID:         1,
+			NumLittleSets: 0,
+			NumLotsSets:   1,
+			SpriteSets:    []int{1},
+		})
+
+		file.AddElement(&callbacks.FoundationCallback{
+			SetID:            2,
+		})
+
+		spriteset = 2
+	}
+
 
 	file.AddElement(&GraphicSetAssignment{
 		IDs: []int{s.ID},
-		DefaultSet: 0,
+		DefaultSet: spriteset,
 	})
 
 	file.AddElement(&TextString{

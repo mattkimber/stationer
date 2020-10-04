@@ -163,6 +163,14 @@ func main() {
 			ObjectName:       "Rural Station",
 			UseCompanyColour: true,
 		},
+		{
+			SpriteFilename:   "suburban_sloped",
+			ClassID:          "TWFB",
+			ClassName:        "Non-track tiles",
+			ObjectName:       "Suburban Station (Sloped)",
+			UseCompanyColour: true,
+			HasCustomFoundations: true,
+		},
 	}
 
 	for _, building := range buildings {
