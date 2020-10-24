@@ -119,6 +119,10 @@ func (s *Building) WriteToFile(file *File) {
 	def.AddProperty(&properties.AllowedLengths{Bitmask: properties.PlatformBitmask{Enable1: true}})
 	def.AddProperty(&properties.AllowedPlatforms{Bitmask: properties.PlatformBitmask{Enable1: true}})
 
+	// No pylons or wires
+	def.AddProperty(&properties.PylonPlacement{Bitmask: 0})
+	def.AddProperty(&properties.WirePlacement{Bitmask: 255})
+
 	// Prevent train entering
 	def.AddProperty(&properties.PreventTrainEntryFlag{})
 

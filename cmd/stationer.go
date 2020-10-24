@@ -164,12 +164,25 @@ func main() {
 			UseCompanyColour: true,
 		},
 		{
-			SpriteFilename:   "suburban_sloped",
+			SpriteFilename:   "art_deco",
 			ClassID:          "TWFB",
 			ClassName:        "Non-track tiles",
-			ObjectName:       "Suburban Station (Sloped)",
+			ObjectName:       "Art Deco Station",
 			UseCompanyColour: true,
-			HasCustomFoundations: true,
+		},
+		{
+			SpriteFilename:   "art_deco_2",
+			ClassID:          "TWFB",
+			ClassName:        "Non-track tiles",
+			ObjectName:       "Art Deco Station (B)",
+			UseCompanyColour: true,
+		},
+		{
+			SpriteFilename:   "small_city",
+			ClassID:          "TWFB",
+			ClassName:        "Non-track tiles",
+			ObjectName:       "City Station",
+			UseCompanyColour: true,
 		},
 	}
 
