@@ -64,11 +64,11 @@ func (mtb *BufferStopCallback) getCallback() string {
 	callback += "    0A 00 00 00\n"
 
 	// 1 = track continues to S only
-	callback += "    00 80 01 01\n"
+	callback += "    1E 00 01 01\n"
 
 	// 2 = track continues to N only
 	// 0E = 14 (as we have 7 fence sprite combinations, including no fence, for 2 directions, for 1 type of buffer stop)
-	callback += "    0E 80 02 02\n"
+	callback += "    14 00 02 02\n"
 
 	// 3 = track continues to N and S
 	// 1C = 28 (as we have 7 fence sprite combinations, including no fence, for 2 directions, for 2 types of buffer stop)
@@ -100,10 +100,36 @@ func (mtb *BufferStopCallback) getDecider() string {
 func (mtb *BufferStopCallback) GetLines() []string {
 	return []string{
 		// Callbacks for "both"
-		// 1C = no fences, 1E = fence to N, 20 = fence to S, 22 = fence to N/S
-		mtb.getFenceCallback("10", "22 80", "1E 80", 11), // N: true, S: check
-		mtb.getFenceCallback("10", "20 80", "1C 80", 12), // N: false, S: check
+		// 20 = no fences, 22 = fence to N, 24 = fence to S, 26 = fence to N/S
+		mtb.getFenceCallback("10", "26 80", "22 80", 11), // N: true, S: check
+		mtb.getFenceCallback("10", "24 80", "20 80", 12), // N: false, S: check
 		mtb.getFenceCallback("F0", bytes.GetWord(11), bytes.GetWord(12), 10), // N: check, S: unknown
+
+		// Callbacks for "N"
+		// 10 = no fences, 12 = fence to N, 14 = fence to S, 16 = n/s, 18 = fence to rear, 1A = rear/n, 1C = rear/s, 1E = rear/n/s
+		mtb.getFenceCallback("10", "1E 80", "1A 80", 21), // R: true, N: true, S: check
+		mtb.getFenceCallback("10", "1C 80", "18 80", 22), // R: true, N: false, S: check
+		mtb.getFenceCallback("F0", bytes.GetWord(21), bytes.GetWord(22), 23), // R: true, N: check, S: unknown
+
+		mtb.getFenceCallback("10", "16 80", "12 80", 24), // R: false, N: true, S: check
+		mtb.getFenceCallback("10", "14 80", "10 80", 25), // R: false, N: false, S: check
+		mtb.getFenceCallback("F0", bytes.GetWord(24), bytes.GetWord(25), 26), // R: false, N: check, S: unknown
+
+		mtb.getFenceCallback("01", bytes.GetWord(23), bytes.GetWord(26), 20), // R: check, N: unknown, S: unknown
+
+		// Callbacks for "S"
+		// 00 = no fences, 02 = fence to N, 04 = fence to S, 06 = n/s, 08 = fence to rear, 0A = rear/n, 0C = rear/s, 0E = rear/n/s
+		mtb.getFenceCallback("10", "0E 80", "0A 80", 31), // R: true, N: true, S: check
+		mtb.getFenceCallback("10", "0C 80", "08 80", 32), // R: true, N: false, S: check
+		mtb.getFenceCallback("F0", bytes.GetWord(31), bytes.GetWord(32), 33), // R: true, N: check, S: unknown
+
+		mtb.getFenceCallback("10", "06 80", "02 80", 34), // R: false, N: true, S: check
+		mtb.getFenceCallback("10", "04 80", "00 80", 35), // R: false, N: false, S: check
+		mtb.getFenceCallback("F0", bytes.GetWord(34), bytes.GetWord(35), 36), // R: false, N: check, S: unknown
+
+		mtb.getFenceCallback("0F", bytes.GetWord(33), bytes.GetWord(36), 30), // R: check, N: unknown, S: unknown
+
+
 		mtb.getCallback(),
 		mtb.getDecider(),
 	}

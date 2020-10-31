@@ -75,7 +75,7 @@ func (s *BufferStop) WriteToFile(file *File) {
 	layoutEntries := make([]properties.LayoutEntry, 0)
 
 	// Add the layouts
-	for i := 0; i < (3 + 3 + (6*2)); i++ {
+	for i := 0; i < (3 + 3 + (7*2)); i++ {
 		entry := s.getLayoutEntry(i)
 		layoutEntries = append(layoutEntries, entry)
 	}
@@ -131,9 +131,9 @@ func (s *BufferStop) WriteToFile(file *File) {
 }
 
 func (s *BufferStop) addSprites(file *File) {
-	// 3 sprites: N, S and both - 3 for Both fences - 6 each for N/S fence combinations
+	// 3 sprites: N, S and both - 3 for Both fences - 7 each for N/S fence combinations
 	// 2 directions so all are doubled
-	numSprites := 2 * (3 + 3 + (6*2))
+	numSprites := 2 * (3 + 3 + (7*2))
 	file.AddElement(&Spritesets{ID: 0, NumSets: 1, NumSprites: numSprites})
 
 	elements := []string { "s", "n", "both" }
@@ -151,9 +151,9 @@ func (s *BufferStop) addSprites(file *File) {
 		fenceElements := []string {"a", "b", "ab"}
 
 		if element == "s" {
-			fenceElements = []string {"a", "b", "d", "ad", "bd", "abd" }
+			fenceElements = []string {"a", "b", "ab", "d", "ad", "bd", "abd" }
 		} else if element == "n" {
-			fenceElements = []string {"a", "b", "c", "ac", "bc", "abc" }
+			fenceElements = []string {"a", "b", "ab", "c", "ac", "bc", "abc" }
 		}
 
 		for _, fenceElement := range fenceElements {
