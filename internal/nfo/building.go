@@ -180,7 +180,9 @@ func (s *Building) getLayoutEntry(idx int) properties.LayoutEntry {
 	entry := properties.LayoutEntry{
 		EastWest: properties.SpriteDirection{
 			GroundSprite: 3981,
-			Sprites:      s.GetObjects(EAST_WEST, idx),
+			// East-West sprites are assembled in the "wrong" order so that
+			// multi tile stations are the correct way round when displayed
+			Sprites:      s.GetObjects(EAST_WEST, s.Width - (idx+1)),
 		},
 		NorthSouth: properties.SpriteDirection{
 			GroundSprite: 3981,
