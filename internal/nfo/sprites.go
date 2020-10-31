@@ -20,6 +20,10 @@ type Sprite struct {
 	YRel     int
 }
 
+func (s *Sprites) GetComment() string {
+	return "Sprites"
+}
+
 func (s *Sprites) GetLines() []string {
 	result := make([]string, len(*s))
 

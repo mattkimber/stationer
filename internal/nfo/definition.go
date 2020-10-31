@@ -11,6 +11,10 @@ type Definition struct {
 	properties []properties2.Property
 }
 
+func (d *Definition) GetComment() string {
+	return "Station definition"
+}
+
 func (d *Definition) AddProperty(property properties2.Property) {
 	if d.properties == nil {
 		d.properties = make([]properties2.Property, 0)

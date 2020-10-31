@@ -51,44 +51,25 @@ func (s *Building) GetBaseSpriteNumber() int {
 	return CUSTOM_SPRITE
 }
 
-func (s *Building) GetObjects(direction int) []properties.BoundingBox {
+func (s *Building) GetObjects(direction int, idx int) []properties.BoundingBox {
 	x, y := 16, 16
 	result := make([]properties.BoundingBox, 0)
 	base := 0
 	if direction == NORTH_SOUTH {
 		base = 1
 	}
-	result = append(result, properties.BoundingBox{X: x, Y: y, Z: 16, SpriteNumber: s.GetBaseSpriteNumber() + base})
+	result = append(result, properties.BoundingBox{X: x, Y: y, Z: 16, SpriteNumber: s.GetBaseSpriteNumber() + base + (idx * 2)})
 
 	return result
 }
 
 func (s *Building) WriteToFile(file *File) {
-
-	platformSprites := 2
-
-	file.AddElement(&Spritesets{ID: 0, NumSets: 1, NumSprites: platformSprites})
-
-	filename := fmt.Sprintf("%s_8bpp.png", s.SpriteFilename)
-
-	// Non-fence sprites
-	file.AddElement(&Sprites{
-		GetBuildingSprite(filename, 0, false),
-		GetBuildingSprite(filename, 1, false),
-	})
-
-	// Foundation sprites
-	if s.HasCustomFoundations {
-		file.AddElement(&Spritesets{ID: 1, NumSets: 1, NumSprites: 2})
-
-		filename := fmt.Sprintf("%s_foundation_8bpp.png", s.SpriteFilename)
-
-		// Non-fence sprites
-		file.AddElement(&Sprites{
-			GetBuildingSprite(filename, 0, false),
-			GetBuildingSprite(filename, 1, false),
-		})
+	// Set default width
+	if s.Width == 0 {
+		s.Width = 1
 	}
+
+	s.addSprites(file)
 
 	def := &Definition{StationID: s.ID}
 	def.AddProperty(&properties.ClassID{ID: s.ClassID})
@@ -98,25 +79,21 @@ func (s *Building) WriteToFile(file *File) {
 
 	layoutEntries := make([]properties.LayoutEntry, 0)
 
-	entry := properties.LayoutEntry{
-		EastWest: properties.SpriteDirection{
-			GroundSprite: 3981,
-			Sprites:      s.GetObjects(EAST_WEST),
-		},
-		NorthSouth: properties.SpriteDirection{
-			GroundSprite: 3981,
-			Sprites:      s.GetObjects(NORTH_SOUTH),
-		},
+	// Add the layouts
+	for i := 0; i < s.Width; i++ {
+		entry := s.getLayoutEntry(i)
+		layoutEntries = append(layoutEntries, entry)
 	}
-
-	layoutEntries = append(layoutEntries, entry)
 
 	def.AddProperty(&properties.SpriteLayout{
 		Entries: layoutEntries,
 	})
 
-	// Limit to 1x1 layout
-	def.AddProperty(&properties.AllowedLengths{Bitmask: properties.PlatformBitmask{Enable1: true}})
+	// Limited to 1xn layout
+	def.AddProperty(&properties.AllowedLengths{Bitmask: properties.PlatformBitmask{
+		Enable1: s.Width == 1,
+		Enable2: s.Width == 2,
+	}})
 	def.AddProperty(&properties.AllowedPlatforms{Bitmask: properties.PlatformBitmask{Enable1: true}})
 
 	// No pylons or wires
@@ -129,6 +106,11 @@ func (s *Building) WriteToFile(file *File) {
 	// Add flags
 	def.AddProperty(&properties.GeneralFlag{HasCustomFoundations: s.HasCustomFoundations})
 
+	// If this is a multi-tile station it will need a callback for its sprite layout
+	if s.Width > 1 {
+		def.AddProperty(&properties.CallbackFlag{SpriteLayout: true})
+	}
+
 	file.AddElement(def)
 
 	file.AddElement(&StationSet{
@@ -139,24 +121,18 @@ func (s *Building) WriteToFile(file *File) {
 	})
 
 	spriteset := 0
-	if s.HasCustomFoundations {
-		file.AddElement(&StationSet{
-			SetID:         1,
-			NumLittleSets: 0,
-			NumLotsSets:   1,
-			SpriteSets:    []int{1},
-		})
+	if s.Width > 1 {
+		spriteset = 10
 
-		file.AddElement(&callbacks.FoundationCallback{
-			SetID:            2,
+		// Add the callback for building tile selection
+		file.AddElement(&callbacks.MultiTileBuildingCallback{
+			SetID:  spriteset,
+			Length: s.Width,
 		})
-
-		spriteset = 2
 	}
 
-
 	file.AddElement(&GraphicSetAssignment{
-		IDs: []int{s.ID},
+		IDs:        []int{s.ID},
 		DefaultSet: spriteset,
 	})
 
@@ -173,4 +149,43 @@ func (s *Building) WriteToFile(file *File) {
 		TextStringType: TextStringTypeClassName,
 		Text:           s.ClassName,
 	})
+}
+
+func (s *Building) addSprites(file *File) {
+	buildingSprites := 2 * s.Width
+
+	file.AddElement(&Spritesets{ID: 0, NumSets: 1, NumSprites: buildingSprites})
+
+	filename := fmt.Sprintf("%s_8bpp.png", s.SpriteFilename)
+
+	// Non-fence sprites
+	file.AddElement(&Sprites{
+		GetBuildingSprite(filename, 0, false),
+		GetBuildingSprite(filename, 1, false),
+	})
+
+	for i := 2; i <= s.Width; i++ {
+		// Additional sprites for long buildings
+		filename = fmt.Sprintf("%s_%d_8bpp.png", s.SpriteFilename, i)
+
+		file.AddElement(&Sprites{
+			GetBuildingSprite(filename, 0, false),
+			GetBuildingSprite(filename, 1, false),
+		})
+
+	}
+}
+
+func (s *Building) getLayoutEntry(idx int) properties.LayoutEntry {
+	entry := properties.LayoutEntry{
+		EastWest: properties.SpriteDirection{
+			GroundSprite: 3981,
+			Sprites:      s.GetObjects(EAST_WEST, idx),
+		},
+		NorthSouth: properties.SpriteDirection{
+			GroundSprite: 3981,
+			Sprites:      s.GetObjects(NORTH_SOUTH, idx),
+		},
+	}
+	return entry
 }

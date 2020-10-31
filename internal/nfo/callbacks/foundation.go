@@ -9,6 +9,11 @@ type FoundationCallback struct {
 	SetID            int
 }
 
+func (f *FoundationCallback) GetComment() string {
+	return "Callback for custom foundation"
+}
+
+
 func (f *FoundationCallback) getCallback() string {
 	length := 14
 

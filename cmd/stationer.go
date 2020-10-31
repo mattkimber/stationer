@@ -168,13 +168,7 @@ func main() {
 			ClassID:          "TWFB",
 			ClassName:        "Non-track tiles",
 			ObjectName:       "Art Deco Station",
-			UseCompanyColour: true,
-		},
-		{
-			SpriteFilename:   "art_deco_2",
-			ClassID:          "TWFB",
-			ClassName:        "Non-track tiles",
-			ObjectName:       "Art Deco Station (B)",
+			Width: 			  2,
 			UseCompanyColour: true,
 		},
 		{
@@ -182,6 +176,20 @@ func main() {
 			ClassID:          "TWFB",
 			ClassName:        "Non-track tiles",
 			ObjectName:       "City Station",
+			UseCompanyColour: true,
+		},
+		{
+			SpriteFilename:   "leslie_green",
+			ClassID:          "TWFB",
+			ClassName:        "Non-track tiles",
+			ObjectName:       "Leslie Green Station",
+			UseCompanyColour: true,
+		},
+		{
+			SpriteFilename:   "j_m_easton",
+			ClassID:          "TWFB",
+			ClassName:        "Non-track tiles",
+			ObjectName:       "J.M. Easton Station",
 			UseCompanyColour: true,
 		},
 	}

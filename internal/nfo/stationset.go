@@ -12,6 +12,10 @@ type StationSet struct {
 	SpriteSets    []int
 }
 
+func (s *StationSet) GetComment() string {
+	return "Station set"
+}
+
 func (s *StationSet) GetLines() []string {
 	bytes := 5 + (len(s.SpriteSets) * 2)
 

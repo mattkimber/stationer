@@ -9,6 +9,11 @@ type CargoTypeTable struct {
 	Cargos []string
 }
 
+func (ct *CargoTypeTable) GetComment() string {
+	return "Cargo table"
+}
+
+
 func (ct *CargoTypeTable) GetLines() []string {
 	bytes := 6
 	output := ""
