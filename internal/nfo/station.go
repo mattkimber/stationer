@@ -36,6 +36,9 @@ const (
 
 	EAST_WEST   = 0
 	NORTH_SOUTH = 1
+
+	GROUND_SPRITE_RAIL_EW = 1012
+	GROUND_SPRITE_RAIL_NS = 1011
 )
 
 func GetSprite(filename string, num int, swap bool) Sprite {
@@ -201,13 +204,14 @@ func (s *Station) WriteToFile(file *File) {
 			break
 		}
 
+
 		entry := properties.LayoutEntry{
 			EastWest: properties.SpriteDirection{
-				GroundSprite: 1012,
+				GroundSprite: GROUND_SPRITE_RAIL_EW,
 				Sprites:      s.GetObjects(EAST_WEST, fenceInside, fenceOutside),
 			},
 			NorthSouth: properties.SpriteDirection{
-				GroundSprite: 1011,
+				GroundSprite: GROUND_SPRITE_RAIL_NS,
 				Sprites:      s.GetObjects(NORTH_SOUTH, fenceInside, fenceOutside),
 			},
 		}

@@ -148,6 +148,20 @@ func main() {
 		objectID = objectID + 1
 	}
 
+	// TODO: clean up and integrate bufferstops properly
+	buffers  := nfo.BufferStop{
+		ID:                   objectID,
+		SpriteFilename:       "concrete_bufferstop",
+		ClassID:              "TWF0",
+		ClassName:            "Concrete Platforms",
+		ObjectName:           "Buffer Stop",
+		UseCompanyColour:     true,
+	}
+
+	buffers.WriteToFile(&file)
+	objectID = objectID + 1
+
+
 	buildings := []nfo.Building{
 		{
 			SpriteFilename:   "suburban_flat_roof",

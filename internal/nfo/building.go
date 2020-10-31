@@ -15,7 +15,6 @@ type Building struct {
 	Width int
 	Height int
 	UseCompanyColour      bool
-	HasCustomFoundations  bool
 }
 
 const (
@@ -26,7 +25,7 @@ const (
 
 func GetBuildingSprite(filename string, num int, swap bool) Sprite {
 	xrel := 1-(BUILDING_SPRITE_WIDTH / 2)
-	yrel := -(BUILDING_SPRITE_HEIGHT / 2) - 6
+	yrel := -(BUILDING_SPRITE_HEIGHT / 2) - 5
 
 	if swap {
 		xrel = 11 - (BUILDING_SPRITE_WIDTH / 2)
@@ -102,9 +101,6 @@ func (s *Building) WriteToFile(file *File) {
 
 	// Prevent train entering
 	def.AddProperty(&properties.PreventTrainEntryFlag{})
-
-	// Add flags
-	def.AddProperty(&properties.GeneralFlag{HasCustomFoundations: s.HasCustomFoundations})
 
 	// If this is a multi-tile station it will need a callback for its sprite layout
 	if s.Width > 1 {
