@@ -75,7 +75,7 @@ func (s *BufferStop) WriteToFile(file *File) {
 	layoutEntries := make([]properties.LayoutEntry, 0)
 
 	// Add the layouts
-	for i := 0; i < 3; i++ {
+	for i := 0; i < (3 + 3 + (6*2)); i++ {
 		entry := s.getLayoutEntry(i)
 		layoutEntries = append(layoutEntries, entry)
 	}
@@ -131,8 +131,10 @@ func (s *BufferStop) WriteToFile(file *File) {
 }
 
 func (s *BufferStop) addSprites(file *File) {
-	// 6 sprites: N, S and both
-	file.AddElement(&Spritesets{ID: 0, NumSets: 1, NumSprites: 6})
+	// 3 sprites: N, S and both - 3 for Both fences - 6 each for N/S fence combinations
+	// 2 directions so all are doubled
+	numSprites := 2 * (3 + 3 + (6*2))
+	file.AddElement(&Spritesets{ID: 0, NumSets: 1, NumSprites: numSprites})
 
 	elements := []string { "s", "n", "both" }
 	for _, element := range elements {
@@ -144,6 +146,24 @@ func (s *BufferStop) addSprites(file *File) {
 			GetBufferStopSprite(filename, 0, false),
 			GetBufferStopSprite(filename, 1, false),
 		})
+
+		// Do fences
+		fenceElements := []string {"a", "b", "ab"}
+
+		if element == "s" {
+			fenceElements = []string {"a", "b", "d", "ad", "bd", "abd" }
+		} else if element == "n" {
+			fenceElements = []string {"a", "b", "c", "ac", "bc", "abc" }
+		}
+
+		for _, fenceElement := range fenceElements {
+			filename := fmt.Sprintf("%s_%s_fence_%s_8bpp.png", s.SpriteFilename, element, fenceElement)
+
+			file.AddElement(&Sprites{
+				GetBufferStopSprite(filename, 0, false),
+				GetBufferStopSprite(filename, 1, false),
+			})
+		}
 	}
 }
 
