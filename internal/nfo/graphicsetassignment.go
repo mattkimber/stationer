@@ -20,7 +20,6 @@ func (gsa *GraphicSetAssignment) GetComment() string {
 	return "Graphics set assignment"
 }
 
-
 func (gsa *GraphicSetAssignment) GetLines() []string {
 	bytes := 5 + (len(gsa.CargoSpecificSets) * 3) + (len(gsa.IDs) * 2)
 

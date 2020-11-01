@@ -60,6 +60,7 @@ func main() {
 	stations := make([]nfo.Station, 0)
 
 	for _, class := range classes {
+
 		thisClass := []nfo.Station{
 			{
 				SpriteFilename:   class.Filename + "_empty",
@@ -68,6 +69,28 @@ func main() {
 				ObjectName:       "Platform",
 				UseCompanyColour: true,
 				HasFences:        true,
+				InnerPlatform:    true,
+				OuterPlatform:    true,
+			},
+			{
+				SpriteFilename:   class.Filename + "_empty",
+				ClassID:          class.ClassID,
+				ClassName:        class.ClassName,
+				ObjectName:       "Platform (inner)",
+				UseCompanyColour: true,
+				HasFences:        true,
+				InnerPlatform:    true,
+				OuterPlatform:    false,
+			},
+			{
+				SpriteFilename:   class.Filename + "_empty",
+				ClassID:          class.ClassID,
+				ClassName:        class.ClassName,
+				ObjectName:       "Platform (outer)",
+				UseCompanyColour: true,
+				HasFences:        true,
+				InnerPlatform:    false,
+				OuterPlatform:    true,
 			},
 			{
 				SpriteFilename:   class.Filename + "_sign",
@@ -76,6 +99,28 @@ func main() {
 				ObjectName:       "Platform with sign",
 				UseCompanyColour: true,
 				HasFences:        true,
+				InnerPlatform:    true,
+				OuterPlatform:    true,
+			},
+			{
+				SpriteFilename:   class.Filename + "_sign",
+				ClassID:          class.ClassID,
+				ClassName:        class.ClassName,
+				ObjectName:       "Platform with sign (inner)",
+				UseCompanyColour: true,
+				HasFences:        true,
+				InnerPlatform:    true,
+				OuterPlatform:    false,
+			},
+			{
+				SpriteFilename:   class.Filename + "_sign",
+				ClassID:          class.ClassID,
+				ClassName:        class.ClassName,
+				ObjectName:       "Platform with sign (outer)",
+				UseCompanyColour: true,
+				HasFences:        true,
+				InnerPlatform:    false,
+				OuterPlatform:    true,
 			},
 			{
 				SpriteFilename:   class.Filename + "_benches",
@@ -84,6 +129,28 @@ func main() {
 				ObjectName:       "Platform with benches",
 				UseCompanyColour: true,
 				HasFences:        true,
+				InnerPlatform:    true,
+				OuterPlatform:    true,
+			},
+			{
+				SpriteFilename:   class.Filename + "_benches",
+				ClassID:          class.ClassID,
+				ClassName:        class.ClassName,
+				ObjectName:       "Platform with benches (inner)",
+				UseCompanyColour: true,
+				HasFences:        true,
+				InnerPlatform:    true,
+				OuterPlatform:    false,
+			},
+			{
+				SpriteFilename:   class.Filename + "_benches",
+				ClassID:          class.ClassID,
+				ClassName:        class.ClassName,
+				ObjectName:       "Platform with benches (outer)",
+				UseCompanyColour: true,
+				HasFences:        true,
+				InnerPlatform:    false,
+				OuterPlatform:    true,
 			},
 			{
 				SpriteFilename:   class.Filename + "_bare_shelter_traditional",
@@ -93,6 +160,102 @@ func main() {
 				MaxLoadState:     5,
 				UseCompanyColour: true,
 				HasFences:        true,
+				InnerPlatform:    true,
+				OuterPlatform:    true,
+			},
+			{
+				SpriteFilename:   class.Filename + "_bare_shelter_traditional",
+				ClassID:          class.ClassID,
+				ClassName:        class.ClassName,
+				ObjectName:       "Shelter (traditional, inner)",
+				MaxLoadState:     5,
+				UseCompanyColour: true,
+				HasFences:        true,
+				InnerPlatform:    true,
+				OuterPlatform:    false,
+			},
+			{
+				SpriteFilename:   class.Filename + "_bare_shelter_traditional",
+				ClassID:          class.ClassID,
+				ClassName:        class.ClassName,
+				ObjectName:       "Shelter (traditional, outer)",
+				MaxLoadState:     5,
+				UseCompanyColour: true,
+				HasFences:        true,
+				InnerPlatform:    false,
+				OuterPlatform:    true,
+			},
+			{
+				SpriteFilename:        class.Filename + "_ramp_ne",
+				ClassID:               class.ClassID,
+				ClassName:             class.ClassName,
+				MaxLoadState:          5,
+				InnerPlatform:         true,
+				OuterPlatform:         true,
+				ObjectName:            "Ramp (NE)",
+				PlatformConfiguration: rampConfiguration,
+				UseCompanyColour:      true,
+				HasFences:             true,
+			},
+			{
+				SpriteFilename:        class.Filename + "_ramp_ne",
+				ClassID:               class.ClassID,
+				ClassName:             class.ClassName,
+				MaxLoadState:          5,
+				InnerPlatform:         true,
+				OuterPlatform:         false,
+				ObjectName:            "Ramp (NE, inner)",
+				PlatformConfiguration: rampConfiguration,
+				UseCompanyColour:      true,
+				HasFences:             true,
+			},
+			{
+				SpriteFilename:        class.Filename + "_ramp_ne",
+				ClassID:               class.ClassID,
+				ClassName:             class.ClassName,
+				MaxLoadState:          5,
+				InnerPlatform:         false,
+				OuterPlatform:         true,
+				ObjectName:            "Ramp (NE, outer)",
+				PlatformConfiguration: rampConfiguration,
+				UseCompanyColour:      true,
+				HasFences:             true,
+			},
+			{
+				SpriteFilename:        class.Filename + "_ramp_sw",
+				ClassID:               class.ClassID,
+				ClassName:             class.ClassName,
+				MaxLoadState:          5,
+				InnerPlatform:         true,
+				OuterPlatform:         true,
+				ObjectName:            "Ramp (SW)",
+				PlatformConfiguration: rampConfiguration,
+				UseCompanyColour:      true,
+				HasFences:             true,
+			},
+			{
+				SpriteFilename:        class.Filename + "_ramp_sw",
+				ClassID:               class.ClassID,
+				ClassName:             class.ClassName,
+				MaxLoadState:          5,
+				InnerPlatform:         true,
+				OuterPlatform:         false,
+				ObjectName:            "Ramp (SW, inner)",
+				PlatformConfiguration: rampConfiguration,
+				UseCompanyColour:      true,
+				HasFences:             true,
+			},
+			{
+				SpriteFilename:        class.Filename + "_ramp_sw",
+				ClassID:               class.ClassID,
+				ClassName:             class.ClassName,
+				MaxLoadState:          5,
+				InnerPlatform:         false,
+				OuterPlatform:         true,
+				ObjectName:            "Ramp (SW, outer)",
+				PlatformConfiguration: rampConfiguration,
+				UseCompanyColour:      true,
+				HasFences:             true,
 			},
 			{
 				SpriteFilename:        class.Filename + "_bare_footbridge",
@@ -103,6 +266,8 @@ func main() {
 				HasFences:             true,
 				MaxLoadState:          5,
 				PlatformHeight:        16,
+				InnerPlatform:         true,
+				OuterPlatform:         true,
 				PlatformConfiguration: rampConfiguration,
 				AdditionalObjects: []nfo.AdditionalObject{{
 					X:              5,
@@ -114,30 +279,8 @@ func main() {
 					SpriteFilename: "footbridge",
 				}},
 			},
-			{
-				SpriteFilename:        class.Filename + "_ramp_ne",
-				ClassID:               class.ClassID,
-				ClassName:             class.ClassName,
-				MaxLoadState:          5,
-				ObjectName:            "Ramp (NE)",
-				PlatformConfiguration: rampConfiguration,
-				UseCompanyColour:      true,
-				HasFences:             true,
-			},
-			{
-				SpriteFilename:        class.Filename + "_ramp_sw",
-				ClassID:               class.ClassID,
-				ClassName:             class.ClassName,
-				MaxLoadState:          5,
-				ObjectName:            "Ramp (SW)",
-				PlatformConfiguration: rampConfiguration,
-				UseCompanyColour:      true,
-				HasFences:             true,
-			},
 		}
-
 		stations = append(stations, thisClass...)
-
 	}
 
 	objectID := 0
@@ -149,18 +292,17 @@ func main() {
 	}
 
 	// TODO: clean up and integrate bufferstops properly
-	buffers  := nfo.BufferStop{
-		ID:                   objectID,
-		SpriteFilename:       "concrete_bufferstop",
-		ClassID:              "TWF0",
-		ClassName:            "Concrete Platforms",
-		ObjectName:           "Buffer Stop",
-		UseCompanyColour:     true,
+	buffers := nfo.BufferStop{
+		ID:               objectID,
+		SpriteFilename:   "concrete_bufferstop",
+		ClassID:          "TWF0",
+		ClassName:        "Concrete Platforms",
+		ObjectName:       "Buffer Stop",
+		UseCompanyColour: true,
 	}
 
 	buffers.WriteToFile(&file)
 	objectID = objectID + 1
-
 
 	buildings := []nfo.Building{
 		{
@@ -182,7 +324,7 @@ func main() {
 			ClassID:          "TWFB",
 			ClassName:        "Non-track tiles",
 			ObjectName:       "Art Deco Station",
-			Width: 			  2,
+			Width:            2,
 			UseCompanyColour: true,
 		},
 		{

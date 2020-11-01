@@ -21,7 +21,6 @@ func (ts *TextString) GetComment() string {
 	return "Text string definition"
 }
 
-
 func (ts *TextString) GetLines() []string {
 	bytes := 7 + len(ts.Text)
 	result := fmt.Sprintf("* %d 04 48 %s 01 %s %s \"%s\" 00",

@@ -6,8 +6,8 @@ import (
 )
 
 type MultiTileBuildingCallback struct {
-	SetID            int
-	Length           int
+	SetID  int
+	Length int
 }
 
 func (mtb *MultiTileBuildingCallback) GetComment() string {
@@ -15,19 +15,19 @@ func (mtb *MultiTileBuildingCallback) GetComment() string {
 }
 
 func (mtb *MultiTileBuildingCallback) getCallback() string {
-	length := 10 + ((mtb.Length-1) * 4)
+	length := 10 + ((mtb.Length - 1) * 4)
 
 	callback := fmt.Sprintf(
 		// 89 = doubleword variable
 		// 41 = variable (platform info for this section, counted from northern edge)
 		// 00 0F = get position along platform from north (mask)
 		// %s = number of ranges other than default
-		"* %d 02 04 %s\n" +
-			"    81 41 00 0F\n" +
+		"* %d 02 04 %s\n"+
+			"    81 41 00 0F\n"+
 			"    %s\n",
 		length,
 		bytes.GetByte(mtb.SetID+1), // We add 1 to the decider ID to give the inner callback ID
-		bytes.GetByte(mtb.Length - 1),
+		bytes.GetByte(mtb.Length-1),
 	)
 
 	for i := 1; i < mtb.Length; i++ {
@@ -47,7 +47,6 @@ func (mtb *MultiTileBuildingCallback) getCallback() string {
 	return callback
 }
 
-
 func (mtb *MultiTileBuildingCallback) getDecider() string {
 	// Callbacks require a callback decider. This will be passed the type
 	// of callback (station layout = 14) and be responsible for routing it
@@ -59,7 +58,7 @@ func (mtb *MultiTileBuildingCallback) getDecider() string {
 			"    %s 00 14 00 14 00\n"+
 			"    00 00", // Return the default sprite if we don't trigger any callback
 		length,
-		bytes.GetByte(mtb.SetID), // The callback decider is given the SetID
+		bytes.GetByte(mtb.SetID),   // The callback decider is given the SetID
 		bytes.GetByte(mtb.SetID+1), // The actual callback is SetID + 1
 	)
 }

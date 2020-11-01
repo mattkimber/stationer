@@ -7,15 +7,15 @@ import (
 )
 
 type BufferStop struct {
-	ID                    int
-	SpriteFilename        string
-	ClassID               string
-	ClassName             string
-	ObjectName            string
-	Width int
-	Height int
-	UseCompanyColour      bool
-	HasCustomFoundations  bool
+	ID                   int
+	SpriteFilename       string
+	ClassID              string
+	ClassName            string
+	ObjectName           string
+	Width                int
+	Height               int
+	UseCompanyColour     bool
+	HasCustomFoundations bool
 }
 
 const (
@@ -33,8 +33,8 @@ func (s *BufferStop) GetBaseSpriteNumber() int {
 }
 
 func GetBufferStopSprite(filename string, num int, swap bool) Sprite {
-	xrel := 1-(BUFFERSTOP_SPRITE_WIDTH / 2)
-	yrel := 5-(BUFFERSTOP_SPRITE_HEIGHT / 2)
+	xrel := 1 - (BUFFERSTOP_SPRITE_WIDTH / 2)
+	yrel := 5 - (BUFFERSTOP_SPRITE_HEIGHT / 2)
 
 	if swap {
 		xrel = 11 - (BUFFERSTOP_SPRITE_WIDTH / 2)
@@ -75,7 +75,7 @@ func (s *BufferStop) WriteToFile(file *File) {
 	layoutEntries := make([]properties.LayoutEntry, 0)
 
 	// Add the layouts
-	for i := 0; i < (3 + 3 + (7*2)); i++ {
+	for i := 0; i < (3 + 3 + (7 * 2)); i++ {
 		entry := s.getLayoutEntry(i)
 		layoutEntries = append(layoutEntries, entry)
 	}
@@ -133,10 +133,10 @@ func (s *BufferStop) WriteToFile(file *File) {
 func (s *BufferStop) addSprites(file *File) {
 	// 3 sprites: N, S and both - 3 for Both fences - 7 each for N/S fence combinations
 	// 2 directions so all are doubled
-	numSprites := 2 * (3 + 3 + (7*2))
+	numSprites := 2 * (3 + 3 + (7 * 2))
 	file.AddElement(&Spritesets{ID: 0, NumSets: 1, NumSprites: numSprites})
 
-	elements := []string { "s", "n", "both" }
+	elements := []string{"s", "n", "both"}
 	for _, element := range elements {
 
 		filename := fmt.Sprintf("%s_%s_8bpp.png", s.SpriteFilename, element)
@@ -148,12 +148,12 @@ func (s *BufferStop) addSprites(file *File) {
 		})
 
 		// Do fences
-		fenceElements := []string {"a", "b", "ab"}
+		fenceElements := []string{"a", "b", "ab"}
 
 		if element == "s" {
-			fenceElements = []string {"a", "b", "ab", "d", "ad", "bd", "abd" }
+			fenceElements = []string{"a", "b", "ab", "d", "ad", "bd", "abd"}
 		} else if element == "n" {
-			fenceElements = []string {"a", "b", "ab", "c", "ac", "bc", "abc" }
+			fenceElements = []string{"a", "b", "ab", "c", "ac", "bc", "abc"}
 		}
 
 		for _, fenceElement := range fenceElements {

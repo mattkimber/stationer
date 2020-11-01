@@ -6,13 +6,12 @@ import (
 )
 
 type FoundationCallback struct {
-	SetID            int
+	SetID int
 }
 
 func (f *FoundationCallback) GetComment() string {
 	return "Callback for custom foundation"
 }
-
 
 func (f *FoundationCallback) getCallback() string {
 	length := 14
@@ -29,12 +28,10 @@ func (f *FoundationCallback) getCallback() string {
 			"    %s",
 		length,
 		bytes.GetByte(f.SetID), // The callback decider is given the SetID
-		bytes.GetWord(1), // 1 = the foundations
-		bytes.GetWord(0), // 0 = the base sprite set
+		bytes.GetWord(1),       // 1 = the foundations
+		bytes.GetWord(0),       // 0 = the base sprite set
 	)
 }
-
-
 
 func (f *FoundationCallback) GetLines() []string {
 	return []string{

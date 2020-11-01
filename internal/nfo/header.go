@@ -28,7 +28,6 @@ func (h *Header) GetComment() string {
 	return ""
 }
 
-
 func (h *Header) GetLines() []string {
 	if len(h.Initials) != 3 {
 		log.Fatalf("Initials must be exactly 3 characters")

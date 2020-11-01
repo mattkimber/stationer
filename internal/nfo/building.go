@@ -7,14 +7,14 @@ import (
 )
 
 type Building struct {
-	ID                    int
-	SpriteFilename        string
-	ClassID               string
-	ClassName             string
-	ObjectName            string
-	Width int
-	Height int
-	UseCompanyColour      bool
+	ID               int
+	SpriteFilename   string
+	ClassID          string
+	ClassName        string
+	ObjectName       string
+	Width            int
+	Height           int
+	UseCompanyColour bool
 }
 
 const (
@@ -24,7 +24,7 @@ const (
 )
 
 func GetBuildingSprite(filename string, num int, swap bool) Sprite {
-	xrel := 1-(BUILDING_SPRITE_WIDTH / 2)
+	xrel := 1 - (BUILDING_SPRITE_WIDTH / 2)
 	yrel := -(BUILDING_SPRITE_HEIGHT / 2) - 5
 
 	if swap {
@@ -178,7 +178,7 @@ func (s *Building) getLayoutEntry(idx int) properties.LayoutEntry {
 			GroundSprite: 3981,
 			// East-West sprites are assembled in the "wrong" order so that
 			// multi tile stations are the correct way round when displayed
-			Sprites:      s.GetObjects(EAST_WEST, s.Width - (idx+1)),
+			Sprites: s.GetObjects(EAST_WEST, s.Width-(idx+1)),
 		},
 		NorthSouth: properties.SpriteDirection{
 			GroundSprite: 3981,

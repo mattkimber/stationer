@@ -14,7 +14,6 @@ func (s *StationFenceCallback) GetComment() string {
 	return "Callback for station fence choice"
 }
 
-
 func (s *StationFenceCallback) getAction(checkValue, ifTrueValue, ifFalseValue string, setIDOffset int) string {
 	length := 18
 

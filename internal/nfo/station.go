@@ -18,6 +18,8 @@ type Station struct {
 	AdditionalObjects     []AdditionalObject
 	PlatformHeight        int
 	HasFences             bool
+	InnerPlatform         bool
+	OuterPlatform         bool
 }
 
 const (
@@ -92,23 +94,35 @@ func (s *Station) GetObjects(direction int, fenceInside, fenceOutside bool) []pr
 		base = base + 2
 	}
 
-	baseSprites := 4
+	baseSprites := 2
+	if s.InnerPlatform && s.OuterPlatform {
+		baseSprites = 4
+	}
+
 	if s.HasFences {
-		baseSprites = 8
+		if s.InnerPlatform && s.OuterPlatform {
+			baseSprites = 8
+		} else {
+			baseSprites = 4
+		}
 	}
 
 	result := make([]properties.BoundingBox, 0)
 
-	if fenceOutside {
-		result = append(result, properties.BoundingBox{YOffset: yOffset, XOffset: xOffset, X: x, Y: y, Z: s.PlatformHeight, SpriteNumber: s.GetBaseSpriteNumber() + base + 4})
-	} else {
-		result = append(result, properties.BoundingBox{YOffset: yOffset, XOffset: xOffset, X: x, Y: y, Z: s.PlatformHeight, SpriteNumber: s.GetBaseSpriteNumber() + base + 0})
+	if s.OuterPlatform {
+		if fenceOutside {
+			result = append(result, properties.BoundingBox{YOffset: yOffset, XOffset: xOffset, X: x, Y: y, Z: s.PlatformHeight, SpriteNumber: s.GetBaseSpriteNumber() + base + 4})
+		} else {
+			result = append(result, properties.BoundingBox{YOffset: yOffset, XOffset: xOffset, X: x, Y: y, Z: s.PlatformHeight, SpriteNumber: s.GetBaseSpriteNumber() + base + 0})
+		}
 	}
 
-	if fenceInside {
-		result = append(result, properties.BoundingBox{X: x, Y: y, Z: s.PlatformHeight, SpriteNumber: s.GetBaseSpriteNumber() + base + 5})
-	} else {
-		result = append(result, properties.BoundingBox{X: x, Y: y, Z: s.PlatformHeight, SpriteNumber: s.GetBaseSpriteNumber() + base + 1})
+	if s.InnerPlatform {
+		if fenceInside {
+			result = append(result, properties.BoundingBox{X: x, Y: y, Z: s.PlatformHeight, SpriteNumber: s.GetBaseSpriteNumber() + base + 5})
+		} else {
+			result = append(result, properties.BoundingBox{X: x, Y: y, Z: s.PlatformHeight, SpriteNumber: s.GetBaseSpriteNumber() + base + 1})
+		}
 	}
 
 	for idx, obj := range s.AdditionalObjects {
@@ -148,36 +162,41 @@ func (s *Station) WriteToFile(file *File) {
 	if s.HasFences {
 		platformSprites = 8
 	}
-	file.AddElement(&Spritesets{ID: 0, NumSets: s.MaxLoadState + 1, NumSprites: platformSprites + (len(s.AdditionalObjects) * 2)})
 
-	for i := 0; i <= s.MaxLoadState; i++ {
-		filename := fmt.Sprintf("%s_%d_8bpp.png", s.SpriteFilename, i)
+	// Only redefine the sprites and spritesets if this is a new platform type
+	// (inner/outer platforms must follow the previous definition)
+	if s.InnerPlatform && s.OuterPlatform {
+		file.AddElement(&Spritesets{ID: 0, NumSets: s.MaxLoadState + 1, NumSprites: platformSprites + (len(s.AdditionalObjects) * 2)})
 
-		// Non-fence sprites
-		file.AddElement(&Sprites{
-			GetSprite(filename, 0, false),
-			GetSprite(filename, 1, false),
-			GetSprite(filename, 2, true),
-			GetSprite(filename, 3, true),
-		})
+		for i := 0; i <= s.MaxLoadState; i++ {
+			filename := fmt.Sprintf("%s_%d_8bpp.png", s.SpriteFilename, i)
 
-		// Fence sprites
-		if s.HasFences {
-			fenceFilename := fmt.Sprintf("%s_%d_fence_8bpp.png", s.SpriteFilename, i)
+			// Non-fence sprites
 			file.AddElement(&Sprites{
-				GetSprite(fenceFilename, 0, false),
-				GetSprite(fenceFilename, 1, false),
-				GetSprite(fenceFilename, 2, true),
-				GetSprite(fenceFilename, 3, true),
+				GetSprite(filename, 0, false),
+				GetSprite(filename, 1, false),
+				GetSprite(filename, 2, true),
+				GetSprite(filename, 3, true),
 			})
-		}
 
-		for _, obj := range s.AdditionalObjects {
-			filename := fmt.Sprintf("%s_%d_8bpp.png", obj.SpriteFilename, i)
-			file.AddElement(&Sprites{
-				GetSprite(filename, 0, obj.InvertDirection != true),
-				GetSprite(filename, 1, obj.InvertDirection != false),
-			})
+			// Fence sprites
+			if s.HasFences {
+				fenceFilename := fmt.Sprintf("%s_%d_fence_8bpp.png", s.SpriteFilename, i)
+				file.AddElement(&Sprites{
+					GetSprite(fenceFilename, 0, false),
+					GetSprite(fenceFilename, 1, false),
+					GetSprite(fenceFilename, 2, true),
+					GetSprite(fenceFilename, 3, true),
+				})
+			}
+
+			for _, obj := range s.AdditionalObjects {
+				filename := fmt.Sprintf("%s_%d_8bpp.png", obj.SpriteFilename, i)
+				file.AddElement(&Sprites{
+					GetSprite(filename, 0, obj.InvertDirection != true),
+					GetSprite(filename, 1, obj.InvertDirection != false),
+				})
+			}
 		}
 	}
 
@@ -203,7 +222,6 @@ func (s *Station) WriteToFile(file *File) {
 		if i > 0 && !s.HasFences {
 			break
 		}
-
 
 		entry := properties.LayoutEntry{
 			EastWest: properties.SpriteDirection{
