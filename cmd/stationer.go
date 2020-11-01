@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/mattkimber/stationer/internal/nfo"
 	"github.com/mattkimber/stationer/internal/nfo/properties"
 )
@@ -291,18 +292,34 @@ func main() {
 		objectID = objectID + 1
 	}
 
-	// TODO: clean up and integrate bufferstops properly
-	buffers := nfo.BufferStop{
-		ID:               objectID,
-		SpriteFilename:   "concrete_bufferstop",
-		ClassID:          "TWF0",
-		ClassName:        "Concrete Platforms",
-		ObjectName:       "Buffer Stop",
-		UseCompanyColour: true,
-	}
+	// TODO: clean up and integrate bufferstops and station roofs properly
+	for _, class := range classes {
+		hall := nfo.StationHall{
+			ID: objectID,
+			SpriteFilename: fmt.Sprintf("%s_empty", class.Filename),
+			ClassID: class.ClassID,
+			ClassName: class.ClassName,
+			MaxLoadState:          5,
+			ObjectName: "Station Hall",
+			RoofType: "arch",
+			UseCompanyColour: true,
+		}
 
-	buffers.WriteToFile(&file)
-	objectID = objectID + 1
+		hall.WriteToFile(&file)
+		objectID = objectID + 1
+
+		buffers := nfo.BufferStop{
+			ID:               objectID,
+			SpriteFilename:   fmt.Sprintf("%s_bufferstop", class.Filename),
+			ClassID:          class.ClassID,
+			ClassName:        class.ClassName,
+			ObjectName:       "Buffer Stop",
+			UseCompanyColour: true,
+		}
+
+		buffers.WriteToFile(&file)
+		objectID = objectID + 1
+	}
 
 	buildings := []nfo.Building{
 		{

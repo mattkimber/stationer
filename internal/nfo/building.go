@@ -23,13 +23,10 @@ const (
 	BUILDING_SPRITE_HEIGHT             = 78
 )
 
-func GetBuildingSprite(filename string, num int, swap bool) Sprite {
+func GetBuildingSprite(filename string, num int) Sprite {
 	xrel := 1 - (BUILDING_SPRITE_WIDTH / 2)
-	yrel := -(BUILDING_SPRITE_HEIGHT / 2) - 5
+	yrel := -(BUILDING_SPRITE_HEIGHT / 2) - 6
 
-	if swap {
-		xrel = 11 - (BUILDING_SPRITE_WIDTH / 2)
-	}
 
 	return Sprite{
 		Filename: filename,
@@ -156,8 +153,8 @@ func (s *Building) addSprites(file *File) {
 
 	// Non-fence sprites
 	file.AddElement(&Sprites{
-		GetBuildingSprite(filename, 0, false),
-		GetBuildingSprite(filename, 1, false),
+		GetBuildingSprite(filename, 0),
+		GetBuildingSprite(filename, 1),
 	})
 
 	for i := 2; i <= s.Width; i++ {
@@ -165,8 +162,8 @@ func (s *Building) addSprites(file *File) {
 		filename = fmt.Sprintf("%s_%d_8bpp.png", s.SpriteFilename, i)
 
 		file.AddElement(&Sprites{
-			GetBuildingSprite(filename, 0, false),
-			GetBuildingSprite(filename, 1, false),
+			GetBuildingSprite(filename, 0),
+			GetBuildingSprite(filename, 1),
 		})
 
 	}
