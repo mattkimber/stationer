@@ -381,6 +381,20 @@ func main() {
 			ObjectName:       "Hebden Bridge",
 			UseCompanyColour: true,
 		},
+		{
+			SpriteFilename:   "wp_sr_type_13",
+			ClassID:          "WAYP",
+			ClassName:        "Waypoints",
+			ObjectName:       "SR Type 13",
+			UseCompanyColour: true,
+		},
+		{
+			SpriteFilename:   "wp_arnside",
+			ClassID:          "WAYP",
+			ClassName:        "Waypoints",
+			ObjectName:       "Arnside",
+			UseCompanyColour: true,
+		},
 	}
 
 	for _, waypoint := range waypoints {

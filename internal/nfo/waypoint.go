@@ -80,13 +80,13 @@ func (wp *Waypoint) GetObjects(direction int, withBuilding bool) []properties.Bo
 		base = 1
 	}
 
-	// Append the base sprite
-	result = append(result, properties.BoundingBox{X: 16, Y: 16, Z: 1, SpriteNumber: wp.GetBaseSpriteNumber() + base + 2})
-
-
-	// Append the building
 	if withBuilding {
+		// Append the building and half base sprite
+		result = append(result, properties.BoundingBox{X: 16, Y: 16, Z: 1, SpriteNumber: wp.GetBaseSpriteNumber() + base + 2})
 		result = append(result, properties.BoundingBox{X: x, Y: y, Z: 12, SpriteNumber: wp.GetBaseSpriteNumber() + base})
+	} else {
+		// Append the full base sprite
+		result = append(result, properties.BoundingBox{X: 16, Y: 16, Z: 1, SpriteNumber: wp.GetBaseSpriteNumber() + base + 4})
 	}
 
 	return result
@@ -149,7 +149,7 @@ func (wp *Waypoint) WriteToFile(file *File) {
 }
 
 func (wp *Waypoint) addSprites(file *File) {
-	file.AddElement(&Spritesets{ID: 0, NumSets: 1, NumSprites: 4})
+	file.AddElement(&Spritesets{ID: 0, NumSets: 1, NumSprites: 6})
 
 	// Waypoint building
 	filename := fmt.Sprintf("%s_8bpp.png", wp.SpriteFilename)
@@ -159,8 +159,16 @@ func (wp *Waypoint) addSprites(file *File) {
 		GetWaypointSprite(filename, 1, true),
 	})
 
-	// Waypoint crossing
+	// Waypoint crossing (for building tile)
 	filename = fmt.Sprintf("%s_base_8bpp.png", wp.SpriteFilename)
+
+	file.AddElement(&Sprites{
+		GetWaypointBaseSprite(filename, 0, false),
+		GetWaypointBaseSprite(filename, 1, true),
+	})
+
+	// Waypoint crossing - full
+	filename = fmt.Sprintf("%s_base_full_8bpp.png", wp.SpriteFilename)
 
 	file.AddElement(&Sprites{
 		GetWaypointBaseSprite(filename, 0, false),

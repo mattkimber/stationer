@@ -13,7 +13,7 @@ func (wsc *WaypointSpriteCallback) GetComment() string {
 }
 
 func (wsc *WaypointSpriteCallback) getCallback() string {
-	length := 16
+	length := 14
 
 	callback := fmt.Sprintf(
 		// 81 = byte-sized variable
