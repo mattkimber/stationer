@@ -373,14 +373,13 @@ func main() {
 		objectID = objectID + 1
 	}
 
-	waypoints := []nfo.Building{
+	waypoints := []nfo.Waypoint{
 		{
 			SpriteFilename:   "wp_hebden_bridge",
 			ClassID:          "WAYP",
 			ClassName:        "Waypoints",
 			ObjectName:       "Hebden Bridge",
 			UseCompanyColour: true,
-			IsWaypoint:       true,
 		},
 	}
 
