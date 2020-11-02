@@ -15,6 +15,7 @@ type Building struct {
 	Width            int
 	Height           int
 	UseCompanyColour bool
+	IsWaypoint       bool
 }
 
 const (
@@ -26,7 +27,6 @@ const (
 func GetBuildingSprite(filename string, num int) Sprite {
 	xrel := 1 - (BUILDING_SPRITE_WIDTH / 2)
 	yrel := -(BUILDING_SPRITE_HEIGHT / 2) - 6
-
 
 	return Sprite{
 		Filename: filename,
@@ -97,7 +97,9 @@ func (s *Building) WriteToFile(file *File) {
 	def.AddProperty(&properties.WirePlacement{Bitmask: 255})
 
 	// Prevent train entering
-	def.AddProperty(&properties.PreventTrainEntryFlag{})
+	if !s.IsWaypoint {
+		def.AddProperty(&properties.PreventTrainEntryFlag{})
+	}
 
 	// If this is a multi-tile station it will need a callback for its sprite layout
 	if s.Width > 1 {
@@ -170,15 +172,22 @@ func (s *Building) addSprites(file *File) {
 }
 
 func (s *Building) getLayoutEntry(idx int) properties.LayoutEntry {
+	groundSpriteNS, groundSpriteEW := 3981, 3981
+
+	if s.IsWaypoint {
+		groundSpriteNS = GROUND_SPRITE_RAIL_NS
+		groundSpriteEW = GROUND_SPRITE_RAIL_EW
+	}
+
 	entry := properties.LayoutEntry{
 		EastWest: properties.SpriteDirection{
-			GroundSprite: 3981,
+			GroundSprite: groundSpriteEW,
 			// East-West sprites are assembled in the "wrong" order so that
 			// multi tile stations are the correct way round when displayed
 			Sprites: s.GetObjects(EAST_WEST, s.Width-(idx+1)),
 		},
 		NorthSouth: properties.SpriteDirection{
-			GroundSprite: 3981,
+			GroundSprite: groundSpriteNS,
 			Sprites:      s.GetObjects(NORTH_SOUTH, idx),
 		},
 	}

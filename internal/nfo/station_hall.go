@@ -22,7 +22,6 @@ func GetRoofSprite(filename string, num int) Sprite {
 	xrel := 1 - (BUILDING_SPRITE_WIDTH / 2)
 	yrel := -(BUILDING_SPRITE_HEIGHT / 2) - 6
 
-
 	return Sprite{
 		Filename: filename,
 		X:        BUILDING_SPRITE_WIDTH_WITH_PADDING * num,
@@ -81,7 +80,7 @@ func (s *StationHall) GetObjects(direction int, supportOuter bool, supportInner 
 		X:            16,
 		Y:            16,
 		Z:            6,
-		SpriteNumber: TRANSPARENT_SPRITE + 8 + (roofSprite*4) + direction  + 2,
+		SpriteNumber: TRANSPARENT_SPRITE + 8 + (roofSprite * 4) + direction + 2,
 	})
 
 	// Add the roof
@@ -92,7 +91,7 @@ func (s *StationHall) GetObjects(direction int, supportOuter bool, supportInner 
 		X:            16,
 		Y:            16,
 		Z:            6,
-		SpriteNumber: s.GetBaseSpriteNumber() + 8 + (roofSprite*4) + direction,
+		SpriteNumber: s.GetBaseSpriteNumber() + 8 + (roofSprite * 4) + direction,
 	})
 
 	return result
@@ -122,7 +121,6 @@ func (s *StationHall) WriteToFile(file *File) {
 			GetSprite(filename, 2, true),
 			GetSprite(filename, 3, true),
 		})
-
 
 		// Sprites with roof support
 		filename = fmt.Sprintf("%s_%d_roof_8bpp.png", s.SpriteFilename, i)

@@ -22,7 +22,7 @@ func main() {
 	file.AddElement(&nfo.Header{
 		Initials:    "TWF",
 		SetID:       8,
-		SetName:     "Timberwolf's Stations",
+		SetName:     "Timberwolf's Stations 0.1.0 (alpha)",
 		Description: "A set of British-style railway stations",
 		Version:     1,
 		MinVersion:  1,
@@ -295,13 +295,13 @@ func main() {
 	// TODO: clean up and integrate bufferstops and station roofs properly
 	for _, class := range classes {
 		hall := nfo.StationHall{
-			ID: objectID,
-			SpriteFilename: fmt.Sprintf("%s_empty", class.Filename),
-			ClassID: class.ClassID,
-			ClassName: class.ClassName,
-			MaxLoadState:          5,
-			ObjectName: "Station Hall",
-			RoofType: "arch",
+			ID:               objectID,
+			SpriteFilename:   fmt.Sprintf("%s_empty", class.Filename),
+			ClassID:          class.ClassID,
+			ClassName:        class.ClassName,
+			MaxLoadState:     5,
+			ObjectName:       "Station Hall",
+			RoofType:         "arch",
 			UseCompanyColour: true,
 		}
 
@@ -370,6 +370,23 @@ func main() {
 	for _, building := range buildings {
 		building.ID = objectID
 		building.WriteToFile(&file)
+		objectID = objectID + 1
+	}
+
+	waypoints := []nfo.Building{
+		{
+			SpriteFilename:   "wp_hebden_bridge",
+			ClassID:          "WAYP",
+			ClassName:        "Waypoints",
+			ObjectName:       "Hebden Bridge",
+			UseCompanyColour: true,
+			IsWaypoint:       true,
+		},
+	}
+
+	for _, waypoint := range waypoints {
+		waypoint.ID = objectID
+		waypoint.WriteToFile(&file)
 		objectID = objectID + 1
 	}
 
