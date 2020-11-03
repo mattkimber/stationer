@@ -98,7 +98,6 @@ func (s *Building) WriteToFile(file *File) {
 	// Prevent train entering
 	def.AddProperty(&properties.PreventTrainEntryFlag{})
 
-
 	// If this is a multi-tile station it will need a callback for its sprite layout
 	if s.Width > 1 {
 		def.AddProperty(&properties.CallbackFlag{SpriteLayout: true})

@@ -32,7 +32,6 @@ func (wsc *WaypointSpriteCallback) getCallback() string {
 	// We return layout 0 for the case where we have a building
 	callback += "    00 80 00 00 \n"
 
-
 	// Default sprite set, layout 2 (no building)
 	callback += "    02 80"
 
@@ -50,7 +49,7 @@ func (wsc *WaypointSpriteCallback) getDecider() string {
 			"    %s 00 14 00 14 00\n"+
 			"    00 00", // Return the default sprite if we don't trigger any callback
 		length,
-		bytes.GetByte(2),   // The callback decider is given an ID of 2
+		bytes.GetByte(2), // The callback decider is given an ID of 2
 		bytes.GetByte(1), // The actual callback is SetID + 1
 	)
 }

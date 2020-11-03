@@ -31,8 +31,9 @@ func main() {
 	file.AddElement(&nfo.CargoTypeTable{Cargos: []string{"PASS", "MAIL"}})
 
 	classes := []StationClass{
-		{Filename: "concrete", ClassID: "TWF0", ClassName: "Concrete Platforms"},
-		{Filename: "modern", ClassID: "TWF1", ClassName: "Modern Platforms"},
+		{Filename: "wooden", ClassID: "TWF0", ClassName: "Wooden Platforms"},
+		{Filename: "concrete", ClassID: "TWF1", ClassName: "Concrete Platforms"},
+		{Filename: "modern", ClassID: "TWF2", ClassName: "Modern Platforms"},
 	}
 
 	rampConfiguration := properties.PlatformLayout{
@@ -294,19 +295,25 @@ func main() {
 
 	// TODO: clean up and integrate bufferstops and station roofs properly
 	for _, class := range classes {
-		hall := nfo.StationHall{
-			ID:               objectID,
-			SpriteFilename:   fmt.Sprintf("%s_empty", class.Filename),
-			ClassID:          class.ClassID,
-			ClassName:        class.ClassName,
-			MaxLoadState:     5,
-			ObjectName:       "Station Hall",
-			RoofType:         "arch",
-			UseCompanyColour: true,
-		}
 
-		hall.WriteToFile(&file)
-		objectID = objectID + 1
+		// Wooden platforms do not have station halls
+		if class.ClassID != "TWF0" {
+
+			hall := nfo.StationHall{
+				ID:               objectID,
+				SpriteFilename:   fmt.Sprintf("%s_empty", class.Filename),
+				ClassID:          class.ClassID,
+				ClassName:        class.ClassName,
+				MaxLoadState:     5,
+				ObjectName:       "Station Hall",
+				RoofType:         "arch",
+				UseCompanyColour: true,
+			}
+
+			hall.WriteToFile(&file)
+			objectID = objectID + 1
+
+		}
 
 		buffers := nfo.BufferStop{
 			ID:               objectID,

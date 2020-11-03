@@ -16,7 +16,7 @@ type Waypoint struct {
 }
 
 const (
-	WAYPOINT_SPRITE_HEIGHT = 55
+	WAYPOINT_SPRITE_HEIGHT      = 55
 	WAYPOINT_BASE_SPRITE_HEIGHT = 35
 )
 
@@ -40,7 +40,7 @@ func GetWaypointSprite(filename string, num int, swap bool) Sprite {
 }
 
 func GetWaypointBaseSprite(filename string, num int, swap bool) Sprite {
-	xrel := 1-(BUILDING_SPRITE_WIDTH / 2)
+	xrel := 1 - (BUILDING_SPRITE_WIDTH / 2)
 	yrel := -(WAYPOINT_BASE_SPRITE_HEIGHT / 2) + 14
 
 	if swap {
@@ -106,7 +106,6 @@ func (wp *Waypoint) WriteToFile(file *File) {
 	// Add the layouts (2 layouts, 1 with building, 1 without)
 	layoutEntries = append(layoutEntries, wp.getLayoutEntry(true))
 	layoutEntries = append(layoutEntries, wp.getLayoutEntry(false))
-
 
 	def.AddProperty(&properties.SpriteLayout{
 		Entries: layoutEntries,
