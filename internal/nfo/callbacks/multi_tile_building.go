@@ -8,6 +8,7 @@ import (
 type MultiTileBuildingCallback struct {
 	SetID  int
 	Length int
+	YearCallbackID int
 }
 
 func (mtb *MultiTileBuildingCallback) GetComment() string {
@@ -47,25 +48,9 @@ func (mtb *MultiTileBuildingCallback) getCallback() string {
 	return callback
 }
 
-func (mtb *MultiTileBuildingCallback) getDecider() string {
-	// Callbacks require a callback decider. This will be passed the type
-	// of callback (station layout = 14) and be responsible for routing it
-	// to the correct callback.
-	length := 17
-
-	return fmt.Sprintf(
-		"* %d 02 04 %s 85 0C 00 FF FF 01\n"+
-			"    %s 00 14 00 14 00\n"+
-			"    00 00", // Return the default sprite if we don't trigger any callback
-		length,
-		bytes.GetByte(mtb.SetID),   // The callback decider is given the SetID
-		bytes.GetByte(mtb.SetID+1), // The actual callback is SetID + 1
-	)
-}
-
 func (mtb *MultiTileBuildingCallback) GetLines() []string {
 	return []string{
 		mtb.getCallback(),
-		mtb.getDecider(),
+		GetDecider(mtb.SetID, mtb.SetID+1, mtb.YearCallbackID, 0),
 	}
 }

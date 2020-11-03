@@ -15,6 +15,7 @@ type Building struct {
 	Width            int
 	Height           int
 	UseCompanyColour bool
+	YearAvailable    int
 }
 
 const (
@@ -98,9 +99,9 @@ func (s *Building) WriteToFile(file *File) {
 	// Prevent train entering
 	def.AddProperty(&properties.PreventTrainEntryFlag{})
 
-	// If this is a multi-tile station it will need a callback for its sprite layout
-	if s.Width > 1 {
-		def.AddProperty(&properties.CallbackFlag{SpriteLayout: true})
+	// If this is a multi-tile station or has an availability year it will need a callback for its sprite layout
+	if s.Width > 1 || s.YearAvailable != 0 {
+		def.AddProperty(&properties.CallbackFlag{SpriteLayout: s.Width > 1, Availability: s.YearAvailable != 0})
 	}
 
 	file.AddElement(def)
@@ -113,13 +114,25 @@ func (s *Building) WriteToFile(file *File) {
 	})
 
 	spriteset := 0
+	yearCallbackID := 0
+
+	if s.YearAvailable != 0 {
+		yearCallbackID, spriteset = 10, 10
+		file.AddElement(&callbacks.AvailabilityYearCallback{
+			SetID:      yearCallbackID,
+			HasDecider: s.Width <= 1,
+			Year:       s.YearAvailable,
+		})
+	}
+
 	if s.Width > 1 {
-		spriteset = 10
+		spriteset = 11
 
 		// Add the callback for building tile selection
 		file.AddElement(&callbacks.MultiTileBuildingCallback{
 			SetID:  spriteset,
 			Length: s.Width,
+			YearCallbackID: yearCallbackID,
 		})
 	}
 

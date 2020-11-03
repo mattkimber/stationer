@@ -8,6 +8,7 @@ import (
 type StationFenceCallback struct {
 	SetID            int
 	DefaultSpriteSet int
+	YearCallbackID   int
 }
 
 func (s *StationFenceCallback) GetComment() string {
@@ -36,25 +37,12 @@ func (s *StationFenceCallback) getAction(checkValue, ifTrueValue, ifFalseValue s
 		ifFalseValue)
 }
 
-func (s *StationFenceCallback) getCallback(chainStart int) string {
-	length := 17
-
-	return fmt.Sprintf(
-		"* %d 02 04 %s 85 0C 00 FF FF 01\n"+
-			"    %s 00 14 00 14 00\n"+
-			"    %s 00",
-		length,
-		bytes.GetByte(s.SetID), // The callback decider is given the SetID
-		bytes.GetByte(chainStart),
-		bytes.GetByte(s.DefaultSpriteSet),
-	)
-}
-
 func (s *StationFenceCallback) GetLines() []string {
 	return []string{
 		s.getAction("10", "04 80", "00 80", 1),                                   // N: true, S: check
 		s.getAction("10", "06 80", "02 80", 2),                                   // N: false, S: check
 		s.getAction("F0", bytes.GetWord(s.SetID+2), bytes.GetWord(s.SetID+1), 3), // N: check, S: unknown
-		s.getCallback(s.SetID + 3),
+		//s.getCallback(s.SetID + 3),
+		GetDecider(s.SetID, s.SetID+3, s.YearCallbackID, s.DefaultSpriteSet),
 	}
 }

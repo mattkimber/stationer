@@ -8,6 +8,7 @@ import (
 // CLass ID
 type CallbackFlag struct {
 	SpriteLayout bool
+	Availability bool
 }
 
 func (c *CallbackFlag) GetBytes() int {
@@ -16,6 +17,9 @@ func (c *CallbackFlag) GetBytes() int {
 
 func (c *CallbackFlag) GetString() string {
 	value := 0
+	if c.Availability {
+		value += 1
+	}
 	if c.SpriteLayout {
 		value += 2
 	}

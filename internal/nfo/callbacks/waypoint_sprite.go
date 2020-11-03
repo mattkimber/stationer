@@ -6,6 +6,7 @@ import (
 )
 
 type WaypointSpriteCallback struct {
+	YearCallbackID int
 }
 
 func (wsc *WaypointSpriteCallback) GetComment() string {
@@ -38,25 +39,9 @@ func (wsc *WaypointSpriteCallback) getCallback() string {
 	return callback
 }
 
-func (wsc *WaypointSpriteCallback) getDecider() string {
-	// Callbacks require a callback decider. This will be passed the type
-	// of callback (station layout = 14) and be responsible for routing it
-	// to the correct callback.
-	length := 17
-
-	return fmt.Sprintf(
-		"* %d 02 04 %s 85 0C 00 FF FF 01\n"+
-			"    %s 00 14 00 14 00\n"+
-			"    00 00", // Return the default sprite if we don't trigger any callback
-		length,
-		bytes.GetByte(2), // The callback decider is given an ID of 2
-		bytes.GetByte(1), // The actual callback is SetID + 1
-	)
-}
-
 func (wsc *WaypointSpriteCallback) GetLines() []string {
 	return []string{
 		wsc.getCallback(),
-		wsc.getDecider(),
+		GetDecider(2, 1, wsc.YearCallbackID, 0),
 	}
 }

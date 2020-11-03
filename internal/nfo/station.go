@@ -20,6 +20,7 @@ type Station struct {
 	HasFences             bool
 	InnerPlatform         bool
 	OuterPlatform         bool
+	YearAvailable         int
 }
 
 const (
@@ -203,8 +204,8 @@ func (s *Station) WriteToFile(file *File) {
 	def := &Definition{StationID: s.ID}
 	def.AddProperty(&properties.ClassID{ID: s.ClassID})
 
-	if s.HasFences {
-		def.AddProperty(&properties.CallbackFlag{SpriteLayout: true})
+	if s.HasFences || s.YearAvailable != 0 {
+		def.AddProperty(&properties.CallbackFlag{SpriteLayout: s.HasFences, Availability: s.YearAvailable != 0})
 	}
 
 	def.AddProperty(&properties.LittleLotsThreshold{Amount: 200})
@@ -266,15 +267,31 @@ func (s *Station) WriteToFile(file *File) {
 	passengerCargoSet := 0
 	otherCargoSet := 1
 
+	yearCallbackID := 0
+
+	if s.YearAvailable != 0 {
+		yearCallbackID = 8
+		file.AddElement(&callbacks.AvailabilityYearCallback{
+			SetID:      yearCallbackID,
+			HasDecider: s.HasFences,
+			Year:       s.YearAvailable,
+		})
+
+		passengerCargoSet, otherCargoSet = yearCallbackID, yearCallbackID
+	}
+
+
 	if s.HasFences {
 		file.AddElement(&callbacks.StationFenceCallback{
 			SetID:            10,
 			DefaultSpriteSet: 0,
+			YearCallbackID: yearCallbackID,
 		})
 
 		file.AddElement(&callbacks.StationFenceCallback{
 			SetID:            20,
 			DefaultSpriteSet: 1,
+			YearCallbackID: yearCallbackID,
 		})
 
 		passengerCargoSet, otherCargoSet = 10, 20

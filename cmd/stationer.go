@@ -15,6 +15,7 @@ type StationClass struct {
 	Filename  string
 	ClassID   string
 	ClassName string
+	Available int
 }
 
 func main() {
@@ -31,9 +32,9 @@ func main() {
 	file.AddElement(&nfo.CargoTypeTable{Cargos: []string{"PASS", "MAIL"}})
 
 	classes := []StationClass{
-		{Filename: "wooden", ClassID: "TWF0", ClassName: "Wooden Platforms"},
-		{Filename: "concrete", ClassID: "TWF1", ClassName: "Concrete Platforms"},
-		{Filename: "modern", ClassID: "TWF2", ClassName: "Modern Platforms"},
+		{Filename: "wooden", ClassID: "TWF0", ClassName: "Wooden Platforms", Available: 0},
+		{Filename: "concrete", ClassID: "TWF1", ClassName: "Concrete Platforms", Available: 1860},
+		{Filename: "modern", ClassID: "TWF2", ClassName: "Modern Platforms", Available: 1970},
 	}
 
 	rampConfiguration := properties.PlatformLayout{
@@ -69,6 +70,7 @@ func main() {
 				ClassID:          class.ClassID,
 				ClassName:        class.ClassName,
 				ObjectName:       "Platform",
+				YearAvailable:    class.Available,
 				UseCompanyColour: true,
 				HasFences:        true,
 				InnerPlatform:    true,
@@ -79,6 +81,7 @@ func main() {
 				ClassID:          class.ClassID,
 				ClassName:        class.ClassName,
 				ObjectName:       "Platform (inner)",
+				YearAvailable:    class.Available,
 				UseCompanyColour: true,
 				HasFences:        true,
 				InnerPlatform:    true,
@@ -89,6 +92,7 @@ func main() {
 				ClassID:          class.ClassID,
 				ClassName:        class.ClassName,
 				ObjectName:       "Platform (outer)",
+				YearAvailable:    class.Available,
 				UseCompanyColour: true,
 				HasFences:        true,
 				InnerPlatform:    false,
@@ -99,6 +103,7 @@ func main() {
 				ClassID:          class.ClassID,
 				ClassName:        class.ClassName,
 				ObjectName:       "Platform with sign",
+				YearAvailable:    max(class.Available, 1845),
 				UseCompanyColour: true,
 				HasFences:        true,
 				InnerPlatform:    true,
@@ -109,6 +114,7 @@ func main() {
 				ClassID:          class.ClassID,
 				ClassName:        class.ClassName,
 				ObjectName:       "Platform with sign (inner)",
+				YearAvailable:    max(class.Available, 1845),
 				UseCompanyColour: true,
 				HasFences:        true,
 				InnerPlatform:    true,
@@ -119,6 +125,7 @@ func main() {
 				ClassID:          class.ClassID,
 				ClassName:        class.ClassName,
 				ObjectName:       "Platform with sign (outer)",
+				YearAvailable:    max(class.Available, 1845),
 				UseCompanyColour: true,
 				HasFences:        true,
 				InnerPlatform:    false,
@@ -129,6 +136,7 @@ func main() {
 				ClassID:          class.ClassID,
 				ClassName:        class.ClassName,
 				ObjectName:       "Platform with benches",
+				YearAvailable:    max(class.Available, 1840),
 				UseCompanyColour: true,
 				HasFences:        true,
 				InnerPlatform:    true,
@@ -139,6 +147,7 @@ func main() {
 				ClassID:          class.ClassID,
 				ClassName:        class.ClassName,
 				ObjectName:       "Platform with benches (inner)",
+				YearAvailable:    max(class.Available, 1840),
 				UseCompanyColour: true,
 				HasFences:        true,
 				InnerPlatform:    true,
@@ -149,6 +158,7 @@ func main() {
 				ClassID:          class.ClassID,
 				ClassName:        class.ClassName,
 				ObjectName:       "Platform with benches (outer)",
+				YearAvailable:    max(class.Available, 1840),
 				UseCompanyColour: true,
 				HasFences:        true,
 				InnerPlatform:    false,
@@ -159,6 +169,7 @@ func main() {
 				ClassID:          class.ClassID,
 				ClassName:        class.ClassName,
 				ObjectName:       "Shelter (traditional)",
+				YearAvailable:    max(class.Available, 1870),
 				MaxLoadState:     5,
 				UseCompanyColour: true,
 				HasFences:        true,
@@ -170,6 +181,7 @@ func main() {
 				ClassID:          class.ClassID,
 				ClassName:        class.ClassName,
 				ObjectName:       "Shelter (traditional, inner)",
+				YearAvailable:    max(class.Available, 1870),
 				MaxLoadState:     5,
 				UseCompanyColour: true,
 				HasFences:        true,
@@ -181,6 +193,7 @@ func main() {
 				ClassID:          class.ClassID,
 				ClassName:        class.ClassName,
 				ObjectName:       "Shelter (traditional, outer)",
+				YearAvailable:    max(class.Available, 1870),
 				MaxLoadState:     5,
 				UseCompanyColour: true,
 				HasFences:        true,
@@ -191,6 +204,7 @@ func main() {
 				SpriteFilename:        class.Filename + "_ramp_ne",
 				ClassID:               class.ClassID,
 				ClassName:             class.ClassName,
+				YearAvailable:    class.Available,
 				MaxLoadState:          5,
 				InnerPlatform:         true,
 				OuterPlatform:         true,
@@ -203,6 +217,7 @@ func main() {
 				SpriteFilename:        class.Filename + "_ramp_ne",
 				ClassID:               class.ClassID,
 				ClassName:             class.ClassName,
+				YearAvailable:    class.Available,
 				MaxLoadState:          5,
 				InnerPlatform:         true,
 				OuterPlatform:         false,
@@ -215,6 +230,7 @@ func main() {
 				SpriteFilename:        class.Filename + "_ramp_ne",
 				ClassID:               class.ClassID,
 				ClassName:             class.ClassName,
+				YearAvailable:    class.Available,
 				MaxLoadState:          5,
 				InnerPlatform:         false,
 				OuterPlatform:         true,
@@ -227,6 +243,7 @@ func main() {
 				SpriteFilename:        class.Filename + "_ramp_sw",
 				ClassID:               class.ClassID,
 				ClassName:             class.ClassName,
+				YearAvailable:    class.Available,
 				MaxLoadState:          5,
 				InnerPlatform:         true,
 				OuterPlatform:         true,
@@ -239,6 +256,7 @@ func main() {
 				SpriteFilename:        class.Filename + "_ramp_sw",
 				ClassID:               class.ClassID,
 				ClassName:             class.ClassName,
+				YearAvailable:    class.Available,
 				MaxLoadState:          5,
 				InnerPlatform:         true,
 				OuterPlatform:         false,
@@ -251,6 +269,7 @@ func main() {
 				SpriteFilename:        class.Filename + "_ramp_sw",
 				ClassID:               class.ClassID,
 				ClassName:             class.ClassName,
+				YearAvailable:    class.Available,
 				MaxLoadState:          5,
 				InnerPlatform:         false,
 				OuterPlatform:         true,
@@ -263,6 +282,7 @@ func main() {
 				SpriteFilename:        class.Filename + "_bare_footbridge",
 				ClassID:               class.ClassID,
 				ClassName:             class.ClassName,
+				YearAvailable:    	    max(class.Available, 1865),
 				ObjectName:            "Footbridge",
 				UseCompanyColour:      true,
 				HasFences:             true,
@@ -326,50 +346,78 @@ func main() {
 
 		buffers.WriteToFile(&file)
 		objectID = objectID + 1
+
+		platforms := []nfo.FullTilePlatform{
+			{
+				SpriteFilename:   fmt.Sprintf("%s_concourse", class.Filename),
+				ClassID:          class.ClassID,
+				ClassName:        class.ClassName,
+				ObjectName:       "Concourse",
+				UseCompanyColour: true,
+			},
+			{
+				SpriteFilename:   fmt.Sprintf("%s_concourse_shelter", class.Filename),
+				ClassID:          class.ClassID,
+				ClassName:        class.ClassName,
+				ObjectName:       "Concourse with shelters",
+				UseCompanyColour: true,
+			},
+		}
+
+		for _, platform := range platforms {
+			platform.ID = objectID
+			platform.WriteToFile(&file)
+			objectID = objectID + 1
+		}
 	}
 
 	buildings := []nfo.Building{
 		{
 			SpriteFilename:   "suburban_flat_roof",
 			ClassID:          "TWFB",
-			ClassName:        "Non-track tiles",
+			ClassName:        "Buildings",
 			ObjectName:       "Suburban Flat Roof Station",
+			YearAvailable:    1962,
 			UseCompanyColour: true,
 		},
 		{
 			SpriteFilename:   "rural",
 			ClassID:          "TWFB",
-			ClassName:        "Non-track tiles",
+			ClassName:        "Buildings",
 			ObjectName:       "Rural Station",
 			UseCompanyColour: true,
 		},
 		{
 			SpriteFilename:   "art_deco",
 			ClassID:          "TWFB",
-			ClassName:        "Non-track tiles",
+			ClassName:        "Buildings",
 			ObjectName:       "Art Deco Station",
+			YearAvailable:    1935,
 			Width:            2,
 			UseCompanyColour: true,
 		},
 		{
 			SpriteFilename:   "small_city",
 			ClassID:          "TWFB",
-			ClassName:        "Non-track tiles",
+			ClassName:        "Buildings",
 			ObjectName:       "City Station",
+			YearAvailable:    1965,
 			UseCompanyColour: true,
 		},
 		{
 			SpriteFilename:   "leslie_green",
 			ClassID:          "TWFB",
-			ClassName:        "Non-track tiles",
+			ClassName:        "Buildings",
 			ObjectName:       "Leslie Green Station",
+			YearAvailable: 	  1904,
 			UseCompanyColour: true,
 		},
 		{
 			SpriteFilename:   "j_m_easton",
 			ClassID:          "TWFB",
-			ClassName:        "Non-track tiles",
+			ClassName:        "Buildings",
 			ObjectName:       "J.M. Easton Station",
+			YearAvailable:    1935,
 			UseCompanyColour: true,
 		},
 	}
@@ -411,4 +459,12 @@ func main() {
 	}
 
 	file.Output()
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+
+	return b
 }
