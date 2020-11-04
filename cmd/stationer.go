@@ -23,7 +23,7 @@ func main() {
 	file.AddElement(&nfo.Header{
 		Initials:    "TWF",
 		SetID:       8,
-		SetName:     "Timberwolf's Stations 0.2.0 (alpha)",
+		SetName:     "Timberwolf's Stations 0.2.1 (alpha)",
 		Description: "A set of British-style railway stations",
 		Version:     1,
 		MinVersion:  1,
@@ -442,6 +442,13 @@ func main() {
 
 	waypoints := []nfo.Waypoint{
 		{
+			SpriteFilename:   "wp_kilby_bridge",
+			ClassID:          "WAYP",
+			ClassName:        "Waypoints",
+			ObjectName:       "Kilby Bridge",
+			UseCompanyColour: true,
+		},
+		{
 			SpriteFilename:   "wp_hebden_bridge",
 			ClassID:          "WAYP",
 			ClassName:        "Waypoints",
@@ -462,7 +469,7 @@ func main() {
 			ClassID:          "WAYP",
 			ClassName:        "Waypoints",
 			ObjectName:       "Arnside",
-			YearAvailable:    0,
+			YearAvailable:    1870,
 			UseCompanyColour: true,
 		},
 	}
