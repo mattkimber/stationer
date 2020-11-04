@@ -23,7 +23,7 @@ func main() {
 	file.AddElement(&nfo.Header{
 		Initials:    "TWF",
 		SetID:       8,
-		SetName:     "Timberwolf's Stations 0.1.0 (alpha)",
+		SetName:     "Timberwolf's Stations 0.2.0 (alpha)",
 		Description: "A set of British-style railway stations",
 		Version:     1,
 		MinVersion:  1,
@@ -377,11 +377,10 @@ func main() {
 
 	buildings := []nfo.Building{
 		{
-			SpriteFilename:   "suburban_flat_roof",
+			SpriteFilename:   "wooden",
 			ClassID:          "TWFB",
 			ClassName:        "Buildings",
-			ObjectName:       "Suburban Flat Roof Station",
-			YearAvailable:    1962,
+			ObjectName:       "Wooden Station",
 			UseCompanyColour: true,
 		},
 		{
@@ -389,6 +388,7 @@ func main() {
 			ClassID:          "TWFB",
 			ClassName:        "Buildings",
 			ObjectName:       "Rural Station",
+			YearAvailable:    1840,
 			UseCompanyColour: true,
 		},
 		{
@@ -398,6 +398,14 @@ func main() {
 			ObjectName:       "Art Deco Station",
 			YearAvailable:    1935,
 			Width:            2,
+			UseCompanyColour: true,
+		},
+		{
+			SpriteFilename:   "suburban_flat_roof",
+			ClassID:          "TWFB",
+			ClassName:        "Buildings",
+			ObjectName:       "Suburban Flat Roof Station",
+			YearAvailable:    1962,
 			UseCompanyColour: true,
 		},
 		{
@@ -454,7 +462,7 @@ func main() {
 			ClassID:          "WAYP",
 			ClassName:        "Waypoints",
 			ObjectName:       "Arnside",
-			YearAvailable:    1895,
+			YearAvailable:    0,
 			UseCompanyColour: true,
 		},
 	}
