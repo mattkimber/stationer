@@ -5,7 +5,9 @@ import (
 	"github.com/mattkimber/stationer/internal/bytes"
 )
 
-type BufferStopCallback struct{}
+type BufferStopCallback struct {
+	YearCallbackID int
+}
 
 func (mtb *BufferStopCallback) GetComment() string {
 	return "Callback for buffer stop"
@@ -79,22 +81,6 @@ func (mtb *BufferStopCallback) getCallback() string {
 	return callback
 }
 
-func (mtb *BufferStopCallback) getDecider() string {
-	// Callbacks require a callback decider. This will be passed the type
-	// of callback (station layout = 14) and be responsible for routing it
-	// to the correct callback.
-	length := 17
-
-	return fmt.Sprintf(
-		"* %d 02 04 %s 85 0C 00 FF FF 01\n"+
-			"    %s 00 14 00 14 00\n"+
-			"    00 00", // Return the default sprite if we don't trigger any callback
-		length,
-		bytes.GetByte(0), // The callback decider is given this ID
-		bytes.GetByte(1), // The first callback in the chain is this ID
-	)
-}
-
 func (mtb *BufferStopCallback) GetLines() []string {
 	return []string{
 		// Callbacks for "both"
@@ -128,6 +114,6 @@ func (mtb *BufferStopCallback) GetLines() []string {
 		mtb.getFenceCallback("0F", bytes.GetWord(33), bytes.GetWord(36), 30), // R: check, N: unknown, S: unknown
 
 		mtb.getCallback(),
-		mtb.getDecider(),
+		GetDecider(0, 1, mtb.YearCallbackID, 0),
 	}
 }

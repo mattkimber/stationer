@@ -16,6 +16,7 @@ type FullTilePlatform struct {
 	Height               int
 	UseCompanyColour     bool
 	HasCustomFoundations bool
+	YearAvailable        int
 }
 
 func (s *FullTilePlatform) GetBaseSpriteNumber() int {
@@ -64,7 +65,7 @@ func (s *FullTilePlatform) WriteToFile(file *File) {
 	def.AddProperty(&properties.PreventTrainEntryFlag{})
 
 	// Add flag for sprite layout callback
-	def.AddProperty(&properties.CallbackFlag{SpriteLayout: true})
+	def.AddProperty(&properties.CallbackFlag{SpriteLayout: true, Availability: s.YearAvailable != 0})
 
 	file.AddElement(def)
 
@@ -75,10 +76,19 @@ func (s *FullTilePlatform) WriteToFile(file *File) {
 		SpriteSets:    []int{0},
 	})
 
-	spriteset := 0
+	yearCallbackID, spriteset := 0, 0
+
+	if s.YearAvailable != 0 {
+		yearCallbackID = 20
+		file.AddElement(&callbacks.AvailabilityYearCallback{
+			SetID:      yearCallbackID,
+			HasDecider: false,
+			Year:       s.YearAvailable,
+		})
+	}
 
 	// Add the callback
-	file.AddElement(&callbacks.PlatformFenceCallback{})
+	file.AddElement(&callbacks.PlatformFenceCallback{YearCallbackID: yearCallbackID})
 
 	file.AddElement(&GraphicSetAssignment{
 		IDs:        []int{s.ID},

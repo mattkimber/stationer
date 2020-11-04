@@ -130,8 +130,8 @@ func (s *Building) WriteToFile(file *File) {
 
 		// Add the callback for building tile selection
 		file.AddElement(&callbacks.MultiTileBuildingCallback{
-			SetID:  spriteset,
-			Length: s.Width,
+			SetID:          spriteset,
+			Length:         s.Width,
 			YearCallbackID: yearCallbackID,
 		})
 	}

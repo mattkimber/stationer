@@ -2,6 +2,7 @@ package nfo
 
 import (
 	"fmt"
+	"github.com/mattkimber/stationer/internal/nfo/callbacks"
 	"github.com/mattkimber/stationer/internal/nfo/properties"
 )
 
@@ -16,6 +17,7 @@ type StationHall struct {
 	MaxLoadState          int
 	PlatformHeight        int
 	RoofType              string
+	YearAvailable         int
 }
 
 func GetRoofSprite(filename string, num int) Sprite {
@@ -156,6 +158,10 @@ func (s *StationHall) WriteToFile(file *File) {
 	def.AddProperty(&properties.ClassID{ID: s.ClassID})
 	def.AddProperty(&properties.LittleLotsThreshold{Amount: 200})
 
+	if s.YearAvailable != 0 {
+		def.AddProperty(&properties.CallbackFlag{Availability: s.YearAvailable != 0})
+	}
+
 	// Default layouts as per original OpenTTD stations
 	layoutEntries := []properties.LayoutEntry{
 		// Single platform
@@ -214,6 +220,9 @@ func (s *StationHall) WriteToFile(file *File) {
 		def.AddProperty(&properties.AllowedPlatforms{Bitmask: s.PlatformConfiguration.Platforms})
 	}
 
+	passengerCargoSet := 0
+	otherCargoSet := 1
+
 	file.AddElement(def)
 
 	file.AddElement(&StationSet{
@@ -230,8 +239,20 @@ func (s *StationHall) WriteToFile(file *File) {
 		SpriteSets:    []int{0},
 	})
 
-	passengerCargoSet := 0
-	otherCargoSet := 1
+	// The callback definition has to come *after* the set definitions or it will be referencing sets from the
+	// previous station item.
+	setID := 0
+	if s.YearAvailable != 0 {
+		setID = 8
+		file.AddElement(&callbacks.AvailabilityYearCallback{
+			SetID:            setID,
+			HasDecider:       true,
+			Year:             s.YearAvailable,
+			DefaultSpriteset: 1,
+		})
+
+		otherCargoSet = setID
+	}
 
 	file.AddElement(&GraphicSetAssignment{
 		IDs: []int{s.ID},

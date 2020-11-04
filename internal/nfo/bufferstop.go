@@ -16,6 +16,7 @@ type BufferStop struct {
 	Height               int
 	UseCompanyColour     bool
 	HasCustomFoundations bool
+	YearAvailable        int
 }
 
 const (
@@ -94,7 +95,7 @@ func (s *BufferStop) WriteToFile(file *File) {
 	def.AddProperty(&properties.PreventTrainEntryFlag{})
 
 	// Add flag for sprite layout callback
-	def.AddProperty(&properties.CallbackFlag{SpriteLayout: true})
+	def.AddProperty(&properties.CallbackFlag{SpriteLayout: true, Availability: s.YearAvailable != 0})
 
 	file.AddElement(def)
 
@@ -105,10 +106,19 @@ func (s *BufferStop) WriteToFile(file *File) {
 		SpriteSets:    []int{0},
 	})
 
-	spriteset := 0
+	spriteset, yearCallbackID := 0, 0
+
+	if s.YearAvailable != 0 {
+		yearCallbackID = 2
+		file.AddElement(&callbacks.AvailabilityYearCallback{
+			SetID:      yearCallbackID,
+			HasDecider: s.Width <= 1,
+			Year:       s.YearAvailable,
+		})
+	}
 
 	// Add the callback
-	file.AddElement(&callbacks.BufferStopCallback{})
+	file.AddElement(&callbacks.BufferStopCallback{YearCallbackID: yearCallbackID})
 
 	file.AddElement(&GraphicSetAssignment{
 		IDs:        []int{s.ID},

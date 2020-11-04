@@ -6,8 +6,8 @@ import (
 )
 
 type MultiTileBuildingCallback struct {
-	SetID  int
-	Length int
+	SetID          int
+	Length         int
 	YearCallbackID int
 }
 

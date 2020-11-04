@@ -273,25 +273,24 @@ func (s *Station) WriteToFile(file *File) {
 		yearCallbackID = 8
 		file.AddElement(&callbacks.AvailabilityYearCallback{
 			SetID:      yearCallbackID,
-			HasDecider: s.HasFences,
+			HasDecider: !s.HasFences,
 			Year:       s.YearAvailable,
 		})
 
 		passengerCargoSet, otherCargoSet = yearCallbackID, yearCallbackID
 	}
 
-
 	if s.HasFences {
 		file.AddElement(&callbacks.StationFenceCallback{
 			SetID:            10,
 			DefaultSpriteSet: 0,
-			YearCallbackID: yearCallbackID,
+			YearCallbackID:   yearCallbackID,
 		})
 
 		file.AddElement(&callbacks.StationFenceCallback{
 			SetID:            20,
 			DefaultSpriteSet: 1,
-			YearCallbackID: yearCallbackID,
+			YearCallbackID:   yearCallbackID,
 		})
 
 		passengerCargoSet, otherCargoSet = 10, 20

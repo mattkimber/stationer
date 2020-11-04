@@ -13,6 +13,7 @@ type Waypoint struct {
 	ClassName        string
 	ObjectName       string
 	UseCompanyColour bool
+	YearAvailable    int
 }
 
 const (
@@ -111,7 +112,7 @@ func (wp *Waypoint) WriteToFile(file *File) {
 		Entries: layoutEntries,
 	})
 
-	def.AddProperty(&properties.CallbackFlag{SpriteLayout: true})
+	def.AddProperty(&properties.CallbackFlag{SpriteLayout: true, Availability: wp.YearAvailable != 0})
 
 	file.AddElement(def)
 
@@ -122,10 +123,19 @@ func (wp *Waypoint) WriteToFile(file *File) {
 		SpriteSets:    []int{0},
 	})
 
-	spriteset := 2
+	spriteset, yearCallbackID := 2, 0
+
+	if wp.YearAvailable != 0 {
+		yearCallbackID = 2
+		file.AddElement(&callbacks.AvailabilityYearCallback{
+			SetID:      yearCallbackID,
+			HasDecider: false,
+			Year:       wp.YearAvailable,
+		})
+	}
 
 	// Add the callback for building tile selection
-	file.AddElement(&callbacks.WaypointSpriteCallback{})
+	file.AddElement(&callbacks.WaypointSpriteCallback{YearCallbackID: yearCallbackID})
 
 	file.AddElement(&GraphicSetAssignment{
 		IDs:        []int{wp.ID},

@@ -5,7 +5,7 @@ import (
 	"github.com/mattkimber/stationer/internal/bytes"
 )
 
-type PlatformFenceCallback struct{
+type PlatformFenceCallback struct {
 	YearCallbackID int
 }
 

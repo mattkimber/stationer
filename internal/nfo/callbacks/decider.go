@@ -28,14 +28,16 @@ func GetDecider(deciderID, layoutCallbackID, yearCallbackID, defaultSpriteset in
 
 	return fmt.Sprintf(
 		"* %d 02 04 %s 85 0C 00 FF FF %s\n"+
-			yearCallback +
-			layoutCallback +
+			yearCallback+
+			layoutCallback+
 			"    %s 00", // Return the default sprite if we don't trigger any callback
+		// DO NOT put the xx 80 flag here, if you're not getting the correct sets from this callback
+		// something else is broken.
 		length,
-		bytes.GetByte(deciderID),   // The callback decider is given the SetID
-		bytes.GetByte(ranges),      // Number of ranges can change if we have more than one callback
-									// If this isn't right you will get weird results (default sprites, etc.)
+		bytes.GetByte(deciderID), // The callback decider is given the SetID
+		bytes.GetByte(ranges),    // Number of ranges can change if we have more than one callback
+		// If this isn't right you will get weird results (default sprites, etc.)
 		bytes.GetByte(defaultSpriteset), // If you return 0 for platforms rather than the correct spriteset, you
-		                                 // get incorrect sprites in the purchase menu
+		// get incorrect sprites in the purchase menu
 	)
 }
