@@ -45,6 +45,11 @@ func (f *File) Output() {
 	for _, l := range lines {
 		if l[0:2] == "//" {
 			fmt.Printf("\n%s\n", l)
+		} else if l[0:2] == "-1" {
+			// Invisible sprites still need to increment the sprite counter, but do
+			// not get prefixed with a line number as they already contain one
+			fmt.Printf("\n%s\n", l)
+			idx++
 		} else {
 			fmt.Printf("%d %s\n", idx+1, l)
 			idx++

@@ -43,6 +43,14 @@ const (
 
 
 func (s *Station) GetBaseSpriteNumber() int {
+	// The sprite number is a relative offset from the spriteset.
+	// e.g. even if you are using set ID 20, the base sprite in it
+	// still has number 0.
+	//
+	// However in this set we put all of the station graphics in
+	// a single spriteset so we can mix and match between them
+	// in our layouts - hence there is still an offset here, which
+	// is the offset *within* the spriteset.
 	if s.UseCompanyColour {
 		return COMPANY_COLOUR_SPRITE + s.BaseSpriteID
 	}

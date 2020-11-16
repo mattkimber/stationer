@@ -8,6 +8,7 @@ import (
 
 type StationHall struct {
 	ID                    int
+	BaseSpritesetID       int
 	SpriteFilename        string
 	ClassID               string
 	ClassName             string
@@ -176,7 +177,7 @@ func (s *StationHall) WriteToFile(file *output_file.File) {
 		SetID:         1,
 		NumLittleSets: 0,
 		NumLotsSets:   1,
-		SpriteSets:    []int{0},
+		SpriteSets:    GetSpriteSets(0),
 	})
 
 	// The callback definition has to come *after* the set definitions or it will be referencing sets from the

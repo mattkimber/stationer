@@ -71,35 +71,29 @@ func main() {
 
 
 	for _, class := range classes {
-		suffixes := map[int]string {
-			0: "empty",
-			100: "sign",
-			200: "benches",
-			300: "bare_shelter_traditional",
-			400: "ramp_ne",
-			500: "ramp_sw",
-			600: "bare_footbridge",
+
+		// All the station sprites are put in one massive spriteset
+		// so they can be mixed and matched
+		classSprites := sprites.StationSprites{
+			ID:             0,
+			Sprites: []sprites.StationSprite{
+					{Filename: "empty", HasFences: true, MaxLoadState: 6},
+					{Filename: "sign", HasFences: true, MaxLoadState: 6},
+					{Filename: "benches", HasFences: true, MaxLoadState: 6},
+					{Filename: "bare_shelter_traditional", HasFences: true, MaxLoadState: 5},
+					{Filename: "ramp_ne", HasFences: true, MaxLoadState: 5},
+					{Filename: "ramp_sw", HasFences: true, MaxLoadState: 5},
+					{Filename: "bare_footbridge", HasFences: true, MaxLoadState: 5},
+			},
+			BaseFilename: class.Filename,
+			MaxLoadState: 6,
 		}
 
-		// Write the platform sprites to file
-		for id, suffix := range suffixes {
-			loadState := 5
-			if id < 300 {
-				loadState = 6
-			}
+		classSprites.WriteToFile(&file)
 
-			classSprite := sprites.StationSprites{
-				ID:             id,
-				SpriteFilename: class.Filename + "_" + suffix,
-				HasFences:      true,
-				MaxLoadState:   loadState,
-			}
-
-			classSprite.WriteToFile(&file)
-		}
 
 		footbridgeSprite := sprites.PlatformObject{
-			ID:              1000,
+			ID:              100,
 			SpriteFilename:  "footbridge",
 			MaxLoadState: 5,
 		}
@@ -122,7 +116,7 @@ func main() {
 			thisClass := []nfo.Station{
 				{
 					ID: baseObjectID+0,
-					BaseSpriteID: 0,
+					BaseSpriteID: 	  classSprites.SpriteMap["empty"],
 					ClassID:          class.ClassID,
 					ClassName:        class.ClassName,
 					ObjectName:       "Platform" + bracketName,
@@ -134,7 +128,7 @@ func main() {
 				},
 				{
 					ID: baseObjectID+1,
-					BaseSpriteID: 48,
+					BaseSpriteID: 	  classSprites.SpriteMap["sign"],
 					ClassID:          class.ClassID,
 					ClassName:        class.ClassName,
 					ObjectName:       "Platform with sign" + bracketName,
@@ -146,7 +140,7 @@ func main() {
 				},
 				{
 					ID: baseObjectID+2,
-					BaseSpriteID: 200,
+					BaseSpriteID: classSprites.SpriteMap["benches"],
 					ClassID:          class.ClassID,
 					ClassName:        class.ClassName,
 					ObjectName:       "Platform with benches" + bracketName,
@@ -158,7 +152,7 @@ func main() {
 				},
 				{
 					ID: baseObjectID+3,
-					BaseSpriteID: 300,
+					BaseSpriteID: classSprites.SpriteMap["bare_shelter_traditional"],
 					ClassID:          class.ClassID,
 					ClassName:        class.ClassName,
 					ObjectName:       "Shelter (traditional" + commaName + ")",
@@ -171,7 +165,7 @@ func main() {
 				},
 				{
 					ID: baseObjectID+4,
-					BaseSpriteID: 400,
+					BaseSpriteID: classSprites.SpriteMap["ramp_ne"],
 					ClassID:               class.ClassID,
 					ClassName:             class.ClassName,
 					YearAvailable:         class.Available,
@@ -185,7 +179,7 @@ func main() {
 				},
 				{
 					ID: baseObjectID+5,
-					BaseSpriteID: 500,
+					BaseSpriteID: classSprites.SpriteMap["ramp_sw"],
 					ClassID:               class.ClassID,
 					ClassName:             class.ClassName,
 					YearAvailable:         class.Available,
@@ -202,7 +196,7 @@ func main() {
 			if i == 0 {
 				thisClass = append(thisClass, nfo.Station{
 					ID: baseObjectID+6,
-					BaseSpriteID: 600,
+					BaseSpriteID: 		   classSprites.SpriteMap["bare_footbridge"],
 					ClassID:               class.ClassID,
 					ClassName:             class.ClassName,
 					YearAvailable:         max(class.Available, 1865),
@@ -222,7 +216,7 @@ func main() {
 							SizeX:          5,
 							SizeY:          8,
 							SizeZ:          3,
-							BaseSpriteID:   1000,
+							BaseSpriteID:   100,
 						},
 					},
 				})
