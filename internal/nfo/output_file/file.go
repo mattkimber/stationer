@@ -1,4 +1,4 @@
-package nfo
+package output_file
 
 import (
 	"fmt"

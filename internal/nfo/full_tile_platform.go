@@ -3,7 +3,9 @@ package nfo
 import (
 	"fmt"
 	"github.com/mattkimber/stationer/internal/nfo/callbacks"
+	"github.com/mattkimber/stationer/internal/nfo/output_file"
 	"github.com/mattkimber/stationer/internal/nfo/properties"
+	"github.com/mattkimber/stationer/internal/nfo/sprites"
 )
 
 type FullTilePlatform struct {
@@ -39,7 +41,7 @@ func (s *FullTilePlatform) GetObjects(direction int, idx int) []properties.Bound
 	return result
 }
 
-func (s *FullTilePlatform) WriteToFile(file *File) {
+func (s *FullTilePlatform) WriteToFile(file *output_file.File) {
 	s.addSprites(file)
 
 	def := &Definition{StationID: s.ID}
@@ -110,16 +112,16 @@ func (s *FullTilePlatform) WriteToFile(file *File) {
 	})
 }
 
-func (s *FullTilePlatform) addSprites(file *File) {
+func (s *FullTilePlatform) addSprites(file *output_file.File) {
 	// 3 sprites: N, S and both - 3 for Both fences - 7 each for N/S fence combinations
 	// 2 directions so all are doubled
 	numSprites := 2 * 16
-	file.AddElement(&Spritesets{ID: 0, NumSets: 1, NumSprites: numSprites})
+	file.AddElement(&sprites.Spritesets{ID: 0, NumSets: 1, NumSprites: numSprites})
 
 	filename := fmt.Sprintf("%s_8bpp.png", s.SpriteFilename)
 
 	// Non-fence sprites
-	file.AddElement(&Sprites{
+	file.AddElement(&sprites.Sprites{
 		GetBufferStopSprite(filename, 0, false),
 		GetBufferStopSprite(filename, 1, false),
 	})
@@ -130,7 +132,7 @@ func (s *FullTilePlatform) addSprites(file *File) {
 	for _, fenceElement := range fenceElements {
 		filename := fmt.Sprintf("%s_fence_%s_8bpp.png", s.SpriteFilename, fenceElement)
 
-		file.AddElement(&Sprites{
+		file.AddElement(&sprites.Sprites{
 			GetBufferStopSprite(filename, 0, false),
 			GetBufferStopSprite(filename, 1, false),
 		})

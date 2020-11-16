@@ -15,6 +15,14 @@ func GetByte(value int) string {
 	return fmt.Sprintf("%02X", a)
 }
 
+func GetVariableByte(value int) string {
+	if value >= 255 {
+		return fmt.Sprintf("FF %s", GetWord(value))
+	}
+
+	return GetByte(value)
+}
+
 func GetWord(value int) string {
 	a := value & 0xFF
 	b := value >> 8 & 0xFF

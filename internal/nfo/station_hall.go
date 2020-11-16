@@ -1,8 +1,8 @@
 package nfo
 
 import (
-	"fmt"
 	"github.com/mattkimber/stationer/internal/nfo/callbacks"
+	"github.com/mattkimber/stationer/internal/nfo/output_file"
 	"github.com/mattkimber/stationer/internal/nfo/properties"
 )
 
@@ -18,21 +18,6 @@ type StationHall struct {
 	PlatformHeight        int
 	RoofType              string
 	YearAvailable         int
-}
-
-func GetRoofSprite(filename string, num int) Sprite {
-	xrel := 1 - (BUILDING_SPRITE_WIDTH / 2)
-	yrel := -(BUILDING_SPRITE_HEIGHT / 2) - 6
-
-	return Sprite{
-		Filename: filename,
-		X:        BUILDING_SPRITE_WIDTH_WITH_PADDING * num,
-		Y:        0,
-		Width:    BUILDING_SPRITE_WIDTH,
-		Height:   BUILDING_SPRITE_HEIGHT,
-		XRel:     xrel,
-		YRel:     yrel,
-	}
 }
 
 func (s *StationHall) GetBaseSpriteNumber() int {
@@ -99,7 +84,7 @@ func (s *StationHall) GetObjects(direction int, supportOuter bool, supportInner 
 	return result
 }
 
-func (s *StationHall) WriteToFile(file *File) {
+func (s *StationHall) WriteToFile(file *output_file.File) {
 
 	if s.MaxLoadState == 0 {
 		s.MaxLoadState = DEFAULT_MAX_LOAD_STATE
@@ -107,51 +92,6 @@ func (s *StationHall) WriteToFile(file *File) {
 
 	if s.PlatformHeight == 0 {
 		s.PlatformHeight = DEFAULT_PLATFORM_HEIGHT
-	}
-
-	platformSprites := 8
-
-	file.AddElement(&Spritesets{ID: 0, NumSets: s.MaxLoadState + 1, NumSprites: platformSprites + (3 * 4)})
-
-	for i := 0; i <= s.MaxLoadState; i++ {
-		// Sprites without roof support
-		filename := fmt.Sprintf("%s_%d_8bpp.png", s.SpriteFilename, i)
-
-		file.AddElement(&Sprites{
-			GetSprite(filename, 0, false),
-			GetSprite(filename, 1, false),
-			GetSprite(filename, 2, true),
-			GetSprite(filename, 3, true),
-		})
-
-		// Sprites with roof support
-		filename = fmt.Sprintf("%s_%d_roof_8bpp.png", s.SpriteFilename, i)
-
-		file.AddElement(&Sprites{
-			GetSprite(filename, 0, false),
-			GetSprite(filename, 1, false),
-			GetSprite(filename, 2, true),
-			GetSprite(filename, 3, true),
-		})
-
-		roofSubtypes := []string{"single", "double_n", "double_s"}
-
-		for _, subtype := range roofSubtypes {
-			// 3 roof sprites (single, N, S) - repeated as we have multiple load states
-			filename = fmt.Sprintf("roof_%s_%s_8bpp.png", s.RoofType, subtype)
-			file.AddElement(&Sprites{
-				GetRoofSprite(filename, 0),
-				GetRoofSprite(filename, 1),
-			})
-
-			// And again for the glass
-			filename = fmt.Sprintf("roof_%s_%s_glass_8bpp.png", s.RoofType, subtype)
-			file.AddElement(&Sprites{
-				GetRoofSprite(filename, 0),
-				GetRoofSprite(filename, 1),
-			})
-		}
-
 	}
 
 	def := &Definition{StationID: s.ID}

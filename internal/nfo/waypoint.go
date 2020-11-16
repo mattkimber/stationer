@@ -3,7 +3,9 @@ package nfo
 import (
 	"fmt"
 	"github.com/mattkimber/stationer/internal/nfo/callbacks"
+	"github.com/mattkimber/stationer/internal/nfo/output_file"
 	"github.com/mattkimber/stationer/internal/nfo/properties"
+	"github.com/mattkimber/stationer/internal/nfo/sprites"
 )
 
 type Waypoint struct {
@@ -21,7 +23,7 @@ const (
 	WAYPOINT_BASE_SPRITE_HEIGHT = 35
 )
 
-func GetWaypointSprite(filename string, num int, swap bool) Sprite {
+func GetWaypointSprite(filename string, num int, swap bool) sprites.Sprite {
 	xrel := -(BUILDING_SPRITE_WIDTH / 2) - 10
 	yrel := -(WAYPOINT_SPRITE_HEIGHT / 2) - 1
 
@@ -29,7 +31,7 @@ func GetWaypointSprite(filename string, num int, swap bool) Sprite {
 		xrel = 11 - (BUILDING_SPRITE_WIDTH / 2)
 	}
 
-	return Sprite{
+	return sprites.Sprite{
 		Filename: filename,
 		X:        BUILDING_SPRITE_WIDTH_WITH_PADDING * num,
 		Y:        0,
@@ -40,7 +42,7 @@ func GetWaypointSprite(filename string, num int, swap bool) Sprite {
 	}
 }
 
-func GetWaypointBaseSprite(filename string, num int, swap bool) Sprite {
+func GetWaypointBaseSprite(filename string, num int, swap bool) sprites.Sprite {
 	xrel := 1 - (BUILDING_SPRITE_WIDTH / 2)
 	yrel := -(WAYPOINT_BASE_SPRITE_HEIGHT / 2) + 14
 
@@ -48,7 +50,7 @@ func GetWaypointBaseSprite(filename string, num int, swap bool) Sprite {
 		xrel = -(BUILDING_SPRITE_WIDTH / 2)
 	}
 
-	return Sprite{
+	return sprites.Sprite{
 		Filename: filename,
 		X:        BUILDING_SPRITE_WIDTH_WITH_PADDING * num,
 		Y:        0,
@@ -93,7 +95,7 @@ func (wp *Waypoint) GetObjects(direction int, withBuilding bool) []properties.Bo
 	return result
 }
 
-func (wp *Waypoint) WriteToFile(file *File) {
+func (wp *Waypoint) WriteToFile(file *output_file.File) {
 	wp.addSprites(file)
 
 	def := &Definition{StationID: wp.ID}
@@ -157,13 +159,13 @@ func (wp *Waypoint) WriteToFile(file *File) {
 	})
 }
 
-func (wp *Waypoint) addSprites(file *File) {
-	file.AddElement(&Spritesets{ID: 0, NumSets: 1, NumSprites: 6})
+func (wp *Waypoint) addSprites(file *output_file.File) {
+	file.AddElement(&sprites.Spritesets{ID: 0, NumSets: 1, NumSprites: 6})
 
 	// Waypoint building
 	filename := fmt.Sprintf("%s_8bpp.png", wp.SpriteFilename)
 
-	file.AddElement(&Sprites{
+	file.AddElement(&sprites.Sprites{
 		GetWaypointSprite(filename, 0, false),
 		GetWaypointSprite(filename, 1, true),
 	})
@@ -171,7 +173,7 @@ func (wp *Waypoint) addSprites(file *File) {
 	// Waypoint crossing (for building tile)
 	filename = fmt.Sprintf("%s_base_8bpp.png", wp.SpriteFilename)
 
-	file.AddElement(&Sprites{
+	file.AddElement(&sprites.Sprites{
 		GetWaypointBaseSprite(filename, 0, false),
 		GetWaypointBaseSprite(filename, 1, true),
 	})
@@ -179,7 +181,7 @@ func (wp *Waypoint) addSprites(file *File) {
 	// Waypoint crossing - full
 	filename = fmt.Sprintf("%s_base_full_8bpp.png", wp.SpriteFilename)
 
-	file.AddElement(&Sprites{
+	file.AddElement(&sprites.Sprites{
 		GetWaypointBaseSprite(filename, 0, false),
 		GetWaypointBaseSprite(filename, 1, true),
 	})

@@ -3,7 +3,9 @@ package nfo
 import (
 	"fmt"
 	"github.com/mattkimber/stationer/internal/nfo/callbacks"
+	"github.com/mattkimber/stationer/internal/nfo/output_file"
 	"github.com/mattkimber/stationer/internal/nfo/properties"
+	"github.com/mattkimber/stationer/internal/nfo/sprites"
 )
 
 type Building struct {
@@ -24,11 +26,11 @@ const (
 	BUILDING_SPRITE_HEIGHT             = 78
 )
 
-func GetBuildingSprite(filename string, num int) Sprite {
+func GetBuildingSprite(filename string, num int) sprites.Sprite {
 	xrel := 1 - (BUILDING_SPRITE_WIDTH / 2)
 	yrel := -(BUILDING_SPRITE_HEIGHT / 2) - 6
 
-	return Sprite{
+	return sprites.Sprite{
 		Filename: filename,
 		X:        BUILDING_SPRITE_WIDTH_WITH_PADDING * num,
 		Y:        0,
@@ -59,7 +61,7 @@ func (s *Building) GetObjects(direction int, idx int) []properties.BoundingBox {
 	return result
 }
 
-func (s *Building) WriteToFile(file *File) {
+func (s *Building) WriteToFile(file *output_file.File) {
 	// Set default width
 	if s.Width == 0 {
 		s.Width = 1
@@ -156,15 +158,15 @@ func (s *Building) WriteToFile(file *File) {
 	})
 }
 
-func (s *Building) addSprites(file *File) {
+func (s *Building) addSprites(file *output_file.File) {
 	buildingSprites := 2 * s.Width
 
-	file.AddElement(&Spritesets{ID: 0, NumSets: 1, NumSprites: buildingSprites})
+	file.AddElement(&sprites.Spritesets{ID: 0, NumSets: 1, NumSprites: buildingSprites})
 
 	filename := fmt.Sprintf("%s_8bpp.png", s.SpriteFilename)
 
 	// Non-fence sprites
-	file.AddElement(&Sprites{
+	file.AddElement(&sprites.Sprites{
 		GetBuildingSprite(filename, 0),
 		GetBuildingSprite(filename, 1),
 	})
@@ -173,7 +175,7 @@ func (s *Building) addSprites(file *File) {
 		// Additional sprites for long buildings
 		filename = fmt.Sprintf("%s_%d_8bpp.png", s.SpriteFilename, i)
 
-		file.AddElement(&Sprites{
+		file.AddElement(&sprites.Sprites{
 			GetBuildingSprite(filename, 0),
 			GetBuildingSprite(filename, 1),
 		})

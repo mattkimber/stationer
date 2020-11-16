@@ -7,6 +7,14 @@ type AdditionalObject struct {
 	SizeX           int
 	SizeY           int
 	SizeZ           int
-	SpriteFilename  string
+	BaseSpriteID    int
 	InvertDirection bool
+}
+
+func (ao *AdditionalObject) GetBaseSpriteNumber(s *Station) int {
+	if s.UseCompanyColour {
+		return COMPANY_COLOUR_SPRITE + s.BaseSpriteID
+	}
+
+	return CUSTOM_SPRITE + s.BaseSpriteID
 }

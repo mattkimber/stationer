@@ -3,7 +3,9 @@ package nfo
 import (
 	"fmt"
 	"github.com/mattkimber/stationer/internal/nfo/callbacks"
+	"github.com/mattkimber/stationer/internal/nfo/output_file"
 	"github.com/mattkimber/stationer/internal/nfo/properties"
+	"github.com/mattkimber/stationer/internal/nfo/sprites"
 )
 
 type BufferStop struct {
@@ -33,7 +35,7 @@ func (s *BufferStop) GetBaseSpriteNumber() int {
 	return CUSTOM_SPRITE
 }
 
-func GetBufferStopSprite(filename string, num int, swap bool) Sprite {
+func GetBufferStopSprite(filename string, num int, swap bool) sprites.Sprite {
 	xrel := 1 - (BUFFERSTOP_SPRITE_WIDTH / 2)
 	yrel := 5 - (BUFFERSTOP_SPRITE_HEIGHT / 2)
 
@@ -41,7 +43,7 @@ func GetBufferStopSprite(filename string, num int, swap bool) Sprite {
 		xrel = 11 - (BUFFERSTOP_SPRITE_WIDTH / 2)
 	}
 
-	return Sprite{
+	return sprites.Sprite{
 		Filename: filename,
 		X:        BUFFERSTOP_SPRITE_WIDTH_WITH_PADDING * num,
 		Y:        0,
@@ -64,7 +66,7 @@ func (s *BufferStop) GetObjects(direction int, idx int) []properties.BoundingBox
 	return result
 }
 
-func (s *BufferStop) WriteToFile(file *File) {
+func (s *BufferStop) WriteToFile(file *output_file.File) {
 	s.addSprites(file)
 
 	def := &Definition{StationID: s.ID}
@@ -140,11 +142,11 @@ func (s *BufferStop) WriteToFile(file *File) {
 	})
 }
 
-func (s *BufferStop) addSprites(file *File) {
+func (s *BufferStop) addSprites(file *output_file.File) {
 	// 3 sprites: N, S and both - 3 for Both fences - 7 each for N/S fence combinations
 	// 2 directions so all are doubled
 	numSprites := 2 * (3 + 3 + (7 * 2))
-	file.AddElement(&Spritesets{ID: 0, NumSets: 1, NumSprites: numSprites})
+	file.AddElement(&sprites.Spritesets{ID: 0, NumSets: 1, NumSprites: numSprites})
 
 	elements := []string{"s", "n", "both"}
 	for _, element := range elements {
@@ -152,7 +154,7 @@ func (s *BufferStop) addSprites(file *File) {
 		filename := fmt.Sprintf("%s_%s_8bpp.png", s.SpriteFilename, element)
 
 		// Non-fence sprites
-		file.AddElement(&Sprites{
+		file.AddElement(&sprites.Sprites{
 			GetBufferStopSprite(filename, 0, false),
 			GetBufferStopSprite(filename, 1, false),
 		})
@@ -169,7 +171,7 @@ func (s *BufferStop) addSprites(file *File) {
 		for _, fenceElement := range fenceElements {
 			filename := fmt.Sprintf("%s_%s_fence_%s_8bpp.png", s.SpriteFilename, element, fenceElement)
 
-			file.AddElement(&Sprites{
+			file.AddElement(&sprites.Sprites{
 				GetBufferStopSprite(filename, 0, false),
 				GetBufferStopSprite(filename, 1, false),
 			})

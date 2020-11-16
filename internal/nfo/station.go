@@ -1,14 +1,14 @@
 package nfo
 
 import (
-	"fmt"
 	"github.com/mattkimber/stationer/internal/nfo/callbacks"
+	"github.com/mattkimber/stationer/internal/nfo/output_file"
 	"github.com/mattkimber/stationer/internal/nfo/properties"
 )
 
 type Station struct {
 	ID                    int
-	SpriteFilename        string
+	BaseSpriteID          int
 	ClassID               string
 	ClassName             string
 	ObjectName            string
@@ -24,9 +24,6 @@ type Station struct {
 }
 
 const (
-	SPRITE_WIDTH_WITH_PADDING = 72
-	SPRITE_WIDTH              = 64
-	SPRITE_HEIGHT             = 55
 	DEFAULT_PLATFORM_HEIGHT   = 3
 
 	CUSTOM_SPRITE         = 0x42D
@@ -44,30 +41,13 @@ const (
 	GROUND_SPRITE_RAIL_NS = 1011
 )
 
-func GetSprite(filename string, num int, swap bool) Sprite {
-	xrel := -(SPRITE_WIDTH / 2) - 10
-
-	if swap {
-		xrel = 11 - (SPRITE_WIDTH / 2)
-	}
-
-	return Sprite{
-		Filename: filename,
-		X:        SPRITE_WIDTH_WITH_PADDING * num,
-		Y:        0,
-		Width:    SPRITE_WIDTH,
-		Height:   SPRITE_HEIGHT,
-		XRel:     xrel,
-		YRel:     -(SPRITE_HEIGHT / 2) - 1,
-	}
-}
 
 func (s *Station) GetBaseSpriteNumber() int {
 	if s.UseCompanyColour {
-		return COMPANY_COLOUR_SPRITE
+		return COMPANY_COLOUR_SPRITE + s.BaseSpriteID
 	}
 
-	return CUSTOM_SPRITE
+	return CUSTOM_SPRITE + s.BaseSpriteID
 }
 
 func GetSpriteSets(max int) []int {
@@ -142,14 +122,14 @@ func (s *Station) GetObjects(direction int, fenceInside, fenceOutside bool) []pr
 			X:            x,
 			Y:            y,
 			Z:            obj.SizeZ,
-			SpriteNumber: s.GetBaseSpriteNumber() + baseSprites + (idx * 2) + direction,
+			SpriteNumber: obj.GetBaseSpriteNumber(s) + baseSprites + (idx * 2) + direction,
 		})
 	}
 
 	return result
 }
 
-func (s *Station) WriteToFile(file *File) {
+func (s *Station) WriteToFile(file *output_file.File) {
 
 	if s.MaxLoadState == 0 {
 		s.MaxLoadState = DEFAULT_MAX_LOAD_STATE
@@ -157,48 +137,6 @@ func (s *Station) WriteToFile(file *File) {
 
 	if s.PlatformHeight == 0 {
 		s.PlatformHeight = DEFAULT_PLATFORM_HEIGHT
-	}
-
-	platformSprites := 4
-	if s.HasFences {
-		platformSprites = 8
-	}
-
-	// Only redefine the sprites and spritesets if this is a new platform type
-	// (inner/outer platforms must follow the previous definition)
-	if s.InnerPlatform && s.OuterPlatform {
-		file.AddElement(&Spritesets{ID: 0, NumSets: s.MaxLoadState + 1, NumSprites: platformSprites + (len(s.AdditionalObjects) * 2)})
-
-		for i := 0; i <= s.MaxLoadState; i++ {
-			filename := fmt.Sprintf("%s_%d_8bpp.png", s.SpriteFilename, i)
-
-			// Non-fence sprites
-			file.AddElement(&Sprites{
-				GetSprite(filename, 0, false),
-				GetSprite(filename, 1, false),
-				GetSprite(filename, 2, true),
-				GetSprite(filename, 3, true),
-			})
-
-			// Fence sprites
-			if s.HasFences {
-				fenceFilename := fmt.Sprintf("%s_%d_fence_8bpp.png", s.SpriteFilename, i)
-				file.AddElement(&Sprites{
-					GetSprite(fenceFilename, 0, false),
-					GetSprite(fenceFilename, 1, false),
-					GetSprite(fenceFilename, 2, true),
-					GetSprite(fenceFilename, 3, true),
-				})
-			}
-
-			for _, obj := range s.AdditionalObjects {
-				filename := fmt.Sprintf("%s_%d_8bpp.png", obj.SpriteFilename, i)
-				file.AddElement(&Sprites{
-					GetSprite(filename, 0, obj.InvertDirection != true),
-					GetSprite(filename, 1, obj.InvertDirection != false),
-				})
-			}
-		}
 	}
 
 	def := &Definition{StationID: s.ID}

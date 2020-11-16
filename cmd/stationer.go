@@ -4,7 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"github.com/mattkimber/stationer/internal/nfo"
+	"github.com/mattkimber/stationer/internal/nfo/output_file"
 	"github.com/mattkimber/stationer/internal/nfo/properties"
+	"github.com/mattkimber/stationer/internal/nfo/sprites"
 )
 
 func init() {
@@ -16,25 +18,32 @@ type StationClass struct {
 	ClassID   string
 	ClassName string
 	Available int
+	BaseObjectID int
 }
 
+const (
+	// This is not the actual number, but the number leaving some room for expansion
+	PLATFORM_TYPES = 10
+	CLASS_PLATFORMS = PLATFORM_TYPES * 3
+)
+
 func main() {
-	file := nfo.File{}
+	file := output_file.File{}
 	file.AddElement(&nfo.Header{
 		Initials:    "TWF",
 		SetID:       8,
-		SetName:     "Timberwolf's Stations 1.0.1",
+		SetName:     "Timberwolf's Stations 1.0.2",
 		Description: "A set of British-style railway stations feature multiple eras of platforms, buildings and waypoints in 2x zoom",
-		Version:     2,
-		MinVersion:  1,
+		Version:     3,
+		MinVersion:  2,
 	})
 
 	file.AddElement(&nfo.CargoTypeTable{Cargos: []string{"PASS", "MAIL"}})
 
 	classes := []StationClass{
-		{Filename: "wooden", ClassID: "TWF0", ClassName: "Wooden Platforms", Available: 0},
-		{Filename: "concrete", ClassID: "TWF1", ClassName: "Concrete Platforms", Available: 1860},
-		{Filename: "modern", ClassID: "TWF2", ClassName: "Modern Platforms", Available: 1970},
+		{Filename: "wooden", ClassID: "TWF0", ClassName: "Wooden Platforms", Available: 0, BaseObjectID: CLASS_PLATFORMS * 0},
+		{Filename: "concrete", ClassID: "TWF1", ClassName: "Concrete Platforms", Available: 1860, BaseObjectID: CLASS_PLATFORMS * 1},
+		{Filename: "modern", ClassID: "TWF2", ClassName: "Modern Platforms", Available: 1970, BaseObjectID: CLASS_PLATFORMS * 2},
 	}
 
 	rampConfiguration := properties.PlatformLayout{
@@ -60,258 +69,173 @@ func main() {
 		},
 	}
 
-	stations := make([]nfo.Station, 0)
 
 	for _, class := range classes {
-
-		thisClass := []nfo.Station{
-			{
-				SpriteFilename:   class.Filename + "_empty",
-				ClassID:          class.ClassID,
-				ClassName:        class.ClassName,
-				ObjectName:       "Platform",
-				YearAvailable:    class.Available,
-				UseCompanyColour: true,
-				HasFences:        true,
-				InnerPlatform:    true,
-				OuterPlatform:    true,
-			},
-			{
-				SpriteFilename:   class.Filename + "_empty",
-				ClassID:          class.ClassID,
-				ClassName:        class.ClassName,
-				ObjectName:       "Platform (inner)",
-				YearAvailable:    class.Available,
-				UseCompanyColour: true,
-				HasFences:        true,
-				InnerPlatform:    true,
-				OuterPlatform:    false,
-			},
-			{
-				SpriteFilename:   class.Filename + "_empty",
-				ClassID:          class.ClassID,
-				ClassName:        class.ClassName,
-				ObjectName:       "Platform (outer)",
-				YearAvailable:    class.Available,
-				UseCompanyColour: true,
-				HasFences:        true,
-				InnerPlatform:    false,
-				OuterPlatform:    true,
-			},
-			{
-				SpriteFilename:   class.Filename + "_sign",
-				ClassID:          class.ClassID,
-				ClassName:        class.ClassName,
-				ObjectName:       "Platform with sign",
-				YearAvailable:    max(class.Available, 1845),
-				UseCompanyColour: true,
-				HasFences:        true,
-				InnerPlatform:    true,
-				OuterPlatform:    true,
-			},
-			{
-				SpriteFilename:   class.Filename + "_sign",
-				ClassID:          class.ClassID,
-				ClassName:        class.ClassName,
-				ObjectName:       "Platform with sign (inner)",
-				YearAvailable:    max(class.Available, 1845),
-				UseCompanyColour: true,
-				HasFences:        true,
-				InnerPlatform:    true,
-				OuterPlatform:    false,
-			},
-			{
-				SpriteFilename:   class.Filename + "_sign",
-				ClassID:          class.ClassID,
-				ClassName:        class.ClassName,
-				ObjectName:       "Platform with sign (outer)",
-				YearAvailable:    max(class.Available, 1845),
-				UseCompanyColour: true,
-				HasFences:        true,
-				InnerPlatform:    false,
-				OuterPlatform:    true,
-			},
-			{
-				SpriteFilename:   class.Filename + "_benches",
-				ClassID:          class.ClassID,
-				ClassName:        class.ClassName,
-				ObjectName:       "Platform with benches",
-				YearAvailable:    max(class.Available, 1840),
-				UseCompanyColour: true,
-				HasFences:        true,
-				InnerPlatform:    true,
-				OuterPlatform:    true,
-			},
-			{
-				SpriteFilename:   class.Filename + "_benches",
-				ClassID:          class.ClassID,
-				ClassName:        class.ClassName,
-				ObjectName:       "Platform with benches (inner)",
-				YearAvailable:    max(class.Available, 1840),
-				UseCompanyColour: true,
-				HasFences:        true,
-				InnerPlatform:    true,
-				OuterPlatform:    false,
-			},
-			{
-				SpriteFilename:   class.Filename + "_benches",
-				ClassID:          class.ClassID,
-				ClassName:        class.ClassName,
-				ObjectName:       "Platform with benches (outer)",
-				YearAvailable:    max(class.Available, 1840),
-				UseCompanyColour: true,
-				HasFences:        true,
-				InnerPlatform:    false,
-				OuterPlatform:    true,
-			},
-			{
-				SpriteFilename:   class.Filename + "_bare_shelter_traditional",
-				ClassID:          class.ClassID,
-				ClassName:        class.ClassName,
-				ObjectName:       "Shelter (traditional)",
-				YearAvailable:    max(class.Available, 1860),
-				MaxLoadState:     5,
-				UseCompanyColour: true,
-				HasFences:        true,
-				InnerPlatform:    true,
-				OuterPlatform:    true,
-			},
-			{
-				SpriteFilename:   class.Filename + "_bare_shelter_traditional",
-				ClassID:          class.ClassID,
-				ClassName:        class.ClassName,
-				ObjectName:       "Shelter (traditional, inner)",
-				YearAvailable:    max(class.Available, 1860),
-				MaxLoadState:     5,
-				UseCompanyColour: true,
-				HasFences:        true,
-				InnerPlatform:    true,
-				OuterPlatform:    false,
-			},
-			{
-				SpriteFilename:   class.Filename + "_bare_shelter_traditional",
-				ClassID:          class.ClassID,
-				ClassName:        class.ClassName,
-				ObjectName:       "Shelter (traditional, outer)",
-				YearAvailable:    max(class.Available, 1860),
-				MaxLoadState:     5,
-				UseCompanyColour: true,
-				HasFences:        true,
-				InnerPlatform:    false,
-				OuterPlatform:    true,
-			},
-			{
-				SpriteFilename:        class.Filename + "_ramp_ne",
-				ClassID:               class.ClassID,
-				ClassName:             class.ClassName,
-				YearAvailable:         class.Available,
-				MaxLoadState:          5,
-				InnerPlatform:         true,
-				OuterPlatform:         true,
-				ObjectName:            "Ramp (NE)",
-				PlatformConfiguration: rampConfiguration,
-				UseCompanyColour:      true,
-				HasFences:             true,
-			},
-			{
-				SpriteFilename:        class.Filename + "_ramp_ne",
-				ClassID:               class.ClassID,
-				ClassName:             class.ClassName,
-				YearAvailable:         class.Available,
-				MaxLoadState:          5,
-				InnerPlatform:         true,
-				OuterPlatform:         false,
-				ObjectName:            "Ramp (NE, inner)",
-				PlatformConfiguration: rampConfiguration,
-				UseCompanyColour:      true,
-				HasFences:             true,
-			},
-			{
-				SpriteFilename:        class.Filename + "_ramp_ne",
-				ClassID:               class.ClassID,
-				ClassName:             class.ClassName,
-				YearAvailable:         class.Available,
-				MaxLoadState:          5,
-				InnerPlatform:         false,
-				OuterPlatform:         true,
-				ObjectName:            "Ramp (NE, outer)",
-				PlatformConfiguration: rampConfiguration,
-				UseCompanyColour:      true,
-				HasFences:             true,
-			},
-			{
-				SpriteFilename:        class.Filename + "_ramp_sw",
-				ClassID:               class.ClassID,
-				ClassName:             class.ClassName,
-				YearAvailable:         class.Available,
-				MaxLoadState:          5,
-				InnerPlatform:         true,
-				OuterPlatform:         true,
-				ObjectName:            "Ramp (SW)",
-				PlatformConfiguration: rampConfiguration,
-				UseCompanyColour:      true,
-				HasFences:             true,
-			},
-			{
-				SpriteFilename:        class.Filename + "_ramp_sw",
-				ClassID:               class.ClassID,
-				ClassName:             class.ClassName,
-				YearAvailable:         class.Available,
-				MaxLoadState:          5,
-				InnerPlatform:         true,
-				OuterPlatform:         false,
-				ObjectName:            "Ramp (SW, inner)",
-				PlatformConfiguration: rampConfiguration,
-				UseCompanyColour:      true,
-				HasFences:             true,
-			},
-			{
-				SpriteFilename:        class.Filename + "_ramp_sw",
-				ClassID:               class.ClassID,
-				ClassName:             class.ClassName,
-				YearAvailable:         class.Available,
-				MaxLoadState:          5,
-				InnerPlatform:         false,
-				OuterPlatform:         true,
-				ObjectName:            "Ramp (SW, outer)",
-				PlatformConfiguration: rampConfiguration,
-				UseCompanyColour:      true,
-				HasFences:             true,
-			},
-			{
-				SpriteFilename:        class.Filename + "_bare_footbridge",
-				ClassID:               class.ClassID,
-				ClassName:             class.ClassName,
-				YearAvailable:         max(class.Available, 1865),
-				ObjectName:            "Footbridge",
-				UseCompanyColour:      true,
-				HasFences:             true,
-				MaxLoadState:          5,
-				PlatformHeight:        16,
-				InnerPlatform:         true,
-				OuterPlatform:         true,
-				PlatformConfiguration: rampConfiguration,
-				AdditionalObjects: []nfo.AdditionalObject{{
-					X:              5,
-					Y:              4,
-					Z:              13,
-					SizeX:          5,
-					SizeY:          8,
-					SizeZ:          3,
-					SpriteFilename: "footbridge",
-				}},
-			},
+		suffixes := map[int]string {
+			0: "empty",
+			100: "sign",
+			200: "benches",
+			300: "bare_shelter_traditional",
+			400: "ramp_ne",
+			500: "ramp_sw",
+			600: "bare_footbridge",
 		}
-		stations = append(stations, thisClass...)
+
+		// Write the platform sprites to file
+		for id, suffix := range suffixes {
+			loadState := 5
+			if id < 300 {
+				loadState = 6
+			}
+
+			classSprite := sprites.StationSprites{
+				ID:             id,
+				SpriteFilename: class.Filename + "_" + suffix,
+				HasFences:      true,
+				MaxLoadState:   loadState,
+			}
+
+			classSprite.WriteToFile(&file)
+		}
+
+		footbridgeSprite := sprites.PlatformObject{
+			ID:              1000,
+			SpriteFilename:  "footbridge",
+			MaxLoadState: 5,
+		}
+
+		footbridgeSprite.WriteToFile(&file)
+
+		names := []string{ "", "inner", "outer" }
+		for i := 0; i < 3; i++ {
+			baseObjectID := class.BaseObjectID + (PLATFORM_TYPES * i)
+			inner := i <= 1
+			outer := i == 0 || i == 2
+			bracketName := ""
+			commaName := ""
+
+			if names[i] != "" {
+				bracketName = "(" + names[i] + ")"
+				commaName = ", " + names[i]
+			}
+
+			thisClass := []nfo.Station{
+				{
+					ID: baseObjectID+0,
+					BaseSpriteID: 0,
+					ClassID:          class.ClassID,
+					ClassName:        class.ClassName,
+					ObjectName:       "Platform" + bracketName,
+					YearAvailable:    class.Available,
+					UseCompanyColour: true,
+					HasFences:        true,
+					InnerPlatform:    inner,
+					OuterPlatform:    outer,
+				},
+				{
+					ID: baseObjectID+1,
+					BaseSpriteID: 48,
+					ClassID:          class.ClassID,
+					ClassName:        class.ClassName,
+					ObjectName:       "Platform with sign" + bracketName,
+					YearAvailable:    max(class.Available, 1845),
+					UseCompanyColour: true,
+					HasFences:        true,
+					InnerPlatform:    inner,
+					OuterPlatform:    outer,
+				},
+				{
+					ID: baseObjectID+2,
+					BaseSpriteID: 200,
+					ClassID:          class.ClassID,
+					ClassName:        class.ClassName,
+					ObjectName:       "Platform with benches" + bracketName,
+					YearAvailable:    max(class.Available, 1840),
+					UseCompanyColour: true,
+					HasFences:        true,
+					InnerPlatform:    inner,
+					OuterPlatform:    outer,
+				},
+				{
+					ID: baseObjectID+3,
+					BaseSpriteID: 300,
+					ClassID:          class.ClassID,
+					ClassName:        class.ClassName,
+					ObjectName:       "Shelter (traditional" + commaName + ")",
+					YearAvailable:    max(class.Available, 1860),
+					MaxLoadState:     5,
+					UseCompanyColour: true,
+					HasFences:        true,
+					InnerPlatform:    inner,
+					OuterPlatform:    outer,
+				},
+				{
+					ID: baseObjectID+4,
+					BaseSpriteID: 400,
+					ClassID:               class.ClassID,
+					ClassName:             class.ClassName,
+					YearAvailable:         class.Available,
+					MaxLoadState:          5,
+					ObjectName:            "Ramp (NE)" + commaName + ")",
+					PlatformConfiguration: rampConfiguration,
+					UseCompanyColour:      true,
+					HasFences:             true,
+					InnerPlatform:         inner,
+					OuterPlatform:         outer,
+				},
+				{
+					ID: baseObjectID+5,
+					BaseSpriteID: 500,
+					ClassID:               class.ClassID,
+					ClassName:             class.ClassName,
+					YearAvailable:         class.Available,
+					MaxLoadState:          5,
+					ObjectName:            "Ramp (SW)" + commaName + ")",
+					PlatformConfiguration: rampConfiguration,
+					UseCompanyColour:      true,
+					HasFences:             true,
+					InnerPlatform:         inner,
+					OuterPlatform:         outer,
+				},
+			}
+
+			if i == 0 {
+				thisClass = append(thisClass, nfo.Station{
+					ID: baseObjectID+6,
+					BaseSpriteID: 600,
+					ClassID:               class.ClassID,
+					ClassName:             class.ClassName,
+					YearAvailable:         max(class.Available, 1865),
+					ObjectName:            "Footbridge",
+					UseCompanyColour:      true,
+					HasFences:             true,
+					MaxLoadState:          5,
+					PlatformHeight:        16,
+					InnerPlatform:         true,
+					OuterPlatform:         true,
+					PlatformConfiguration: rampConfiguration,
+					AdditionalObjects: []nfo.AdditionalObject{
+						{
+							X:              5,
+							Y:              4,
+							Z:              13,
+							SizeX:          5,
+							SizeY:          8,
+							SizeZ:          3,
+							BaseSpriteID:   1000,
+						},
+					},
+				})
+			}
+
+			for _, station := range thisClass {
+				station.WriteToFile(&file)
+			}
+		}
+
 	}
 
-	objectID := 0
-
-	for _, station := range stations {
-		station.ID = objectID
-		station.WriteToFile(&file)
-		objectID = objectID + 1
-	}
+	objectID := 90
 
 	// TODO: clean up and integrate bufferstops and station roofs properly
 	for _, class := range classes {
