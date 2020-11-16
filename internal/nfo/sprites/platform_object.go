@@ -6,10 +6,10 @@ import (
 )
 
 type PlatformObject struct {
-	ID                    int
-	SpriteFilename        string
-	MaxLoadState          int
-	InvertDirection       bool
+	BaseSpriteID    int
+	SpriteFilename  string
+	MaxLoadState    int
+	InvertDirection bool
 }
 
 func (po *PlatformObject) GetSprite(filename string, num int, swap bool) Sprite {
@@ -30,15 +30,17 @@ func (po *PlatformObject) GetSprite(filename string, num int, swap bool) Sprite 
 	}
 }
 
-func (po *PlatformObject) WriteToFile(file *output_file.File) {
-	file.AddElement(&Spritesets{ID: po.ID, NumSets: po.MaxLoadState + 1, NumSprites: 2})
+func (po *PlatformObject) WriteToFile(file *output_file.File, loadState int) {
 
-	for i := 0; i <= po.MaxLoadState; i++ {
-		filename := fmt.Sprintf("%s_%d_8bpp.png", po.SpriteFilename, i)
+	filename := fmt.Sprintf("%s_%d_8bpp.png", po.SpriteFilename, loadState)
 
+	if loadState <= po.MaxLoadState {
 		file.AddElement(&Sprites{
 			po.GetSprite(filename, 0, po.InvertDirection != true),
 			po.GetSprite(filename, 1, po.InvertDirection != false),
 		})
+	} else {
+		file.AddElement(&Blank{Size: 2})
 	}
+
 }

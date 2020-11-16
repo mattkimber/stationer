@@ -14,16 +14,16 @@ func init() {
 }
 
 type StationClass struct {
-	Filename  string
-	ClassID   string
-	ClassName string
-	Available int
+	Filename     string
+	ClassID      string
+	ClassName    string
+	Available    int
 	BaseObjectID int
 }
 
 const (
 	// This is not the actual number, but the number leaving some room for expansion
-	PLATFORM_TYPES = 10
+	PLATFORM_TYPES  = 10
 	CLASS_PLATFORMS = PLATFORM_TYPES * 3
 )
 
@@ -69,38 +69,44 @@ func main() {
 		},
 	}
 
-
 	for _, class := range classes {
 
 		// All the station sprites are put in one massive spriteset
 		// so they can be mixed and matched
 		classSprites := sprites.StationSprites{
-			ID:             0,
 			Sprites: []sprites.StationSprite{
-					{Filename: "empty", HasFences: true, MaxLoadState: 6},
-					{Filename: "sign", HasFences: true, MaxLoadState: 6},
-					{Filename: "benches", HasFences: true, MaxLoadState: 6},
-					{Filename: "bare_shelter_traditional", HasFences: true, MaxLoadState: 5},
-					{Filename: "ramp_ne", HasFences: true, MaxLoadState: 5},
-					{Filename: "ramp_sw", HasFences: true, MaxLoadState: 5},
-					{Filename: "bare_footbridge", HasFences: true, MaxLoadState: 5},
+				{Filename: "empty", HasFences: true, MaxLoadState: 6},
+				{Filename: "sign", HasFences: true, MaxLoadState: 6},
+				{Filename: "benches", HasFences: true, MaxLoadState: 6},
+				{Filename: "bare_shelter_traditional", HasFences: true, MaxLoadState: 5},
+				{Filename: "ramp_ne", HasFences: true, MaxLoadState: 5},
+				{Filename: "ramp_sw", HasFences: true, MaxLoadState: 5},
+				{Filename: "bare_footbridge", HasFences: true, MaxLoadState: 5},
 			},
 			BaseFilename: class.Filename,
-			MaxLoadState: 6,
 		}
 
-		classSprites.WriteToFile(&file)
-
+		classSprites.SetStatistics()
 
 		footbridgeSprite := sprites.PlatformObject{
-			ID:              100,
-			SpriteFilename:  "footbridge",
-			MaxLoadState: 5,
+			BaseSpriteID:   classSprites.LastSpriteNumber,
+			SpriteFilename: "footbridge",
+			MaxLoadState:   5,
 		}
 
-		footbridgeSprite.WriteToFile(&file)
+		// +2 = footbridge sprite
+		total := classSprites.LastSpriteNumber + 2
 
-		names := []string{ "", "inner", "outer" }
+		// Definition for all the spritesets
+		file.AddElement(&sprites.Spritesets{ID: 0, NumSets: sprites.GLOBAL_MAX_LOAD_STATE + 1, NumSprites: total})
+
+		// Write each type of sprite to the file
+		for i := 0; i <= sprites.GLOBAL_MAX_LOAD_STATE; i++ {
+			classSprites.WriteToFile(&file, i)
+			footbridgeSprite.WriteToFile(&file, i)
+		}
+
+		names := []string{"", "inner", "outer"}
 		for i := 0; i < 3; i++ {
 			baseObjectID := class.BaseObjectID + (PLATFORM_TYPES * i)
 			inner := i <= 1
@@ -115,8 +121,8 @@ func main() {
 
 			thisClass := []nfo.Station{
 				{
-					ID: baseObjectID+0,
-					BaseSpriteID: 	  classSprites.SpriteMap["empty"],
+					ID:               baseObjectID + 0,
+					BaseSpriteID:     classSprites.SpriteMap["empty"],
 					ClassID:          class.ClassID,
 					ClassName:        class.ClassName,
 					ObjectName:       "Platform" + bracketName,
@@ -127,8 +133,8 @@ func main() {
 					OuterPlatform:    outer,
 				},
 				{
-					ID: baseObjectID+1,
-					BaseSpriteID: 	  classSprites.SpriteMap["sign"],
+					ID:               baseObjectID + 1,
+					BaseSpriteID:     classSprites.SpriteMap["sign"],
 					ClassID:          class.ClassID,
 					ClassName:        class.ClassName,
 					ObjectName:       "Platform with sign" + bracketName,
@@ -139,8 +145,8 @@ func main() {
 					OuterPlatform:    outer,
 				},
 				{
-					ID: baseObjectID+2,
-					BaseSpriteID: classSprites.SpriteMap["benches"],
+					ID:               baseObjectID + 2,
+					BaseSpriteID:     classSprites.SpriteMap["benches"],
 					ClassID:          class.ClassID,
 					ClassName:        class.ClassName,
 					ObjectName:       "Platform with benches" + bracketName,
@@ -151,8 +157,8 @@ func main() {
 					OuterPlatform:    outer,
 				},
 				{
-					ID: baseObjectID+3,
-					BaseSpriteID: classSprites.SpriteMap["bare_shelter_traditional"],
+					ID:               baseObjectID + 3,
+					BaseSpriteID:     classSprites.SpriteMap["bare_shelter_traditional"],
 					ClassID:          class.ClassID,
 					ClassName:        class.ClassName,
 					ObjectName:       "Shelter (traditional" + commaName + ")",
@@ -164,8 +170,8 @@ func main() {
 					OuterPlatform:    outer,
 				},
 				{
-					ID: baseObjectID+4,
-					BaseSpriteID: classSprites.SpriteMap["ramp_ne"],
+					ID:                    baseObjectID + 4,
+					BaseSpriteID:          classSprites.SpriteMap["ramp_ne"],
 					ClassID:               class.ClassID,
 					ClassName:             class.ClassName,
 					YearAvailable:         class.Available,
@@ -178,8 +184,8 @@ func main() {
 					OuterPlatform:         outer,
 				},
 				{
-					ID: baseObjectID+5,
-					BaseSpriteID: classSprites.SpriteMap["ramp_sw"],
+					ID:                    baseObjectID + 5,
+					BaseSpriteID:          classSprites.SpriteMap["ramp_sw"],
 					ClassID:               class.ClassID,
 					ClassName:             class.ClassName,
 					YearAvailable:         class.Available,
@@ -195,8 +201,8 @@ func main() {
 
 			if i == 0 {
 				thisClass = append(thisClass, nfo.Station{
-					ID: baseObjectID+6,
-					BaseSpriteID: 		   classSprites.SpriteMap["bare_footbridge"],
+					ID:                    baseObjectID + 6,
+					BaseSpriteID:          classSprites.SpriteMap["bare_footbridge"],
 					ClassID:               class.ClassID,
 					ClassName:             class.ClassName,
 					YearAvailable:         max(class.Available, 1865),
@@ -210,13 +216,13 @@ func main() {
 					PlatformConfiguration: rampConfiguration,
 					AdditionalObjects: []nfo.AdditionalObject{
 						{
-							X:              5,
-							Y:              4,
-							Z:              13,
-							SizeX:          5,
-							SizeY:          8,
-							SizeZ:          3,
-							BaseSpriteID:   100,
+							X:            5,
+							Y:            4,
+							Z:            13,
+							SizeX:        5,
+							SizeY:        8,
+							SizeZ:        3,
+							BaseSpriteID: footbridgeSprite.BaseSpriteID,
 						},
 					},
 				})

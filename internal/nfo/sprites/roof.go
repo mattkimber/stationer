@@ -6,10 +6,10 @@ import (
 )
 
 type StationRoof struct {
-	ID                    int
-	SpriteFilename        string
-	MaxLoadState          int
-	RoofType              string
+	ID             int
+	SpriteFilename string
+	MaxLoadState   int
+	RoofType       string
 }
 
 func (s *StationRoof) GetSprite(filename string, num int, swap bool) Sprite {
@@ -44,7 +44,6 @@ func (s *StationRoof) GetRoofSprite(filename string, num int) Sprite {
 		YRel:     yrel,
 	}
 }
-
 
 func (s *StationRoof) WriteToFile(file *output_file.File) {
 

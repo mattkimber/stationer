@@ -6,17 +6,16 @@ import (
 )
 
 type StationSprite struct {
-	Filename string
-	HasFences bool
+	Filename     string
+	HasFences    bool
 	MaxLoadState int
 }
 
 type StationSprites struct {
-	ID                    int
-	BaseFilename          string
-	Sprites 			  []StationSprite
-	SpriteMap             map[string]int // Will be populated after the sprites have been written to a file
-	MaxLoadState          int
+	BaseFilename     string
+	Sprites          []StationSprite
+	SpriteMap        map[string]int // Will be populated after SetStatistics is called
+	LastSpriteNumber int            // Will be populated after SetStatistics is called
 }
 
 func (s *StationSprites) GetSprite(filename string, num int, swap bool) Sprite {
@@ -37,10 +36,13 @@ func (s *StationSprites) GetSprite(filename string, num int, swap bool) Sprite {
 	}
 }
 
-func (s *StationSprites) getTotalSprites() int {
+func (s *StationSprites) SetStatistics() {
 	total := 0
+	s.SpriteMap = make(map[string]int)
 
 	for _, sprite := range s.Sprites {
+		s.SpriteMap[sprite.Filename] = total
+
 		total += 4
 		if sprite.HasFences {
 			// Add another 4 for the fences
@@ -48,58 +50,44 @@ func (s *StationSprites) getTotalSprites() int {
 		}
 	}
 
-	return total
+	s.LastSpriteNumber = total
 }
 
-func (s *StationSprites) WriteToFile(file *output_file.File) {
-	platformSprites := s.getTotalSprites()
-	s.SpriteMap = make(map[string]int)
+func (s *StationSprites) WriteToFile(file *output_file.File, loadState int) {
 
-	file.AddElement(&Spritesets{ID: s.ID, NumSets: s.MaxLoadState + 1, NumSprites: platformSprites})
+	for _, spr := range s.Sprites {
+		// Populate the map of where sprites begin and end
 
+		filename := fmt.Sprintf("%s_%s_%d_8bpp.png", s.BaseFilename, spr.Filename, loadState)
 
-	for i := 0; i <= s.MaxLoadState; i++ {
-		sprites := 0
+		if loadState <= spr.MaxLoadState {
+			// Non-fence sprites
+			file.AddElement(&Sprites{
+				s.GetSprite(filename, 0, false),
+				s.GetSprite(filename, 1, false),
+				s.GetSprite(filename, 2, true),
+				s.GetSprite(filename, 3, true),
+			})
+		} else {
+			// Add blank pseudosprites
+			file.AddElement(&Blank{Size: 4})
+		}
 
-		for _, spr := range s.Sprites {
-			// Populate the map of where sprites begin and end
-			s.SpriteMap[spr.Filename] = sprites
-
-			filename := fmt.Sprintf("%s_%s_%d_8bpp.png", s.BaseFilename, spr.Filename, i)
-
-			if i <= spr.MaxLoadState {
-				// Non-fence sprites
+		// Fence sprites
+		if spr.HasFences {
+			fenceFilename := fmt.Sprintf("%s_%s_%d_fence_8bpp.png", s.BaseFilename, spr.Filename, loadState)
+			if loadState <= spr.MaxLoadState {
 				file.AddElement(&Sprites{
-					s.GetSprite(filename, 0, false),
-					s.GetSprite(filename, 1, false),
-					s.GetSprite(filename, 2, true),
-					s.GetSprite(filename, 3, true),
+					s.GetSprite(fenceFilename, 0, false),
+					s.GetSprite(fenceFilename, 1, false),
+					s.GetSprite(fenceFilename, 2, true),
+					s.GetSprite(fenceFilename, 3, true),
 				})
 			} else {
 				// Add blank pseudosprites
 				file.AddElement(&Blank{Size: 4})
 			}
 
-			sprites += 4
-
-			// Fence sprites
-			if spr.HasFences {
-				fenceFilename := fmt.Sprintf("%s_%s_%d_fence_8bpp.png", s.BaseFilename, spr.Filename, i)
-				if i <= spr.MaxLoadState {
-					file.AddElement(&Sprites{
-						s.GetSprite(fenceFilename, 0, false),
-						s.GetSprite(fenceFilename, 1, false),
-						s.GetSprite(fenceFilename, 2, true),
-						s.GetSprite(fenceFilename, 3, true),
-					})
-				} else {
-					// Add blank pseudosprites
-					file.AddElement(&Blank{Size: 4})
-				}
-
-
-				sprites += 4
-			}
 		}
 	}
 }

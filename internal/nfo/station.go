@@ -24,7 +24,7 @@ type Station struct {
 }
 
 const (
-	DEFAULT_PLATFORM_HEIGHT   = 3
+	DEFAULT_PLATFORM_HEIGHT = 3
 
 	CUSTOM_SPRITE         = 0x42D
 	COMPANY_COLOUR_SPRITE = 0x842D
@@ -40,7 +40,6 @@ const (
 	GROUND_SPRITE_RAIL_EW = 1012
 	GROUND_SPRITE_RAIL_NS = 1011
 )
-
 
 func (s *Station) GetBaseSpriteNumber() int {
 	// The sprite number is a relative offset from the spriteset.
@@ -83,19 +82,6 @@ func (s *Station) GetObjects(direction int, fenceInside, fenceOutside bool) []pr
 		base = base + 2
 	}
 
-	baseSprites := 2
-	if s.InnerPlatform && s.OuterPlatform {
-		baseSprites = 4
-	}
-
-	if s.HasFences {
-		if s.InnerPlatform && s.OuterPlatform {
-			baseSprites = 8
-		} else {
-			baseSprites = 4
-		}
-	}
-
 	result := make([]properties.BoundingBox, 0)
 
 	if s.OuterPlatform {
@@ -114,7 +100,7 @@ func (s *Station) GetObjects(direction int, fenceInside, fenceOutside bool) []pr
 		}
 	}
 
-	for idx, obj := range s.AdditionalObjects {
+	for _, obj := range s.AdditionalObjects {
 		x, y := obj.SizeX, obj.SizeY
 		xOffset, yOffset := obj.X, obj.Y
 
@@ -130,7 +116,7 @@ func (s *Station) GetObjects(direction int, fenceInside, fenceOutside bool) []pr
 			X:            x,
 			Y:            y,
 			Z:            obj.SizeZ,
-			SpriteNumber: obj.GetBaseSpriteNumber(s) + baseSprites + (idx * 2) + direction,
+			SpriteNumber: obj.GetBaseSpriteNumber(s) + direction,
 		})
 	}
 

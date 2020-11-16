@@ -13,8 +13,8 @@ type AdditionalObject struct {
 
 func (ao *AdditionalObject) GetBaseSpriteNumber(s *Station) int {
 	if s.UseCompanyColour {
-		return COMPANY_COLOUR_SPRITE + s.BaseSpriteID
+		return COMPANY_COLOUR_SPRITE + ao.BaseSpriteID
 	}
 
-	return CUSTOM_SPRITE + s.BaseSpriteID
+	return CUSTOM_SPRITE + ao.BaseSpriteID
 }
