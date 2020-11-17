@@ -61,7 +61,7 @@ func (s *StationSprites) WriteToFile(file *output_file.File, loadState int) {
 		filename := fmt.Sprintf("%s_%s_%d_8bpp.png", s.BaseFilename, spr.Filename, loadState)
 		if spr.Filename == "roof" {
 			// Hack to override the different naming scheme of roofs
-			filename = fmt.Sprintf("%s_empty_%d_%s_8bpp.png", s.BaseFilename,loadState,  spr.Filename)
+			filename = fmt.Sprintf("%s_empty_%d_%s_8bpp.png", s.BaseFilename, loadState, spr.Filename)
 		}
 
 		if loadState <= spr.MaxLoadState {
