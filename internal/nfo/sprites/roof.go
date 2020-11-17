@@ -6,10 +6,10 @@ import (
 )
 
 type StationRoof struct {
-	ID             int
 	SpriteFilename string
 	MaxLoadState   int
 	RoofType       string
+	BaseSpriteID   int
 }
 
 func (s *StationRoof) GetSprite(filename string, num int, swap bool) Sprite {
@@ -45,27 +45,14 @@ func (s *StationRoof) GetRoofSprite(filename string, num int) Sprite {
 	}
 }
 
-func (s *StationRoof) WriteToFile(file *output_file.File) {
-
-	file.AddElement(&Spritesets{ID: 0, NumSets: s.MaxLoadState + 1, NumSprites: 4 + (3 * 4)})
-
-	for i := 0; i <= s.MaxLoadState; i++ {
-
-		// Sprites with roof support
-		filename := fmt.Sprintf("%s_%d_roof_8bpp.png", s.SpriteFilename, i)
-
-		file.AddElement(&Sprites{
-			s.GetSprite(filename, 0, false),
-			s.GetSprite(filename, 1, false),
-			s.GetSprite(filename, 2, true),
-			s.GetSprite(filename, 3, true),
-		})
+func (s *StationRoof) WriteToFile(file *output_file.File, loadState int) {
+	if loadState <= s.MaxLoadState {
 
 		roofSubtypes := []string{"single", "double_n", "double_s"}
 
 		for _, subtype := range roofSubtypes {
 			// 3 roof sprites (single, N, S) - repeated as we have multiple load states
-			filename = fmt.Sprintf("roof_%s_%s_8bpp.png", s.RoofType, subtype)
+			filename := fmt.Sprintf("roof_%s_%s_8bpp.png", s.RoofType, subtype)
 			file.AddElement(&Sprites{
 				s.GetRoofSprite(filename, 0),
 				s.GetRoofSprite(filename, 1),
@@ -78,5 +65,7 @@ func (s *StationRoof) WriteToFile(file *output_file.File) {
 				s.GetRoofSprite(filename, 1),
 			})
 		}
+	} else {
+		file.AddElement(&Blank{Size: 12})
 	}
 }

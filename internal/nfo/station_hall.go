@@ -8,8 +8,9 @@ import (
 
 type StationHall struct {
 	ID                    int
-	BaseSpritesetID       int
-	SpriteFilename        string
+	BarePlatformSprite    int
+	RoofPlatformSprite    int
+	RoofBaseSprite        int
 	ClassID               string
 	ClassName             string
 	ObjectName            string
@@ -17,7 +18,6 @@ type StationHall struct {
 	UseCompanyColour      bool
 	MaxLoadState          int
 	PlatformHeight        int
-	RoofType              string
 	YearAvailable         int
 }
 
@@ -45,15 +45,15 @@ func (s *StationHall) GetObjects(direction int, supportOuter bool, supportInner 
 
 	result := make([]properties.BoundingBox, 0)
 
-	innerPlatformSprite := s.GetBaseSpriteNumber() + base + 0
-	outerPlatformSprite := s.GetBaseSpriteNumber() + base + 1
+	innerPlatformSprite := s.GetBaseSpriteNumber() + s.BarePlatformSprite + (direction*2)
+	outerPlatformSprite := s.GetBaseSpriteNumber() + s.BarePlatformSprite + 1 + (direction*2)
 
 	if supportInner {
-		innerPlatformSprite += 4
+		innerPlatformSprite = s.GetBaseSpriteNumber() + s.RoofPlatformSprite + (direction*2)
 	}
 
 	if supportOuter {
-		outerPlatformSprite += 4
+		outerPlatformSprite = s.GetBaseSpriteNumber() + s.RoofPlatformSprite + 1 + (direction*2)
 	}
 
 	// Add the base tiles
@@ -68,7 +68,7 @@ func (s *StationHall) GetObjects(direction int, supportOuter bool, supportInner 
 		X:            16,
 		Y:            16,
 		Z:            6,
-		SpriteNumber: TRANSPARENT_SPRITE + 8 + (roofSprite * 4) + direction + 2,
+		SpriteNumber: TRANSPARENT_SPRITE + s.RoofBaseSprite + (roofSprite * 4) + direction + 2,
 	})
 
 	// Add the roof
@@ -79,7 +79,7 @@ func (s *StationHall) GetObjects(direction int, supportOuter bool, supportInner 
 		X:            16,
 		Y:            16,
 		Z:            6,
-		SpriteNumber: s.GetBaseSpriteNumber() + 8 + (roofSprite * 4) + direction,
+		SpriteNumber: s.GetBaseSpriteNumber() + s.RoofBaseSprite + (roofSprite * 4) + direction,
 	})
 
 	return result

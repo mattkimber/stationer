@@ -19,12 +19,15 @@ type StationClass struct {
 	ClassName    string
 	Available    int
 	BaseObjectID int
+	EmptySprite  int
+	RoofSprite   int
+	RoofPlatform int
 }
 
 const (
 	// This is not the actual number, but the number leaving some room for expansion
 	PLATFORM_TYPES  = 10
-	CLASS_PLATFORMS = PLATFORM_TYPES * 3
+	CLASS_PLATFORMS = (PLATFORM_TYPES * 3) + 10
 )
 
 func main() {
@@ -86,6 +89,10 @@ func main() {
 			BaseFilename: class.Filename,
 		}
 
+		if class.ClassID != "TWF0" {
+			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "roof", HasFences: false, MaxLoadState: 5})
+		}
+
 		classSprites.SetStatistics()
 
 		footbridgeSprite := sprites.PlatformObject{
@@ -94,8 +101,21 @@ func main() {
 			MaxLoadState:   5,
 		}
 
+		roofSprite := sprites.StationRoof{
+			SpriteFilename: "",
+			MaxLoadState:   5,
+			RoofType:       "arch",
+			// +2 for the footbridge
+			BaseSpriteID: classSprites.LastSpriteNumber + 2,
+		}
+
 		// +2 = footbridge sprite
-		total := classSprites.LastSpriteNumber + 2
+		// +12 = roof sprites
+		total := classSprites.LastSpriteNumber + 14
+
+		class.EmptySprite = classSprites.SpriteMap["sign"]
+		class.RoofPlatform = classSprites.SpriteMap["roof"]
+		class.RoofSprite = roofSprite.BaseSpriteID
 
 		// Definition for all the spritesets
 		file.AddElement(&sprites.Spritesets{ID: 0, NumSets: sprites.GLOBAL_MAX_LOAD_STATE + 1, NumSprites: total})
@@ -104,6 +124,7 @@ func main() {
 		for i := 0; i <= sprites.GLOBAL_MAX_LOAD_STATE; i++ {
 			classSprites.WriteToFile(&file, i)
 			footbridgeSprite.WriteToFile(&file, i)
+			roofSprite.WriteToFile(&file, i)
 		}
 
 		names := []string{"", "inner", "outer"}
@@ -115,7 +136,7 @@ func main() {
 			commaName := ""
 
 			if names[i] != "" {
-				bracketName = "(" + names[i] + ")"
+				bracketName = " (" + names[i] + ")"
 				commaName = ", " + names[i]
 			}
 
@@ -176,7 +197,7 @@ func main() {
 					ClassName:             class.ClassName,
 					YearAvailable:         class.Available,
 					MaxLoadState:          5,
-					ObjectName:            "Ramp (NE)" + commaName + ")",
+					ObjectName:            "Ramp (NE" + commaName + ")",
 					PlatformConfiguration: rampConfiguration,
 					UseCompanyColour:      true,
 					HasFences:             true,
@@ -190,7 +211,7 @@ func main() {
 					ClassName:             class.ClassName,
 					YearAvailable:         class.Available,
 					MaxLoadState:          5,
-					ObjectName:            "Ramp (SW)" + commaName + ")",
+					ObjectName:            "Ramp (SW" + commaName + ")",
 					PlatformConfiguration: rampConfiguration,
 					UseCompanyColour:      true,
 					HasFences:             true,
@@ -233,35 +254,29 @@ func main() {
 			}
 		}
 
-	}
-
-	objectID := 90
-
-	// TODO: clean up and integrate bufferstops and station roofs properly
-	for _, class := range classes {
-
 		// Wooden platforms do not have station halls
 		if class.ClassID != "TWF0" {
 
 			hall := nfo.StationHall{
-				ID:               objectID,
-				SpriteFilename:   fmt.Sprintf("%s_empty", class.Filename),
-				ClassID:          class.ClassID,
-				ClassName:        class.ClassName,
-				YearAvailable:    max(class.Available, 1870),
-				MaxLoadState:     5,
-				ObjectName:       "Station Hall",
-				RoofType:         "arch",
-				UseCompanyColour: true,
+				ID:                    class.BaseObjectID + 31,
+				BarePlatformSprite:    class.EmptySprite,
+				RoofPlatformSprite:    class.RoofPlatform,
+				RoofBaseSprite:        class.RoofSprite,
+				ClassID:               class.ClassID,
+				ClassName:             class.ClassName,
+				ObjectName:            "Station Hall",
+				PlatformConfiguration: properties.PlatformLayout{},
+				UseCompanyColour:      true,
+				MaxLoadState:          5,
+				PlatformHeight:        0,
+				YearAvailable:         max(class.Available, 1870),
 			}
 
 			hall.WriteToFile(&file)
-			objectID = objectID + 1
-
 		}
 
 		buffers := nfo.BufferStop{
-			ID:               objectID,
+			ID:               class.BaseObjectID + 32,
 			SpriteFilename:   fmt.Sprintf("%s_bufferstop", class.Filename),
 			ClassID:          class.ClassID,
 			ClassName:        class.ClassName,
@@ -271,11 +286,11 @@ func main() {
 		}
 
 		buffers.WriteToFile(&file)
-		objectID = objectID + 1
 
 		platforms := []nfo.FullTilePlatform{
 			{
 				SpriteFilename:   fmt.Sprintf("%s_concourse", class.Filename),
+				ID: class.BaseObjectID + 33,
 				ClassID:          class.ClassID,
 				ClassName:        class.ClassName,
 				YearAvailable:    class.Available,
@@ -284,6 +299,7 @@ func main() {
 			},
 			{
 				SpriteFilename:   fmt.Sprintf("%s_concourse_shelter", class.Filename),
+				ID: class.BaseObjectID + 34,
 				ClassID:          class.ClassID,
 				ClassName:        class.ClassName,
 				YearAvailable:    max(class.Available, 1860),
@@ -293,11 +309,13 @@ func main() {
 		}
 
 		for _, platform := range platforms {
-			platform.ID = objectID
 			platform.WriteToFile(&file)
-			objectID = objectID + 1
 		}
+
 	}
+
+	objectID := CLASS_PLATFORMS * 3
+
 
 	buildings := []nfo.Building{
 		{
