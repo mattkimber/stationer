@@ -5,10 +5,16 @@ import (
 	"github.com/mattkimber/stationer/internal/bytes"
 )
 
+const (
+	STATION_FENCE_OFFSET = 3
+)
+
 type StationFenceCallback struct {
 	SetID            int
+	BaseLayoutOffset int
 	DefaultSpriteSet int
 	YearCallbackID   int
+	HasDecider       bool
 }
 
 func (s *StationFenceCallback) GetComment() string {
@@ -38,11 +44,17 @@ func (s *StationFenceCallback) getAction(checkValue, ifTrueValue, ifFalseValue s
 }
 
 func (s *StationFenceCallback) GetLines() []string {
-	return []string{
-		s.getAction("10", "04 80", "00 80", 1),                                   // N: true, S: check
-		s.getAction("10", "06 80", "02 80", 2),                                   // N: false, S: check
-		s.getAction("F0", bytes.GetWord(s.SetID+2), bytes.GetWord(s.SetID+1), 3), // N: check, S: unknown
-		//s.getCallback(s.SetID + 3),
-		GetDecider(s.SetID, s.SetID+3, s.YearCallbackID, s.DefaultSpriteSet),
+	// Fence layouts follow a specific pattern, but we might not be using the one which starts at
+	// 0, so we add the offset to the fixed pattern of N/S fences
+	result := []string{
+		s.getAction("10", bytes.GetCallbackResultByte(s.BaseLayoutOffset+4), bytes.GetCallbackResultByte(s.BaseLayoutOffset+0), 1),                                   // N: true, S: check
+		s.getAction("10", bytes.GetCallbackResultByte(s.BaseLayoutOffset+6), bytes.GetCallbackResultByte(s.BaseLayoutOffset+2), 2),                                   // N: false, S: check
+		s.getAction("F0", bytes.GetWord(s.SetID+2), bytes.GetWord(s.SetID+1), STATION_FENCE_OFFSET), // N: check, S: unknown
 	}
+
+	if s.HasDecider {
+		result = append(result, GetDecider(s.SetID, s.SetID+3, s.YearCallbackID, s.DefaultSpriteSet))
+	}
+
+	return result
 }

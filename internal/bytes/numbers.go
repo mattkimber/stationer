@@ -28,3 +28,8 @@ func GetWord(value int) string {
 	b := value >> 8 & 0xFF
 	return fmt.Sprintf("%02X %02X", a, b)
 }
+
+func GetCallbackResultByte(value int) string {
+	a := value & 0xFF
+	return fmt.Sprintf("%02X 80", a)
+}

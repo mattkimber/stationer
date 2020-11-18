@@ -21,6 +21,9 @@ type Station struct {
 	InnerPlatform         bool
 	OuterPlatform         bool
 	YearAvailable         int
+	OverrideOuter         bool // Whether to use an override sprite for the outer platforms
+	OuterPlatformSprite   int  // and if so, which sprite.
+	HasLargeCentralObject bool // If the central object covers two tiles
 }
 
 const (
@@ -57,6 +60,14 @@ func (s *Station) GetBaseSpriteNumber() int {
 	return CUSTOM_SPRITE + s.BaseSpriteID
 }
 
+func (s *Station) GetOuterPlatformSpriteNumber() int {
+	if s.UseCompanyColour {
+		return COMPANY_COLOUR_SPRITE + s.OuterPlatformSprite
+	}
+
+	return CUSTOM_SPRITE + s.OuterPlatformSprite
+}
+
 func GetSpriteSets(max int) []int {
 	switch max {
 	case 5:
@@ -68,7 +79,7 @@ func GetSpriteSets(max int) []int {
 	return []int{0}
 }
 
-func (s *Station) GetObjects(direction int, fenceInside, fenceOutside bool) []properties.BoundingBox {
+func (s *Station) GetObjects(direction int, fenceInside, fenceOutside bool, platform int) []properties.BoundingBox {
 	yOffset := 16 - 5
 	xOffset := 0
 	x, y := 16, 5
@@ -84,19 +95,32 @@ func (s *Station) GetObjects(direction int, fenceInside, fenceOutside bool) []pr
 
 	result := make([]properties.BoundingBox, 0)
 
-	if s.OuterPlatform {
-		if fenceOutside {
-			result = append(result, properties.BoundingBox{YOffset: yOffset, XOffset: xOffset, X: x, Y: y, Z: s.PlatformHeight, SpriteNumber: s.GetBaseSpriteNumber() + base + 4})
+	if s.OuterPlatform || (platform >= 1 && s.HasLargeCentralObject) {
+		baseSprite := s.GetBaseSpriteNumber()
+		if s.OverrideOuter && platform == 0 {
+			baseSprite = s.GetOuterPlatformSpriteNumber()
+		}
+
+		// We only do the fence offsets if we are on the "outside" tile, not the central object tile.
+		// This is so when players chop stations up into "unnatural" tiles (e.g. removing one side of a
+		// 2-platform object) OpenTTD doesn't get confused looking for an "object+fence" sprite that doesn't exist.
+		if fenceOutside && platform == 0 {
+			result = append(result, properties.BoundingBox{YOffset: yOffset, XOffset: xOffset, X: x, Y: y, Z: s.PlatformHeight, SpriteNumber: baseSprite + base + 4})
 		} else {
-			result = append(result, properties.BoundingBox{YOffset: yOffset, XOffset: xOffset, X: x, Y: y, Z: s.PlatformHeight, SpriteNumber: s.GetBaseSpriteNumber() + base + 0})
+			result = append(result, properties.BoundingBox{YOffset: yOffset, XOffset: xOffset, X: x, Y: y, Z: s.PlatformHeight, SpriteNumber: baseSprite + base + 0})
 		}
 	}
 
-	if s.InnerPlatform {
-		if fenceInside {
-			result = append(result, properties.BoundingBox{X: x, Y: y, Z: s.PlatformHeight, SpriteNumber: s.GetBaseSpriteNumber() + base + 5})
+	if s.InnerPlatform && !(!s.OuterPlatform && s.HasLargeCentralObject && platform == 1) {
+		baseSprite := s.GetBaseSpriteNumber()
+		if s.OverrideOuter && platform == 1 {
+			baseSprite = s.GetOuterPlatformSpriteNumber()
+		}
+
+		if fenceInside && (platform == 1 || !s.HasLargeCentralObject) {
+			result = append(result, properties.BoundingBox{X: x, Y: y, Z: s.PlatformHeight, SpriteNumber: baseSprite + base + 5})
 		} else {
-			result = append(result, properties.BoundingBox{X: x, Y: y, Z: s.PlatformHeight, SpriteNumber: s.GetBaseSpriteNumber() + base + 1})
+			result = append(result, properties.BoundingBox{X: x, Y: y, Z: s.PlatformHeight, SpriteNumber: baseSprite + base + 1})
 		}
 	}
 
@@ -142,32 +166,13 @@ func (s *Station) WriteToFile(file *output_file.File) {
 
 	def.AddProperty(&properties.LittleLotsThreshold{Amount: 200})
 
-	// Default layouts:
-	// - Fence (both sides)
-	// - Fence (outside)
-	// - Fence (inside)
-	// - No fences
-	layoutEntries := make([]properties.LayoutEntry, 0)
-	for i := 0; i < 4; i++ {
-		fenceOutside := i >= 2
-		fenceInside := i == 1 || i == 3
+	layoutEntries := s.getLayoutEntryForPlatform(0)
+	if s.HasLargeCentralObject {
+		// 1 = the "other side" tile
+		layoutEntries = append(layoutEntries, s.getLayoutEntryForPlatform(1)...)
 
-		if i > 0 && !s.HasFences {
-			break
-		}
-
-		entry := properties.LayoutEntry{
-			EastWest: properties.SpriteDirection{
-				GroundSprite: GROUND_SPRITE_RAIL_EW,
-				Sprites:      s.GetObjects(EAST_WEST, fenceInside, fenceOutside),
-			},
-			NorthSouth: properties.SpriteDirection{
-				GroundSprite: GROUND_SPRITE_RAIL_NS,
-				Sprites:      s.GetObjects(NORTH_SOUTH, fenceInside, fenceOutside),
-			},
-		}
-
-		layoutEntries = append(layoutEntries, entry)
+		// 2 = the "both sides" tile
+		layoutEntries = append(layoutEntries, s.getLayoutEntryForPlatform(2)...)
 	}
 
 	def.AddProperty(&properties.SpriteLayout{
@@ -217,15 +222,68 @@ func (s *Station) WriteToFile(file *output_file.File) {
 			SetID:            10,
 			DefaultSpriteSet: 0,
 			YearCallbackID:   yearCallbackID,
+			HasDecider: !s.HasLargeCentralObject,
 		})
 
 		file.AddElement(&callbacks.StationFenceCallback{
-			SetID:            20,
+			SetID:            15,
 			DefaultSpriteSet: 1,
 			YearCallbackID:   yearCallbackID,
+			HasDecider: !s.HasLargeCentralObject,
 		})
 
-		passengerCargoSet, otherCargoSet = 10, 20
+		if s.HasLargeCentralObject {
+			file.AddElement(&callbacks.StationFenceCallback{
+				SetID:            20,
+				DefaultSpriteSet: 0,
+				YearCallbackID:   yearCallbackID,
+				BaseLayoutOffset: 8,
+			})
+
+			file.AddElement(&callbacks.StationFenceCallback{
+				SetID:            25,
+				DefaultSpriteSet: 1,
+				YearCallbackID:   yearCallbackID,
+				BaseLayoutOffset: 8,
+			})
+
+			file.AddElement(&callbacks.StationFenceCallback{
+				SetID:            30,
+				DefaultSpriteSet: 0,
+				YearCallbackID:   yearCallbackID,
+				BaseLayoutOffset: 16,
+			})
+
+			file.AddElement(&callbacks.StationFenceCallback{
+				SetID:            35,
+				DefaultSpriteSet: 1,
+				YearCallbackID:   yearCallbackID,
+				BaseLayoutOffset: 16,
+			})
+
+			file.AddElement(&callbacks.LargeCentralObjectCallback{
+				SetID:            40,
+				OuterCallbackID:  13,
+				InnerCallbackID:  23,
+				MiddleCallbackID: 33,
+				DefaultSpriteSet: 0,
+				YearCallbackID:   yearCallbackID,
+			})
+
+			file.AddElement(&callbacks.LargeCentralObjectCallback{
+				SetID:            45,
+				OuterCallbackID:  18,
+				InnerCallbackID:  28,
+				MiddleCallbackID: 38,
+				DefaultSpriteSet: 1, // this is needed to prevent stations showing cargo in the purchase menu
+				YearCallbackID:   yearCallbackID,
+			})
+
+			passengerCargoSet, otherCargoSet = 40, 45
+		} else {
+			passengerCargoSet, otherCargoSet = 10, 15
+		}
+
 	}
 
 	file.AddElement(&GraphicSetAssignment{
@@ -250,4 +308,38 @@ func (s *Station) WriteToFile(file *output_file.File) {
 		TextStringType: TextStringTypeClassName,
 		Text:           s.ClassName,
 	})
+}
+
+func (s *Station) getLayoutEntryForPlatform(platform int) []properties.LayoutEntry {
+	// Default layouts:
+	// - Fence (both sides)
+	// - Fence (outside)
+	// - Fence (inside)
+	// - No fences
+	layoutEntries := make([]properties.LayoutEntry, 0)
+	for i := 0; i < 4; i++ {
+		fenceOutside := i >= 2
+		fenceInside := i == 1 || i == 3
+
+		if i > 0 && !s.HasFences {
+			break
+		}
+
+		// Even though not all fence possibilities will be displayed for large objects,
+		// we still add the layouts into the station layout so all of the different options
+		// have the same size (even if some of the fence possibilities aren't used)
+		entry := properties.LayoutEntry{
+			EastWest: properties.SpriteDirection{
+				GroundSprite: GROUND_SPRITE_RAIL_EW,
+				Sprites:      s.GetObjects(EAST_WEST, fenceInside, fenceOutside, platform),
+			},
+			NorthSouth: properties.SpriteDirection{
+				GroundSprite: GROUND_SPRITE_RAIL_NS,
+				Sprites:      s.GetObjects(NORTH_SOUTH, fenceInside, fenceOutside, platform),
+			},
+		}
+
+		layoutEntries = append(layoutEntries, entry)
+	}
+	return layoutEntries
 }

@@ -62,13 +62,28 @@ func main() {
 		},
 		Lengths: properties.PlatformBitmask{
 			Enable1:    true,
-			Enable2:    false,
-			Enable3:    false,
-			Enable4:    false,
-			Enable5:    false,
-			Enable6:    false,
-			Enable7:    false,
-			EnableMore: false,
+		},
+	}
+
+	largeObjectConfiguration := properties.PlatformLayout{
+		Platforms: properties.PlatformBitmask{
+			Enable2:    true,
+			Enable3:    true,
+			Enable4:    true,
+			Enable5:    true,
+			Enable6:    true,
+			Enable7:    true,
+			EnableMore: true,
+		},
+		Lengths: properties.PlatformBitmask{
+			Enable1:    true,
+			Enable2:    true,
+			Enable3:    true,
+			Enable4:    true,
+			Enable5:    true,
+			Enable6:    true,
+			Enable7:    true,
+			EnableMore: true,
 		},
 	}
 
@@ -223,21 +238,28 @@ func main() {
 
 			// Tiles only available on concrete/modern
 			if class.ClassID != "TWF0" {
-				thisClass = append(thisClass, []nfo.Station{
-					{
-						ID:                    baseObjectID + 7,
-						BaseSpriteID:          classSprites.SpriteMap["bare_cafe"],
-						ClassID:               class.ClassID,
-						ClassName:             class.ClassName,
-						YearAvailable:         max(class.Available, 1932),
-						MaxLoadState:          5,
-						ObjectName:            "Waiting Room",
-						UseCompanyColour:      true,
-						HasFences:             false,
-						InnerPlatform:         inner,
-						OuterPlatform:         outer,
-					},
-				}...)
+				// Only available if we have an "inner" platform
+				if i <= 1 {
+					thisClass = append(thisClass, []nfo.Station{
+						{
+							ID:                    baseObjectID + 7,
+							BaseSpriteID:          classSprites.SpriteMap["bare_cafe"],
+							ClassID:               class.ClassID,
+							ClassName:             class.ClassName,
+							YearAvailable:         max(class.Available, 1932),
+							MaxLoadState:          5,
+							ObjectName:            "Waiting Room" + bracketName,
+							UseCompanyColour:      true,
+							HasFences:             true,
+							InnerPlatform:         inner,
+							OuterPlatform:         outer,
+							HasLargeCentralObject: true,
+							OverrideOuter:         true,
+							OuterPlatformSprite:   classSprites.SpriteMap["empty"],
+							PlatformConfiguration: largeObjectConfiguration,
+						},
+					}...)
+				}
 			}
 
 			if i == 0 {
