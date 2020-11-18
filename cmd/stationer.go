@@ -107,6 +107,7 @@ func main() {
 		if class.ClassID != "TWF0" {
 			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "roof", HasFences: false, MaxLoadState: 5})
 			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "bare_cafe", HasFences: false, MaxLoadState: 5})
+			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "bare_planter", HasFences: false, MaxLoadState: 5})
 		}
 
 		classSprites.SetStatistics()
@@ -249,6 +250,23 @@ func main() {
 							YearAvailable:         max(class.Available, 1932),
 							MaxLoadState:          5,
 							ObjectName:            "Waiting Room" + bracketName,
+							UseCompanyColour:      true,
+							HasFences:             true,
+							InnerPlatform:         inner,
+							OuterPlatform:         outer,
+							HasLargeCentralObject: true,
+							OverrideOuter:         true,
+							OuterPlatformSprite:   classSprites.SpriteMap["empty"],
+							PlatformConfiguration: largeObjectConfiguration,
+						},
+						{
+							ID:                    baseObjectID + 8,
+							BaseSpriteID:          classSprites.SpriteMap["bare_planter"],
+							ClassID:               class.ClassID,
+							ClassName:             class.ClassName,
+							YearAvailable:         max(class.Available, 1870),
+							MaxLoadState:          5,
+							ObjectName:            "Planter" + bracketName,
 							UseCompanyColour:      true,
 							HasFences:             true,
 							InnerPlatform:         inner,
