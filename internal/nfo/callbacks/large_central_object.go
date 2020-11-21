@@ -52,7 +52,6 @@ func (lco *LargeCentralObjectCallback) GetLines() []string {
 		lco.getCallback("08 F0", bytes.GetWord(lco.OuterCallbackID), bytes.GetWord(lco.SetID+1), 2),
 	}
 
-
 	if lco.HasDecider {
 		result = append(result, GetDecider(lco.SetID, lco.SetID+2, lco.YearCallbackID, lco.DefaultSpriteSet))
 	}

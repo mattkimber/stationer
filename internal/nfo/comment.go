@@ -11,4 +11,3 @@ func (c *Comment) GetComment() string {
 func (c *Comment) GetLines() []string {
 	return []string{}
 }
-

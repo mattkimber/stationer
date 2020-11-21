@@ -250,12 +250,12 @@ func (s *Station) WriteToFile(file *output_file.File) {
 		passengerCargoSet, otherCargoSet = yearCallbackID, yearCallbackID
 	}
 
-	randomPassengerSets, randomOtherSets := make([]int, 0),  make([]int, 0)
+	randomPassengerSets, randomOtherSets := make([]int, 0), make([]int, 0)
 
 	for i := 0; i < iterations; i++ {
 		if s.HasFences {
 			file.AddElement(&callbacks.StationFenceCallback{
-				SetID:            10 + (i*50),
+				SetID:            10 + (i * 50),
 				DefaultSpriteSet: 0,
 				YearCallbackID:   yearCallbackID,
 				HasDecider:       !s.HasLargeCentralObject,
@@ -263,7 +263,7 @@ func (s *Station) WriteToFile(file *output_file.File) {
 			})
 
 			file.AddElement(&callbacks.StationFenceCallback{
-				SetID:            15 + (i*50),
+				SetID:            15 + (i * 50),
 				DefaultSpriteSet: 1,
 				YearCallbackID:   yearCallbackID,
 				HasDecider:       !s.HasLargeCentralObject,
@@ -272,60 +272,60 @@ func (s *Station) WriteToFile(file *output_file.File) {
 
 			if s.HasLargeCentralObject {
 				file.AddElement(&callbacks.StationFenceCallback{
-					SetID:            20 + (i*50),
+					SetID:            20 + (i * 50),
 					DefaultSpriteSet: 0,
 					YearCallbackID:   yearCallbackID,
 					BaseLayoutOffset: 8 + (i * 24),
 				})
 
 				file.AddElement(&callbacks.StationFenceCallback{
-					SetID:            25 + (i*50),
+					SetID:            25 + (i * 50),
 					DefaultSpriteSet: 1,
 					YearCallbackID:   yearCallbackID,
 					BaseLayoutOffset: 8 + (i * 24),
 				})
 
 				file.AddElement(&callbacks.StationFenceCallback{
-					SetID:            30 + (i*50),
+					SetID:            30 + (i * 50),
 					DefaultSpriteSet: 0,
 					YearCallbackID:   yearCallbackID,
 					BaseLayoutOffset: 16 + (i * 24),
 				})
 
 				file.AddElement(&callbacks.StationFenceCallback{
-					SetID:            35 + (i*50),
+					SetID:            35 + (i * 50),
 					DefaultSpriteSet: 1,
 					YearCallbackID:   yearCallbackID,
 					BaseLayoutOffset: 16 + (i * 24),
 				})
 
 				file.AddElement(&callbacks.LargeCentralObjectCallback{
-					SetID:            40 + (i*50),
-					OuterCallbackID:  13 + (i*50),
-					InnerCallbackID:  23 + (i*50),
-					MiddleCallbackID: 33 + (i*50),
+					SetID:            40 + (i * 50),
+					OuterCallbackID:  13 + (i * 50),
+					InnerCallbackID:  23 + (i * 50),
+					MiddleCallbackID: 33 + (i * 50),
 					DefaultSpriteSet: 0,
 					YearCallbackID:   yearCallbackID,
-					HasDecider: len(s.RandomSpriteIDs) == 0,
+					HasDecider:       len(s.RandomSpriteIDs) == 0,
 				})
 
 				file.AddElement(&callbacks.LargeCentralObjectCallback{
-					SetID:            45 + (i*50),
-					OuterCallbackID:  18 + (i*50),
-					InnerCallbackID:  28 + (i*50),
-					MiddleCallbackID: 38 + (i*50),
+					SetID:            45 + (i * 50),
+					OuterCallbackID:  18 + (i * 50),
+					InnerCallbackID:  28 + (i * 50),
+					MiddleCallbackID: 38 + (i * 50),
 					DefaultSpriteSet: 1, // this is needed to prevent stations showing cargo in the purchase menu
 					YearCallbackID:   yearCallbackID,
-					HasDecider: len(s.RandomSpriteIDs) == 0,
+					HasDecider:       len(s.RandomSpriteIDs) == 0,
 				})
 
-				passengerCargoSet, otherCargoSet = 40 + (i*50), 45 + (i*50)
+				passengerCargoSet, otherCargoSet = 40+(i*50), 45+(i*50)
 
 				// The actual set ID of the LCO callback is offset 2 from the base ID
 				randomPassengerSets = append(randomPassengerSets, passengerCargoSet+2)
 				randomOtherSets = append(randomOtherSets, passengerCargoSet+2)
 			} else {
-				passengerCargoSet, otherCargoSet = 10 + (i*50), 15 + (i*50)
+				passengerCargoSet, otherCargoSet = 10+(i*50), 15+(i*50)
 			}
 		}
 	}
@@ -333,23 +333,23 @@ func (s *Station) WriteToFile(file *output_file.File) {
 	if len(s.RandomSpriteIDs) > 0 {
 		// Add the random set decider
 		file.AddElement(&callbacks.RandomChoiceCallback{
-			SetID:            (iterations+1)*50,
+			SetID:            (iterations + 1) * 50,
 			DefaultSpriteSet: 0,
 			YearCallbackID:   yearCallbackID,
-			ResultIDs: randomPassengerSets,
-			HasDecider: true,
+			ResultIDs:        randomPassengerSets,
+			HasDecider:       true,
 		})
 
 		file.AddElement(&callbacks.RandomChoiceCallback{
-			SetID:            ((iterations+1)*50) + 2,
+			SetID:            ((iterations + 1) * 50) + 2,
 			DefaultSpriteSet: 1, // this is needed to prevent stations showing cargo in the purchase menu
 			YearCallbackID:   yearCallbackID,
-			ResultIDs: randomOtherSets,
-			HasDecider: true,
+			ResultIDs:        randomOtherSets,
+			HasDecider:       true,
 		})
 
 		// The callback decider is 1 + the set ID of the random choice callback
-		passengerCargoSet, otherCargoSet =  ((iterations+1)*50) + 1, ((iterations+1)*50) + 3
+		passengerCargoSet, otherCargoSet = ((iterations+1)*50)+1, ((iterations+1)*50)+3
 	}
 
 	file.AddElement(&GraphicSetAssignment{

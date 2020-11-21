@@ -5,9 +5,8 @@ import (
 	"github.com/mattkimber/stationer/internal/bytes"
 )
 
-
 type RandomChoiceCallback struct {
-	SetID            int
+	SetID int
 	// ResultIDs must have length of a power of 2
 	ResultIDs        []int
 	HasDecider       bool
@@ -30,14 +29,13 @@ func (rcb *RandomChoiceCallback) getCallback() string {
 		// 10 = random bits to use (byte)
 		// %s = number of options (must be a power of 2)
 
-
 		// %s = number of ranges other than default
 		"* %d 02 04 %s\n"+
 			"    80 00\n"+
-			"    10\n" +
+			"    10\n"+
 			"    %s\n",
 		length,
-		bytes.GetByte(rcb.SetID), 		   // ID of this callback
+		bytes.GetByte(rcb.SetID),          // ID of this callback
 		bytes.GetByte(len(rcb.ResultIDs)), // number of ranges
 	)
 

@@ -181,7 +181,7 @@ func main() {
 					ClassID:          class.ClassID,
 					ClassName:        class.ClassName,
 					ObjectName:       "Platform with sign" + bracketName,
-					YearAvailable:    max(class.Available, 1845),
+					YearAvailable:    max(class.Available, 1835),
 					UseCompanyColour: true,
 					HasFences:        true,
 					InnerPlatform:    inner,
@@ -193,7 +193,7 @@ func main() {
 					ClassID:          class.ClassID,
 					ClassName:        class.ClassName,
 					ObjectName:       "Platform with benches" + bracketName,
-					YearAvailable:    max(class.Available, 1840),
+					YearAvailable:    max(class.Available, 1845),
 					UseCompanyColour: true,
 					HasFences:        true,
 					InnerPlatform:    inner,
@@ -260,8 +260,8 @@ func main() {
 
 				thisClass = append(thisClass, []nfo.Station{
 					{
-						ID:                    baseObjectID + 7,
-						BaseSpriteID:          classSprites.SpriteMap["billboard_1"],
+						ID:           baseObjectID + 7,
+						BaseSpriteID: classSprites.SpriteMap["billboard_1"],
 						RandomSpriteIDs: []int{
 							classSprites.SpriteMap["billboard_1"],
 							classSprites.SpriteMap["billboard_2"],
@@ -270,7 +270,7 @@ func main() {
 						},
 						ClassID:               class.ClassID,
 						ClassName:             class.ClassName,
-						YearAvailable:         max(class.Available, 1850),
+						YearAvailable:         max(class.Available, 1845),
 						MaxLoadState:          5,
 						ObjectName:            "Billboard" + bracketName,
 						UseCompanyColour:      true,
