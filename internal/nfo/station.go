@@ -9,6 +9,7 @@ import (
 type Station struct {
 	ID                    int
 	BaseSpriteID          int
+	RandomSpriteIDs       []int
 	ClassID               string
 	ClassName             string
 	ObjectName            string
@@ -24,6 +25,7 @@ type Station struct {
 	OverrideOuter         bool // Whether to use an override sprite for the outer platforms
 	OuterPlatformSprite   int  // and if so, which sprite.
 	HasLargeCentralObject bool // If the central object covers two tiles
+	ObjectIsSingleSided   bool // if the central object is "single sided" - only present on one platform tile.
 }
 
 const (
@@ -60,6 +62,15 @@ func (s *Station) GetBaseSpriteNumber() int {
 	return CUSTOM_SPRITE + s.BaseSpriteID
 }
 
+func (s *Station) GetRandomSpriteNumber(number int) int {
+
+	if s.UseCompanyColour {
+		return COMPANY_COLOUR_SPRITE + s.RandomSpriteIDs[number]
+	}
+
+	return CUSTOM_SPRITE + s.RandomSpriteIDs[number]
+}
+
 func (s *Station) GetOuterPlatformSpriteNumber() int {
 	if s.UseCompanyColour {
 		return COMPANY_COLOUR_SPRITE + s.OuterPlatformSprite
@@ -79,7 +90,7 @@ func GetSpriteSets(max int) []int {
 	return []int{0}
 }
 
-func (s *Station) GetObjects(direction int, fenceInside, fenceOutside bool, platform int) []properties.BoundingBox {
+func (s *Station) GetObjects(direction int, fenceInside, fenceOutside bool, iteration int) []properties.BoundingBox {
 	yOffset := 16 - 5
 	xOffset := 0
 	x, y := 16, 5
@@ -95,9 +106,17 @@ func (s *Station) GetObjects(direction int, fenceInside, fenceOutside bool, plat
 
 	result := make([]properties.BoundingBox, 0)
 
+	platform := iteration % 3
+	randomChoice := iteration / 3
+
 	if s.OuterPlatform || (platform >= 1 && s.HasLargeCentralObject) {
 		baseSprite := s.GetBaseSpriteNumber()
-		if s.OverrideOuter && platform == 0 {
+
+		if len(s.RandomSpriteIDs) > 0 {
+			baseSprite = s.GetRandomSpriteNumber(randomChoice)
+		}
+
+		if s.OverrideOuter && (platform == 0 || s.ObjectIsSingleSided) {
 			baseSprite = s.GetOuterPlatformSpriteNumber()
 		}
 
@@ -113,6 +132,11 @@ func (s *Station) GetObjects(direction int, fenceInside, fenceOutside bool, plat
 
 	if s.InnerPlatform && !(!s.OuterPlatform && s.HasLargeCentralObject && platform == 1) {
 		baseSprite := s.GetBaseSpriteNumber()
+
+		if len(s.RandomSpriteIDs) > 0 {
+			baseSprite = s.GetRandomSpriteNumber(randomChoice)
+		}
+
 		if s.OverrideOuter && platform == 1 {
 			baseSprite = s.GetOuterPlatformSpriteNumber()
 		}
@@ -166,13 +190,22 @@ func (s *Station) WriteToFile(file *output_file.File) {
 
 	def.AddProperty(&properties.LittleLotsThreshold{Amount: 200})
 
-	layoutEntries := s.getLayoutEntryForPlatform(0)
-	if s.HasLargeCentralObject {
-		// 1 = the "other side" tile
-		layoutEntries = append(layoutEntries, s.getLayoutEntryForPlatform(1)...)
+	iterations := 1
+	if len(s.RandomSpriteIDs) > 0 {
+		iterations = len(s.RandomSpriteIDs)
+	}
 
-		// 2 = the "both sides" tile
-		layoutEntries = append(layoutEntries, s.getLayoutEntryForPlatform(2)...)
+	layoutEntries := make([]properties.LayoutEntry, 0)
+
+	for i := 0; i < iterations; i++ {
+		layoutEntries = append(layoutEntries, s.getLayoutEntryForPlatform(i*3)...)
+		if s.HasLargeCentralObject {
+			// 1 = the "other side" tile
+			layoutEntries = append(layoutEntries, s.getLayoutEntryForPlatform(1+(i*3))...)
+
+			// 2 = the "both sides" tile
+			layoutEntries = append(layoutEntries, s.getLayoutEntryForPlatform(2+(i*3))...)
+		}
 	}
 
 	def.AddProperty(&properties.SpriteLayout{
@@ -217,73 +250,106 @@ func (s *Station) WriteToFile(file *output_file.File) {
 		passengerCargoSet, otherCargoSet = yearCallbackID, yearCallbackID
 	}
 
-	if s.HasFences {
-		file.AddElement(&callbacks.StationFenceCallback{
-			SetID:            10,
+	randomPassengerSets, randomOtherSets := make([]int, 0),  make([]int, 0)
+
+	for i := 0; i < iterations; i++ {
+		if s.HasFences {
+			file.AddElement(&callbacks.StationFenceCallback{
+				SetID:            10 + (i*50),
+				DefaultSpriteSet: 0,
+				YearCallbackID:   yearCallbackID,
+				HasDecider:       !s.HasLargeCentralObject,
+				BaseLayoutOffset: i * 24,
+			})
+
+			file.AddElement(&callbacks.StationFenceCallback{
+				SetID:            15 + (i*50),
+				DefaultSpriteSet: 1,
+				YearCallbackID:   yearCallbackID,
+				HasDecider:       !s.HasLargeCentralObject,
+				BaseLayoutOffset: i * 24,
+			})
+
+			if s.HasLargeCentralObject {
+				file.AddElement(&callbacks.StationFenceCallback{
+					SetID:            20 + (i*50),
+					DefaultSpriteSet: 0,
+					YearCallbackID:   yearCallbackID,
+					BaseLayoutOffset: 8 + (i * 24),
+				})
+
+				file.AddElement(&callbacks.StationFenceCallback{
+					SetID:            25 + (i*50),
+					DefaultSpriteSet: 1,
+					YearCallbackID:   yearCallbackID,
+					BaseLayoutOffset: 8 + (i * 24),
+				})
+
+				file.AddElement(&callbacks.StationFenceCallback{
+					SetID:            30 + (i*50),
+					DefaultSpriteSet: 0,
+					YearCallbackID:   yearCallbackID,
+					BaseLayoutOffset: 16 + (i * 24),
+				})
+
+				file.AddElement(&callbacks.StationFenceCallback{
+					SetID:            35 + (i*50),
+					DefaultSpriteSet: 1,
+					YearCallbackID:   yearCallbackID,
+					BaseLayoutOffset: 16 + (i * 24),
+				})
+
+				file.AddElement(&callbacks.LargeCentralObjectCallback{
+					SetID:            40 + (i*50),
+					OuterCallbackID:  13 + (i*50),
+					InnerCallbackID:  23 + (i*50),
+					MiddleCallbackID: 33 + (i*50),
+					DefaultSpriteSet: 0,
+					YearCallbackID:   yearCallbackID,
+					HasDecider: len(s.RandomSpriteIDs) == 0,
+				})
+
+				file.AddElement(&callbacks.LargeCentralObjectCallback{
+					SetID:            45 + (i*50),
+					OuterCallbackID:  18 + (i*50),
+					InnerCallbackID:  28 + (i*50),
+					MiddleCallbackID: 38 + (i*50),
+					DefaultSpriteSet: 1, // this is needed to prevent stations showing cargo in the purchase menu
+					YearCallbackID:   yearCallbackID,
+					HasDecider: len(s.RandomSpriteIDs) == 0,
+				})
+
+				passengerCargoSet, otherCargoSet = 40 + (i*50), 45 + (i*50)
+
+				// The actual set ID of the LCO callback is offset 2 from the base ID
+				randomPassengerSets = append(randomPassengerSets, passengerCargoSet+2)
+				randomOtherSets = append(randomOtherSets, passengerCargoSet+2)
+			} else {
+				passengerCargoSet, otherCargoSet = 10 + (i*50), 15 + (i*50)
+			}
+		}
+	}
+
+	if len(s.RandomSpriteIDs) > 0 {
+		// Add the random set decider
+		file.AddElement(&callbacks.RandomChoiceCallback{
+			SetID:            (iterations+1)*50,
 			DefaultSpriteSet: 0,
 			YearCallbackID:   yearCallbackID,
-			HasDecider: !s.HasLargeCentralObject,
+			ResultIDs: randomPassengerSets,
+			HasDecider: true,
 		})
 
-		file.AddElement(&callbacks.StationFenceCallback{
-			SetID:            15,
-			DefaultSpriteSet: 1,
+		file.AddElement(&callbacks.RandomChoiceCallback{
+			SetID:            ((iterations+1)*50) + 2,
+			DefaultSpriteSet: 1, // this is needed to prevent stations showing cargo in the purchase menu
 			YearCallbackID:   yearCallbackID,
-			HasDecider: !s.HasLargeCentralObject,
+			ResultIDs: randomOtherSets,
+			HasDecider: true,
 		})
 
-		if s.HasLargeCentralObject {
-			file.AddElement(&callbacks.StationFenceCallback{
-				SetID:            20,
-				DefaultSpriteSet: 0,
-				YearCallbackID:   yearCallbackID,
-				BaseLayoutOffset: 8,
-			})
-
-			file.AddElement(&callbacks.StationFenceCallback{
-				SetID:            25,
-				DefaultSpriteSet: 1,
-				YearCallbackID:   yearCallbackID,
-				BaseLayoutOffset: 8,
-			})
-
-			file.AddElement(&callbacks.StationFenceCallback{
-				SetID:            30,
-				DefaultSpriteSet: 0,
-				YearCallbackID:   yearCallbackID,
-				BaseLayoutOffset: 16,
-			})
-
-			file.AddElement(&callbacks.StationFenceCallback{
-				SetID:            35,
-				DefaultSpriteSet: 1,
-				YearCallbackID:   yearCallbackID,
-				BaseLayoutOffset: 16,
-			})
-
-			file.AddElement(&callbacks.LargeCentralObjectCallback{
-				SetID:            40,
-				OuterCallbackID:  13,
-				InnerCallbackID:  23,
-				MiddleCallbackID: 33,
-				DefaultSpriteSet: 0,
-				YearCallbackID:   yearCallbackID,
-			})
-
-			file.AddElement(&callbacks.LargeCentralObjectCallback{
-				SetID:            45,
-				OuterCallbackID:  18,
-				InnerCallbackID:  28,
-				MiddleCallbackID: 38,
-				DefaultSpriteSet: 1, // this is needed to prevent stations showing cargo in the purchase menu
-				YearCallbackID:   yearCallbackID,
-			})
-
-			passengerCargoSet, otherCargoSet = 40, 45
-		} else {
-			passengerCargoSet, otherCargoSet = 10, 15
-		}
-
+		// The callback decider is 1 + the set ID of the random choice callback
+		passengerCargoSet, otherCargoSet =  ((iterations+1)*50) + 1, ((iterations+1)*50) + 3
 	}
 
 	file.AddElement(&GraphicSetAssignment{

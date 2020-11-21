@@ -47,9 +47,9 @@ func (s *StationFenceCallback) GetLines() []string {
 	// Fence layouts follow a specific pattern, but we might not be using the one which starts at
 	// 0, so we add the offset to the fixed pattern of N/S fences
 	result := []string{
-		s.getAction("10", bytes.GetCallbackResultByte(s.BaseLayoutOffset+4), bytes.GetCallbackResultByte(s.BaseLayoutOffset+0), 1),                                   // N: true, S: check
-		s.getAction("10", bytes.GetCallbackResultByte(s.BaseLayoutOffset+6), bytes.GetCallbackResultByte(s.BaseLayoutOffset+2), 2),                                   // N: false, S: check
-		s.getAction("F0", bytes.GetWord(s.SetID+2), bytes.GetWord(s.SetID+1), STATION_FENCE_OFFSET), // N: check, S: unknown
+		s.getAction("10", bytes.GetCallbackResultByte(s.BaseLayoutOffset+4), bytes.GetCallbackResultByte(s.BaseLayoutOffset+0), 1), // N: true, S: check
+		s.getAction("10", bytes.GetCallbackResultByte(s.BaseLayoutOffset+6), bytes.GetCallbackResultByte(s.BaseLayoutOffset+2), 2), // N: false, S: check
+		s.getAction("F0", bytes.GetWord(s.SetID+2), bytes.GetWord(s.SetID+1), STATION_FENCE_OFFSET),                                // N: check, S: unknown
 	}
 
 	if s.HasDecider {

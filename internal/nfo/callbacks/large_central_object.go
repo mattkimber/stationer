@@ -6,12 +6,13 @@ import (
 )
 
 type LargeCentralObjectCallback struct {
-	SetID          int
-	OuterCallbackID int // the callback ID of the "outer"/southernmost platform
-	InnerCallbackID int // the callback ID of the "inner"/northernmost platform
+	SetID            int
+	OuterCallbackID  int // the callback ID of the "outer"/southernmost platform
+	InnerCallbackID  int // the callback ID of the "inner"/northernmost platform
 	MiddleCallbackID int // the callback ID for in-between platforms with objects
 	DefaultSpriteSet int
-	YearCallbackID int
+	YearCallbackID   int
+	HasDecider       bool
 }
 
 func (lco *LargeCentralObjectCallback) GetComment() string {
@@ -31,13 +32,13 @@ func (lco *LargeCentralObjectCallback) getCallback(positionMask, edgeValue, midd
 			"    %s\n",
 		length,
 		bytes.GetByte(lco.SetID+offset), // ID of this callback - we add the offset to avoid colliding switches
-		positionMask, // the platform position mask to use
-		bytes.GetByte(1), // number of ranges
+		positionMask,                    // the platform position mask to use
+		bytes.GetByte(1),                // number of ranges
 	)
 
 	// set ID, low range, high range
 	// We return layout 0 for the case where we have a building
-	callback += fmt.Sprintf("    %s 00 00 \n",edgeValue)
+	callback += fmt.Sprintf("    %s 00 00 \n", edgeValue)
 
 	// Default sprite set, layout 2 (no building)
 	callback += fmt.Sprintf("    %s", middleValue)
@@ -46,9 +47,15 @@ func (lco *LargeCentralObjectCallback) getCallback(positionMask, edgeValue, midd
 }
 
 func (lco *LargeCentralObjectCallback) GetLines() []string {
-	return []string{
-		lco.getCallback("08 0F", bytes.GetWord(lco.InnerCallbackID), bytes.GetWord(lco.MiddleCallbackID),1),
+	result := []string{
+		lco.getCallback("08 0F", bytes.GetWord(lco.InnerCallbackID), bytes.GetWord(lco.MiddleCallbackID), 1),
 		lco.getCallback("08 F0", bytes.GetWord(lco.OuterCallbackID), bytes.GetWord(lco.SetID+1), 2),
-		GetDecider(lco.SetID, lco.SetID+2, lco.YearCallbackID, lco.DefaultSpriteSet),
 	}
+
+
+	if lco.HasDecider {
+		result = append(result, GetDecider(lco.SetID, lco.SetID+2, lco.YearCallbackID, lco.DefaultSpriteSet))
+	}
+
+	return result
 }

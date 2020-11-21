@@ -6,9 +6,11 @@ import (
 )
 
 type StationSprite struct {
-	Filename     string
-	HasFences    bool
-	MaxLoadState int
+	Filename            string
+	HasFences           bool
+	MaxLoadState        int
+	DedicatedFlipSprite bool // If the sprite has its own file for flipped sprites
+	SingleSided         bool // Only one side is needed - the rear side is never displayed
 }
 
 type StationSprites struct {
@@ -44,6 +46,7 @@ func (s *StationSprites) SetStatistics() {
 		s.SpriteMap[sprite.Filename] = total
 
 		total += 4
+
 		if sprite.HasFences {
 			// Add another 4 for the fences
 			total += 4
@@ -64,14 +67,29 @@ func (s *StationSprites) WriteToFile(file *output_file.File, loadState int) {
 			filename = fmt.Sprintf("%s_empty_%d_%s_8bpp.png", s.BaseFilename, loadState, spr.Filename)
 		}
 
+		filenameFlip := filename
+		if spr.DedicatedFlipSprite {
+			filenameFlip = fmt.Sprintf("%s_%s_flip_%d_8bpp.png", s.BaseFilename, spr.Filename, loadState)
+		}
+
 		if loadState <= spr.MaxLoadState {
-			// Non-fence sprites
-			file.AddElement(&Sprites{
-				s.GetSprite(filename, 0, false),
-				s.GetSprite(filename, 1, false),
-				s.GetSprite(filename, 2, true),
-				s.GetSprite(filename, 3, true),
-			})
+			if spr.SingleSided {
+				// Non-fence sprites for single-sided object
+				// Uses blank sprites in between to keep the same relative sprite offsets
+				file.AddElement(&Blank{Size: 1})
+				file.AddElement(&Sprites{s.GetSprite(filename, 1, false)})
+				file.AddElement(&Blank{Size: 1})
+				file.AddElement(&Sprites{s.GetSprite(filenameFlip, 3, true)})
+			} else {
+				// Non-fence sprites
+				file.AddElement(&Sprites{
+					s.GetSprite(filename, 0, false),
+					s.GetSprite(filename, 1, false),
+					s.GetSprite(filenameFlip, 2, true),
+					s.GetSprite(filenameFlip, 3, true),
+				})
+			}
+
 		} else {
 			// Add blank pseudosprites
 			file.AddElement(&Blank{Size: 4})

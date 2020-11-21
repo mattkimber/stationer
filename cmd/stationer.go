@@ -26,7 +26,7 @@ type StationClass struct {
 
 const (
 	// This is not the actual number, but the number leaving some room for expansion
-	PLATFORM_TYPES  = 10
+	PLATFORM_TYPES  = 20
 	CLASS_PLATFORMS = (PLATFORM_TYPES * 3) + 10
 )
 
@@ -35,10 +35,10 @@ func main() {
 	file.AddElement(&nfo.Header{
 		Initials:    "TWF",
 		SetID:       8,
-		SetName:     "Timberwolf's Stations 1.0.2",
+		SetName:     "Timberwolf's Stations 1.1.0",
 		Description: "A set of British-style railway stations feature multiple eras of platforms, buildings and waypoints in 2x zoom",
-		Version:     3,
-		MinVersion:  2,
+		Version:     4,
+		MinVersion:  4,
 	})
 
 	file.AddElement(&nfo.CargoTypeTable{Cargos: []string{"PASS", "MAIL"}})
@@ -61,7 +61,7 @@ func main() {
 			EnableMore: true,
 		},
 		Lengths: properties.PlatformBitmask{
-			Enable1:    true,
+			Enable1: true,
 		},
 	}
 
@@ -100,6 +100,10 @@ func main() {
 				{Filename: "ramp_ne", HasFences: true, MaxLoadState: 5},
 				{Filename: "ramp_sw", HasFences: true, MaxLoadState: 5},
 				{Filename: "bare_footbridge", HasFences: true, MaxLoadState: 5},
+				{Filename: "billboard_1", HasFences: false, MaxLoadState: 5, DedicatedFlipSprite: true, SingleSided: true},
+				{Filename: "billboard_2", HasFences: false, MaxLoadState: 5, DedicatedFlipSprite: true, SingleSided: true},
+				{Filename: "billboard_3", HasFences: false, MaxLoadState: 5, DedicatedFlipSprite: true, SingleSided: true},
+				{Filename: "billboard_4", HasFences: false, MaxLoadState: 5, DedicatedFlipSprite: true, SingleSided: true},
 			},
 			BaseFilename: class.Filename,
 		}
@@ -237,13 +241,41 @@ func main() {
 				},
 			}
 
-			// Tiles only available on concrete/modern
-			if class.ClassID != "TWF0" {
-				// Only available if we have an "inner" platform
-				if i <= 1 {
+			// Only available if we have an "inner" platform
+			if i <= 1 {
+
+				thisClass = append(thisClass, []nfo.Station{
+					{
+						ID:                    baseObjectID + 7,
+						BaseSpriteID:          classSprites.SpriteMap["billboard_1"],
+						RandomSpriteIDs: []int{
+							classSprites.SpriteMap["billboard_1"],
+							classSprites.SpriteMap["billboard_2"],
+							classSprites.SpriteMap["billboard_3"],
+							classSprites.SpriteMap["billboard_4"],
+						},
+						ClassID:               class.ClassID,
+						ClassName:             class.ClassName,
+						YearAvailable:         max(class.Available, 1850),
+						MaxLoadState:          5,
+						ObjectName:            "Billboard" + bracketName,
+						UseCompanyColour:      true,
+						HasFences:             true,
+						InnerPlatform:         inner,
+						OuterPlatform:         outer,
+						HasLargeCentralObject: true,
+						OverrideOuter:         true,
+						ObjectIsSingleSided:   true,
+						OuterPlatformSprite:   classSprites.SpriteMap["empty"],
+						PlatformConfiguration: largeObjectConfiguration,
+					},
+				}...)
+
+				// Tiles only available on concrete/modern
+				if class.ClassID != "TWF0" {
 					thisClass = append(thisClass, []nfo.Station{
 						{
-							ID:                    baseObjectID + 7,
+							ID:                    baseObjectID + 8,
 							BaseSpriteID:          classSprites.SpriteMap["bare_cafe"],
 							ClassID:               class.ClassID,
 							ClassName:             class.ClassName,
@@ -260,7 +292,7 @@ func main() {
 							PlatformConfiguration: largeObjectConfiguration,
 						},
 						{
-							ID:                    baseObjectID + 8,
+							ID:                    baseObjectID + 9,
 							BaseSpriteID:          classSprites.SpriteMap["bare_planter"],
 							ClassID:               class.ClassID,
 							ClassName:             class.ClassName,
