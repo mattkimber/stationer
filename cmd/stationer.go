@@ -37,7 +37,7 @@ func main() {
 		SetID:       8,
 		SetName:     "Timberwolf's Stations 1.1.0",
 		Description: "A set of British-style railway stations feature multiple eras of platforms, buildings and waypoints in 2x zoom",
-		Version:     4,
+		Version:     5,
 		MinVersion:  4,
 	})
 
@@ -101,6 +101,8 @@ func main() {
 				{Filename: "ramp_ne", HasFences: true, MaxLoadState: 5},
 				{Filename: "ramp_sw", HasFences: true, MaxLoadState: 5},
 				{Filename: "bare_footbridge", HasFences: true, MaxLoadState: 5},
+				{Filename: "bare_footbridge_covered", HasFences: true, MaxLoadState: 5},
+				{Filename: "bare_footbridge_covered_brick", HasFences: true, MaxLoadState: 5},
 				{Filename: "billboard_1", HasFences: false, MaxLoadState: 5, DedicatedFlipSprite: true, SingleSided: true},
 				{Filename: "billboard_2", HasFences: false, MaxLoadState: 5, DedicatedFlipSprite: true, SingleSided: true},
 				{Filename: "billboard_3", HasFences: false, MaxLoadState: 5, DedicatedFlipSprite: true, SingleSided: true},
@@ -112,6 +114,7 @@ func main() {
 		if class.ClassID != "TWF0" {
 			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "bare_shelter_glass", HasFences: true, MaxLoadState: 5})
 			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "shelter_glass", HasFences: false, MaxLoadState: 5, IsStatic: true})
+			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "underpass", HasFences: true, MaxLoadState: 5})
 			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "roof", HasFences: false, MaxLoadState: 5})
 			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "bare_cafe", HasFences: false, MaxLoadState: 5})
 			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "bare_planter", HasFences: false, MaxLoadState: 5})
@@ -119,10 +122,23 @@ func main() {
 
 		classSprites.SetStatistics()
 
-		footbridgeSprite := sprites.PlatformObject{
+		footbridgeSprites := []sprites.PlatformObject{{
 			BaseSpriteID:   classSprites.LastSpriteNumber,
 			SpriteFilename: "footbridge",
 			MaxLoadState:   5,
+		},
+			{
+				BaseSpriteID:   classSprites.LastSpriteNumber + 2,
+				SpriteFilename: "footbridge_covered",
+				MaxLoadState:   5,
+				IsStatic:       true,
+			},
+			{
+				BaseSpriteID:   classSprites.LastSpriteNumber + 4,
+				SpriteFilename: "footbridge_covered_brick",
+				MaxLoadState:   5,
+				IsStatic:       true,
+			},
 		}
 
 		roofSprite := sprites.StationRoof{
@@ -130,12 +146,14 @@ func main() {
 			MaxLoadState:   5,
 			RoofType:       "arch",
 			// +2 for the footbridge
-			BaseSpriteID: classSprites.LastSpriteNumber + 2,
+			BaseSpriteID: classSprites.LastSpriteNumber + 6,
 		}
 
-		// +2 = footbridge sprite
+		// +6 = footbridge sprites
+		footbridgeSpriteCount := 6
+
 		// +12 = roof sprites
-		total := classSprites.LastSpriteNumber + 14
+		total := classSprites.LastSpriteNumber + footbridgeSpriteCount + 12
 
 		class.EmptySprite = classSprites.SpriteMap["sign"]
 		class.RoofPlatform = classSprites.SpriteMap["roof"]
@@ -147,7 +165,9 @@ func main() {
 		// Write each type of sprite to the file
 		for i := 0; i <= sprites.GLOBAL_MAX_LOAD_STATE; i++ {
 			classSprites.WriteToFile(&file, i)
-			footbridgeSprite.WriteToFile(&file, i)
+			for _, footbridgeSprite := range footbridgeSprites {
+				footbridgeSprite.WriteToFile(&file, i)
+			}
 			roofSprite.WriteToFile(&file, i)
 		}
 
@@ -262,6 +282,20 @@ func main() {
 				solarPanels := getGlassObjects(inner, outer, classSprites.SpriteMap["shelter_glass"], false)
 
 				thisClass = append(thisClass, []nfo.Station{
+					{
+						ID:                    baseObjectID + 19,
+						BaseSpriteID:          classSprites.SpriteMap["underpass"],
+						ClassID:               class.ClassID,
+						ClassName:             class.ClassName,
+						PlatformConfiguration: rampConfiguration,
+						ObjectName:            "Underpass" + bracketName,
+						YearAvailable:         max(class.Available, 1890),
+						MaxLoadState:          5,
+						UseCompanyColour:      true,
+						HasFences:             true,
+						InnerPlatform:         inner,
+						OuterPlatform:         outer,
+					},
 					{
 						ID:                baseObjectID + 15,
 						BaseSpriteID:      classSprites.SpriteMap["bare_shelter_glass"],
@@ -388,10 +422,63 @@ func main() {
 								SizeX:        5,
 								SizeY:        8,
 								SizeZ:        3,
-								BaseSpriteID: footbridgeSprite.BaseSpriteID,
+								BaseSpriteID: footbridgeSprites[0].BaseSpriteID,
 							},
 						},
 					},
+					{
+						ID:                    baseObjectID + 17,
+						BaseSpriteID:          classSprites.SpriteMap["bare_footbridge_covered_brick"],
+						ClassID:               class.ClassID,
+						ClassName:             class.ClassName,
+						YearAvailable:         max(class.Available, 1910),
+						ObjectName:            "Footbridge (covered)",
+						UseCompanyColour:      true,
+						HasFences:             true,
+						MaxLoadState:          5,
+						PlatformHeight:        16,
+						InnerPlatform:         true,
+						OuterPlatform:         true,
+						PlatformConfiguration: rampConfiguration,
+						AdditionalObjects: []nfo.AdditionalObject{
+							{
+								X:            6,
+								Y:            2,
+								Z:            15,
+								SizeX:        5,
+								SizeY:        8,
+								SizeZ:        3,
+								BaseSpriteID: footbridgeSprites[2].BaseSpriteID,
+							},
+						},
+					},
+					{
+						ID:                    baseObjectID + 18,
+						BaseSpriteID:          classSprites.SpriteMap["bare_footbridge_covered"],
+						ClassID:               class.ClassID,
+						ClassName:             class.ClassName,
+						YearAvailable:         max(class.Available, 1932),
+						ObjectName:            "Footbridge (covered)",
+						UseCompanyColour:      true,
+						HasFences:             true,
+						MaxLoadState:          5,
+						PlatformHeight:        16,
+						InnerPlatform:         true,
+						OuterPlatform:         true,
+						PlatformConfiguration: rampConfiguration,
+						AdditionalObjects: []nfo.AdditionalObject{
+							{
+								X:            6,
+								Y:            2,
+								Z:            15,
+								SizeX:        5,
+								SizeY:        8,
+								SizeZ:        3,
+								BaseSpriteID: footbridgeSprites[1].BaseSpriteID,
+							},
+						},
+					},
+
 					{
 						ID:                    baseObjectID + 10,
 						BaseSpriteID:          classSprites.SpriteMap["ramp_ne"],
@@ -639,27 +726,29 @@ func getGlassObjects(inner, outer bool, baseSpriteID int, isTransparent bool) []
 
 	if inner {
 		shelterGlass = append(shelterGlass, nfo.AdditionalObject{
-			X:             0,
-			Y:             0,
-			Z:             0,
-			SizeX:         16,
-			SizeY:         5,
-			SizeZ:         5,
-			IsTransparent: isTransparent,
-			BaseSpriteID:  baseSpriteID + 1,
+			X:                0,
+			Y:                0,
+			Z:                0,
+			SizeX:            16,
+			SizeY:            5,
+			SizeZ:            5,
+			IsTransparent:    isTransparent,
+			BaseSpriteID:     baseSpriteID,
+			HasFourWaySprite: true,
 		})
 	}
 
 	if outer {
 		shelterGlass = append(shelterGlass, nfo.AdditionalObject{
-			X:             0,
-			Y:             16 - 5,
-			Z:             0,
-			SizeX:         16,
-			SizeY:         5,
-			SizeZ:         5,
-			IsTransparent: isTransparent,
-			BaseSpriteID:  baseSpriteID,
+			X:                0,
+			Y:                16 - 5,
+			Z:                0,
+			SizeX:            16,
+			SizeY:            5,
+			SizeZ:            5,
+			IsTransparent:    isTransparent,
+			BaseSpriteID:     baseSpriteID + 1,
+			HasFourWaySprite: true,
 		})
 	}
 	return shelterGlass

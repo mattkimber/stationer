@@ -1,15 +1,16 @@
 package nfo
 
 type AdditionalObject struct {
-	X               int
-	Y               int
-	Z               int
-	SizeX           int
-	SizeY           int
-	SizeZ           int
-	BaseSpriteID    int
-	IsTransparent   bool
-	InvertDirection bool
+	X                int
+	Y                int
+	Z                int
+	SizeX            int
+	SizeY            int
+	SizeZ            int
+	BaseSpriteID     int
+	IsTransparent    bool
+	InvertDirection  bool
+	HasFourWaySprite bool
 }
 
 func (ao *AdditionalObject) GetBaseSpriteNumber(s *Station) int {

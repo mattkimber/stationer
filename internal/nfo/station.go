@@ -157,6 +157,11 @@ func (s *Station) GetObjects(direction int, fenceInside, fenceOutside bool, iter
 			xOffset, yOffset = obj.Y, obj.X
 		}
 
+		multiplier := 1
+		if obj.HasFourWaySprite {
+			multiplier = 2
+		}
+
 		result = append(result, properties.BoundingBox{
 			XOffset:      xOffset,
 			YOffset:      yOffset,
@@ -164,7 +169,7 @@ func (s *Station) GetObjects(direction int, fenceInside, fenceOutside bool, iter
 			X:            x,
 			Y:            y,
 			Z:            obj.SizeZ,
-			SpriteNumber: obj.GetBaseSpriteNumber(s) + direction,
+			SpriteNumber: obj.GetBaseSpriteNumber(s) + (direction * multiplier),
 		})
 	}
 
