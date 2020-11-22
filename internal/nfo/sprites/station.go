@@ -11,6 +11,7 @@ type StationSprite struct {
 	MaxLoadState        int
 	DedicatedFlipSprite bool // If the sprite has its own file for flipped sprites
 	SingleSided         bool // Only one side is needed - the rear side is never displayed
+	IsStatic            bool // Is a single static sprite for all load states
 }
 
 type StationSprites struct {
@@ -65,6 +66,12 @@ func (s *StationSprites) WriteToFile(file *output_file.File, loadState int) {
 		if spr.Filename == "roof" {
 			// Hack to override the different naming scheme of roofs
 			filename = fmt.Sprintf("%s_empty_%d_%s_8bpp.png", s.BaseFilename, loadState, spr.Filename)
+		}
+
+		if spr.IsStatic {
+			// Ignore all load states and platform types
+			// This is slightly wasteful as we repeat the same sprite multiple times.
+			filename = fmt.Sprintf("%s_8bpp.png", spr.Filename)
 		}
 
 		filenameFlip := filename

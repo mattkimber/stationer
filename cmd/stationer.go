@@ -110,6 +110,8 @@ func main() {
 		}
 
 		if class.ClassID != "TWF0" {
+			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "bare_shelter_glass", HasFences: true, MaxLoadState: 5})
+			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "shelter_glass", HasFences: false, MaxLoadState: 5, IsStatic: true})
 			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "roof", HasFences: false, MaxLoadState: 5})
 			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "bare_cafe", HasFences: false, MaxLoadState: 5})
 			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "bare_planter", HasFences: false, MaxLoadState: 5})
@@ -253,6 +255,42 @@ func main() {
 					InnerPlatform:         inner,
 					OuterPlatform:         outer,
 				},
+			}
+
+			if class.ClassID != "TWF0" {
+				shelterGlass := getGlassObjects(inner, outer, classSprites.SpriteMap["shelter_glass"], true)
+				solarPanels := getGlassObjects(inner, outer, classSprites.SpriteMap["shelter_glass"], false)
+
+				thisClass = append(thisClass, []nfo.Station{
+					{
+						ID:                baseObjectID + 15,
+						BaseSpriteID:      classSprites.SpriteMap["bare_shelter_glass"],
+						ClassID:           class.ClassID,
+						ClassName:         class.ClassName,
+						ObjectName:        "Shelter (glass" + commaName + ")",
+						YearAvailable:     max(class.Available, 1990),
+						AdditionalObjects: shelterGlass,
+						MaxLoadState:      5,
+						UseCompanyColour:  true,
+						HasFences:         true,
+						InnerPlatform:     inner,
+						OuterPlatform:     outer,
+					},
+					{
+						ID:                baseObjectID + 16,
+						BaseSpriteID:      classSprites.SpriteMap["bare_shelter_glass"],
+						ClassID:           class.ClassID,
+						ClassName:         class.ClassName,
+						ObjectName:        "Shelter (solar panels" + commaName + ")",
+						YearAvailable:     max(class.Available, 2005),
+						AdditionalObjects: solarPanels,
+						MaxLoadState:      5,
+						UseCompanyColour:  true,
+						HasFences:         true,
+						InnerPlatform:     inner,
+						OuterPlatform:     outer,
+					},
+				}...)
 			}
 
 			// Only available if we have an "inner" platform
@@ -594,6 +632,37 @@ func main() {
 	}
 
 	file.Output()
+}
+
+func getGlassObjects(inner, outer bool, baseSpriteID int, isTransparent bool) []nfo.AdditionalObject {
+	shelterGlass := make([]nfo.AdditionalObject, 0)
+
+	if inner {
+		shelterGlass = append(shelterGlass, nfo.AdditionalObject{
+			X:             0,
+			Y:             0,
+			Z:             0,
+			SizeX:         16,
+			SizeY:         5,
+			SizeZ:         5,
+			IsTransparent: isTransparent,
+			BaseSpriteID:  baseSpriteID + 1,
+		})
+	}
+
+	if outer {
+		shelterGlass = append(shelterGlass, nfo.AdditionalObject{
+			X:             0,
+			Y:             16 - 5,
+			Z:             0,
+			SizeX:         16,
+			SizeY:         5,
+			SizeZ:         5,
+			IsTransparent: isTransparent,
+			BaseSpriteID:  baseSpriteID,
+		})
+	}
+	return shelterGlass
 }
 
 func max(a, b int) int {

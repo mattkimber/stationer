@@ -8,10 +8,15 @@ type AdditionalObject struct {
 	SizeY           int
 	SizeZ           int
 	BaseSpriteID    int
+	IsTransparent   bool
 	InvertDirection bool
 }
 
 func (ao *AdditionalObject) GetBaseSpriteNumber(s *Station) int {
+	if ao.IsTransparent {
+		return TRANSPARENT_SPRITE + ao.BaseSpriteID
+	}
+
 	if s.UseCompanyColour {
 		return COMPANY_COLOUR_SPRITE + ao.BaseSpriteID
 	}
