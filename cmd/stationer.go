@@ -35,9 +35,9 @@ func main() {
 	file.AddElement(&nfo.Header{
 		Initials:    "TWF",
 		SetID:       8,
-		SetName:     "Timberwolf's Stations 1.1.0",
+		SetName:     "Timberwolf's Stations 1.1.1",
 		Description: "A set of British-style railway stations feature multiple eras of platforms, buildings and waypoints in 2x zoom",
-		Version:     5,
+		Version:     6,
 		MinVersion:  4,
 	})
 
@@ -101,8 +101,6 @@ func main() {
 				{Filename: "ramp_ne", HasFences: true, MaxLoadState: 5},
 				{Filename: "ramp_sw", HasFences: true, MaxLoadState: 5},
 				{Filename: "bare_footbridge", HasFences: true, MaxLoadState: 5},
-				{Filename: "bare_footbridge_covered", HasFences: true, MaxLoadState: 5},
-				{Filename: "bare_footbridge_covered_brick", HasFences: true, MaxLoadState: 5},
 				{Filename: "billboard_1", HasFences: false, MaxLoadState: 5, DedicatedFlipSprite: true, SingleSided: true},
 				{Filename: "billboard_2", HasFences: false, MaxLoadState: 5, DedicatedFlipSprite: true, SingleSided: true},
 				{Filename: "billboard_3", HasFences: false, MaxLoadState: 5, DedicatedFlipSprite: true, SingleSided: true},
@@ -112,52 +110,64 @@ func main() {
 		}
 
 		if class.ClassID != "TWF0" {
+			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "bare_footbridge_covered", HasFences: true, MaxLoadState: 5})
+			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "bare_footbridge_covered_brick", HasFences: true, MaxLoadState: 5})
 			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "bare_shelter_glass", HasFences: true, MaxLoadState: 5})
 			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "shelter_glass", HasFences: false, MaxLoadState: 5, IsStatic: true})
 			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "underpass", HasFences: true, MaxLoadState: 5})
-			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "roof", HasFences: false, MaxLoadState: 5})
 			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "bare_cafe", HasFences: false, MaxLoadState: 5})
 			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "bare_planter", HasFences: false, MaxLoadState: 5})
+			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "roof", HasFences: false, MaxLoadState: 5})
 		}
 
 		classSprites.SetStatistics()
 
-		footbridgeSprites := []sprites.PlatformObject{{
-			BaseSpriteID:   classSprites.LastSpriteNumber,
-			SpriteFilename: "footbridge",
-			MaxLoadState:   5,
-		},
+		footbridgeSprites := []sprites.PlatformObject{
 			{
-				BaseSpriteID:   classSprites.LastSpriteNumber + 2,
-				SpriteFilename: "footbridge_covered",
+				BaseSpriteID:   classSprites.LastSpriteNumber,
+				SpriteFilename: "footbridge",
 				MaxLoadState:   5,
-				IsStatic:       true,
-			},
-			{
-				BaseSpriteID:   classSprites.LastSpriteNumber + 4,
-				SpriteFilename: "footbridge_covered_brick",
-				MaxLoadState:   5,
-				IsStatic:       true,
 			},
 		}
 
-		roofSprite := sprites.StationRoof{
-			SpriteFilename: "",
-			MaxLoadState:   5,
-			RoofType:       "arch",
-			// +2 for the footbridge
-			BaseSpriteID: classSprites.LastSpriteNumber + 6,
+		if class.ClassID != "TWF0" {
+			footbridgeSprites = append(footbridgeSprites, []sprites.PlatformObject{
+				{
+					BaseSpriteID:   classSprites.LastSpriteNumber + 2,
+					SpriteFilename: "footbridge_covered",
+					MaxLoadState:   5,
+					IsStatic:       true,
+				},
+				{
+					BaseSpriteID:   classSprites.LastSpriteNumber + 4,
+					SpriteFilename: "footbridge_covered_brick",
+					MaxLoadState:   5,
+					IsStatic:       true,
+				},
+			}...)
 		}
 
 		// +6 = footbridge sprites
-		footbridgeSpriteCount := 6
+		footbridgeSpriteCount := len(footbridgeSprites) * 2
 
-		// +12 = roof sprites
-		total := classSprites.LastSpriteNumber + footbridgeSpriteCount + 12
+		total := classSprites.LastSpriteNumber + footbridgeSpriteCount
 
-		class.EmptySprite = classSprites.SpriteMap["sign"]
-		class.RoofPlatform = classSprites.SpriteMap["roof"]
-		class.RoofSprite = roofSprite.BaseSpriteID
+		roofSprite := sprites.StationRoof{}
+		if class.ClassID != "TWF0" {
+			roofSprite = sprites.StationRoof{
+				SpriteFilename: "",
+				MaxLoadState:   5,
+				RoofType:       "arch",
+				BaseSpriteID:   classSprites.LastSpriteNumber + footbridgeSpriteCount,
+			}
+
+			class.EmptySprite = classSprites.SpriteMap["sign"]
+			class.RoofPlatform = classSprites.SpriteMap["roof"]
+			class.RoofSprite = roofSprite.BaseSpriteID
+
+			// +12 = roof sprites
+			total = total + 12
+		}
 
 		// Definition for all the spritesets
 		file.AddElement(&sprites.Spritesets{ID: 0, NumSets: sprites.GLOBAL_MAX_LOAD_STATE + 1, NumSprites: total})
@@ -168,7 +178,10 @@ func main() {
 			for _, footbridgeSprite := range footbridgeSprites {
 				footbridgeSprite.WriteToFile(&file, i)
 			}
-			roofSprite.WriteToFile(&file, i)
+
+			if class.ClassID != "TWF0" {
+				roofSprite.WriteToFile(&file, i)
+			}
 		}
 
 		names := []string{"", "inner", "outer"}
@@ -425,60 +438,66 @@ func main() {
 								BaseSpriteID: footbridgeSprites[0].BaseSpriteID,
 							},
 						},
-					},
-					{
-						ID:                    baseObjectID + 17,
-						BaseSpriteID:          classSprites.SpriteMap["bare_footbridge_covered_brick"],
-						ClassID:               class.ClassID,
-						ClassName:             class.ClassName,
-						YearAvailable:         max(class.Available, 1910),
-						ObjectName:            "Footbridge (covered)",
-						UseCompanyColour:      true,
-						HasFences:             true,
-						MaxLoadState:          5,
-						PlatformHeight:        16,
-						InnerPlatform:         true,
-						OuterPlatform:         true,
-						PlatformConfiguration: rampConfiguration,
-						AdditionalObjects: []nfo.AdditionalObject{
-							{
-								X:            6,
-								Y:            2,
-								Z:            15,
-								SizeX:        5,
-								SizeY:        8,
-								SizeZ:        3,
-								BaseSpriteID: footbridgeSprites[2].BaseSpriteID,
-							},
-						},
-					},
-					{
-						ID:                    baseObjectID + 18,
-						BaseSpriteID:          classSprites.SpriteMap["bare_footbridge_covered"],
-						ClassID:               class.ClassID,
-						ClassName:             class.ClassName,
-						YearAvailable:         max(class.Available, 1932),
-						ObjectName:            "Footbridge (covered)",
-						UseCompanyColour:      true,
-						HasFences:             true,
-						MaxLoadState:          5,
-						PlatformHeight:        16,
-						InnerPlatform:         true,
-						OuterPlatform:         true,
-						PlatformConfiguration: rampConfiguration,
-						AdditionalObjects: []nfo.AdditionalObject{
-							{
-								X:            6,
-								Y:            2,
-								Z:            15,
-								SizeX:        5,
-								SizeY:        8,
-								SizeZ:        3,
-								BaseSpriteID: footbridgeSprites[1].BaseSpriteID,
-							},
-						},
-					},
+					}}...)
 
+				if class.ClassID != "TWF0" {
+					thisClass = append(thisClass, []nfo.Station{
+						{
+							ID:                    baseObjectID + 17,
+							BaseSpriteID:          classSprites.SpriteMap["bare_footbridge_covered_brick"],
+							ClassID:               class.ClassID,
+							ClassName:             class.ClassName,
+							YearAvailable:         max(class.Available, 1910),
+							ObjectName:            "Footbridge (covered)",
+							UseCompanyColour:      true,
+							HasFences:             true,
+							MaxLoadState:          5,
+							PlatformHeight:        16,
+							InnerPlatform:         true,
+							OuterPlatform:         true,
+							PlatformConfiguration: rampConfiguration,
+							AdditionalObjects: []nfo.AdditionalObject{
+								{
+									X:            6,
+									Y:            2,
+									Z:            15,
+									SizeX:        5,
+									SizeY:        8,
+									SizeZ:        3,
+									BaseSpriteID: footbridgeSprites[2].BaseSpriteID,
+								},
+							},
+						},
+						{
+							ID:                    baseObjectID + 18,
+							BaseSpriteID:          classSprites.SpriteMap["bare_footbridge_covered"],
+							ClassID:               class.ClassID,
+							ClassName:             class.ClassName,
+							YearAvailable:         max(class.Available, 1932),
+							ObjectName:            "Footbridge (covered)",
+							UseCompanyColour:      true,
+							HasFences:             true,
+							MaxLoadState:          5,
+							PlatformHeight:        16,
+							InnerPlatform:         true,
+							OuterPlatform:         true,
+							PlatformConfiguration: rampConfiguration,
+							AdditionalObjects: []nfo.AdditionalObject{
+								{
+									X:            6,
+									Y:            2,
+									Z:            15,
+									SizeX:        5,
+									SizeY:        8,
+									SizeZ:        3,
+									BaseSpriteID: footbridgeSprites[1].BaseSpriteID,
+								},
+							},
+						},
+					}...)
+				}
+
+				thisClass = append(thisClass, []nfo.Station{
 					{
 						ID:                    baseObjectID + 10,
 						BaseSpriteID:          classSprites.SpriteMap["ramp_ne"],
