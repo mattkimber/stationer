@@ -35,9 +35,9 @@ func main() {
 	file.AddElement(&nfo.Header{
 		Initials:    "TWF",
 		SetID:       8,
-		SetName:     "Timberwolf's Stations 1.1.1",
+		SetName:     "Timberwolf's Stations 1.1.3",
 		Description: "A set of British-style railway stations feature multiple eras of platforms, buildings and waypoints in 2x zoom",
-		Version:     6,
+		Version:     8,
 		MinVersion:  4,
 	})
 
