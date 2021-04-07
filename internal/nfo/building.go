@@ -18,6 +18,7 @@ type Building struct {
 	Height           int
 	UseCompanyColour bool
 	YearAvailable    int
+	Reversed         bool
 }
 
 const (
@@ -160,27 +161,54 @@ func (s *Building) WriteToFile(file *output_file.File) {
 
 func (s *Building) addSprites(file *output_file.File) {
 	buildingSprites := 2 * s.Width
+	spriteOffset := 0
+	if s.Reversed {
+		spriteOffset = 2
+	}
 
 	file.AddElement(&sprites.Spritesets{ID: 0, NumSets: 1, NumSprites: buildingSprites})
 
-	filename := fmt.Sprintf("%s_8bpp.png", s.SpriteFilename)
+
 
 	// Non-fence sprites
-	file.AddElement(&sprites.Sprites{
-		GetBuildingSprite(filename, 0),
-		GetBuildingSprite(filename, 1),
-	})
-
-	for i := 2; i <= s.Width; i++ {
-		// Additional sprites for long buildings
-		filename = fmt.Sprintf("%s_%d_8bpp.png", s.SpriteFilename, i)
+	if !s.Reversed {
+		filename := fmt.Sprintf("%s_8bpp.png", s.SpriteFilename)
 
 		file.AddElement(&sprites.Sprites{
-			GetBuildingSprite(filename, 0),
-			GetBuildingSprite(filename, 1),
+			GetBuildingSprite(filename, spriteOffset+0),
+			GetBuildingSprite(filename, spriteOffset+1),
 		})
 
+		for i := 2; i <= s.Width; i++ {
+			// Additional sprites for long buildings
+			filename = fmt.Sprintf("%s_%d_8bpp.png", s.SpriteFilename, i)
+
+			file.AddElement(&sprites.Sprites{
+				GetBuildingSprite(filename, spriteOffset+0),
+				GetBuildingSprite(filename, spriteOffset+1),
+			})
+		}
+	} else {
+		// Reversed sprites go in the opposite order
+		for i := s.Width; i >= 2; i-- {
+			// Additional sprites for long buildings
+			filename := fmt.Sprintf("%s_%d_8bpp.png", s.SpriteFilename, i)
+
+			file.AddElement(&sprites.Sprites{
+				GetBuildingSprite(filename, spriteOffset+0),
+				GetBuildingSprite(filename, spriteOffset+1),
+			})
+		}
+
+		filename := fmt.Sprintf("%s_8bpp.png", s.SpriteFilename)
+
+		file.AddElement(&sprites.Sprites{
+			GetBuildingSprite(filename, spriteOffset+0),
+			GetBuildingSprite(filename, spriteOffset+1),
+		})
 	}
+
+
 }
 
 func (s *Building) getLayoutEntry(idx int) properties.LayoutEntry {

@@ -37,7 +37,7 @@ func (s *BufferStop) GetBaseSpriteNumber() int {
 
 func GetBufferStopSprite(filename string, num int, swap bool) sprites.Sprite {
 	xrel := 1 - (BUFFERSTOP_SPRITE_WIDTH / 2)
-	yrel := 5 - (BUFFERSTOP_SPRITE_HEIGHT / 2)
+	yrel := 6 - (BUFFERSTOP_SPRITE_HEIGHT / 2)
 
 	if swap {
 		xrel = 11 - (BUFFERSTOP_SPRITE_WIDTH / 2)

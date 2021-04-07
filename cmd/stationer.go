@@ -35,9 +35,9 @@ func main() {
 	file.AddElement(&nfo.Header{
 		Initials:    "TWF",
 		SetID:       8,
-		SetName:     "Timberwolf's Stations 1.1.4",
+		SetName:     "Timberwolf's Stations 1.1.5",
 		Description: "A set of British-style railway stations feature multiple eras of platforms, buildings and waypoints in 2x zoom",
-		Version:     9,
+		Version:     10,
 		MinVersion:  4,
 	})
 
@@ -460,7 +460,7 @@ func main() {
 								{
 									X:            6,
 									Y:            2,
-									Z:            15,
+									Z:            14,
 									SizeX:        5,
 									SizeY:        8,
 									SizeZ:        3,
@@ -486,7 +486,7 @@ func main() {
 								{
 									X:            6,
 									Y:            2,
-									Z:            15,
+									Z:            14,
 									SizeX:        5,
 									SizeY:        8,
 									SizeZ:        3,
@@ -693,6 +693,15 @@ func main() {
 
 	for _, building := range buildings {
 		building.ID = objectID
+		building.WriteToFile(&file)
+		objectID = objectID + 1
+	}
+
+	for _, building := range buildings {
+		building.ID = objectID
+		building.Reversed = true
+		building.ClassID = "TWFC"
+		building.ClassName = "Buildings (Reversed)"
 		building.WriteToFile(&file)
 		objectID = objectID + 1
 	}
