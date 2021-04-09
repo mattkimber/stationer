@@ -82,9 +82,9 @@ func (s *Station) GetOuterPlatformSpriteNumber() int {
 func GetSpriteSets(max int) []int {
 	switch max {
 	case 5:
-		return []int{0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 5, 5}
+		return []int{0, 1, 2, 3, 4, 5, 5}
 	case 6:
-		return []int{0, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 5, 5, 5, 5, 6}
+		return []int{0, 1, 2, 3, 4, 5, 6}
 	}
 
 	return []int{0}
@@ -188,12 +188,13 @@ func (s *Station) WriteToFile(file *output_file.File) {
 
 	def := &Definition{StationID: s.ID}
 	def.AddProperty(&properties.ClassID{ID: s.ClassID})
+	def.AddProperty(&properties.GeneralFlag{SpreadCargo: true})
 
 	if s.HasFences || s.YearAvailable != 0 {
 		def.AddProperty(&properties.CallbackFlag{SpriteLayout: s.HasFences, Availability: s.YearAvailable != 0})
 	}
 
-	def.AddProperty(&properties.LittleLotsThreshold{Amount: 200})
+	def.AddProperty(&properties.LittleLotsThreshold{Amount: 20})
 
 	iterations := 1
 	if len(s.RandomSpriteIDs) > 0 {
@@ -227,8 +228,8 @@ func (s *Station) WriteToFile(file *output_file.File) {
 
 	file.AddElement(&StationSet{
 		SetID:         0,
-		NumLittleSets: LITTLE_SETS * 3,
-		NumLotsSets:   LOTS_SETS * 3,
+		NumLittleSets: LITTLE_SETS,
+		NumLotsSets:   LOTS_SETS,
 		SpriteSets:    GetSpriteSets(s.MaxLoadState),
 	})
 

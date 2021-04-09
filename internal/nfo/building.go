@@ -168,8 +168,6 @@ func (s *Building) addSprites(file *output_file.File) {
 
 	file.AddElement(&sprites.Spritesets{ID: 0, NumSets: 1, NumSprites: buildingSprites})
 
-
-
 	// Non-fence sprites
 	if !s.Reversed {
 		filename := fmt.Sprintf("%s_8bpp.png", s.SpriteFilename)
@@ -207,7 +205,6 @@ func (s *Building) addSprites(file *output_file.File) {
 			GetBuildingSprite(filename, spriteOffset+1),
 		})
 	}
-
 
 }
 

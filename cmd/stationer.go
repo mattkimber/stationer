@@ -144,6 +144,18 @@ func main() {
 					MaxLoadState:   5,
 					IsStatic:       true,
 				},
+				{
+					BaseSpriteID:   classSprites.LastSpriteNumber + 6,
+					SpriteFilename: "footbridge_pillar_covered",
+					MaxLoadState:   5,
+					IsStatic:       true,
+				},
+				{
+					BaseSpriteID:   classSprites.LastSpriteNumber + 8,
+					SpriteFilename: "footbridge_pillar_covered_b",
+					MaxLoadState:   5,
+					IsStatic:       true,
+				},
 			}...)
 		}
 
@@ -453,8 +465,8 @@ func main() {
 							HasFences:             true,
 							MaxLoadState:          5,
 							PlatformHeight:        16,
-							InnerPlatform:         true,
-							OuterPlatform:         true,
+							InnerPlatform:         inner,
+							OuterPlatform:         outer,
 							PlatformConfiguration: rampConfiguration,
 							AdditionalObjects: []nfo.AdditionalObject{
 								{
@@ -467,35 +479,63 @@ func main() {
 									BaseSpriteID: footbridgeSprites[2].BaseSpriteID,
 								},
 							},
-						},
-						{
-							ID:                    baseObjectID + 18,
-							BaseSpriteID:          classSprites.SpriteMap["bare_footbridge_covered"],
-							ClassID:               class.ClassID,
-							ClassName:             class.ClassName,
-							YearAvailable:         max(class.Available, 1932),
-							ObjectName:            "Footbridge (covered)",
-							UseCompanyColour:      true,
-							HasFences:             true,
-							MaxLoadState:          5,
-							PlatformHeight:        16,
-							InnerPlatform:         true,
-							OuterPlatform:         true,
-							PlatformConfiguration: rampConfiguration,
-							AdditionalObjects: []nfo.AdditionalObject{
-								{
-									X:            6,
-									Y:            2,
-									Z:            14,
-									SizeX:        5,
-									SizeY:        8,
-									SizeZ:        3,
-									BaseSpriteID: footbridgeSprites[1].BaseSpriteID,
-								},
-							},
-						},
-					}...)
+						}}...)
 				}
+			}
+
+			if class.ClassID != "TWF0" {
+				footbridgeObjects := []nfo.AdditionalObject{
+					{
+						X:            6,
+						Y:            2,
+						Z:            14,
+						SizeX:        5,
+						SizeY:        8,
+						SizeZ:        3,
+						BaseSpriteID: footbridgeSprites[1].BaseSpriteID,
+					},
+				}
+
+				if !inner || !outer {
+					y := 0
+					pillarSprite := 3
+					if inner {
+						y = 12
+						pillarSprite = 4
+					}
+
+					footbridgeObjects = append(footbridgeObjects, nfo.AdditionalObject{
+						X:            6,
+						Y:            y,
+						Z:            0,
+						SizeX:        3,
+						SizeY:        3,
+						SizeZ:        15,
+						BaseSpriteID: footbridgeSprites[pillarSprite].BaseSpriteID,
+					})
+				}
+
+				thisClass = append(thisClass, []nfo.Station{
+					{
+						ID:                    baseObjectID + 18,
+						BaseSpriteID:          classSprites.SpriteMap["bare_footbridge_covered"],
+						ClassID:               class.ClassID,
+						ClassName:             class.ClassName,
+						YearAvailable:         max(class.Available, 1932),
+						ObjectName:            "Footbridge (covered)",
+						UseCompanyColour:      true,
+						HasFences:             true,
+						MaxLoadState:          5,
+						PlatformHeight:        16,
+						InnerPlatform:         inner,
+						OuterPlatform:         outer,
+						PlatformConfiguration: rampConfiguration,
+						AdditionalObjects:     footbridgeObjects,
+					},
+				}...)
+			}
+
+			if i == 0 {
 
 				thisClass = append(thisClass, []nfo.Station{
 					{

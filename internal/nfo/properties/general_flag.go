@@ -8,6 +8,7 @@ import (
 // CLass ID
 type GeneralFlag struct {
 	HasCustomFoundations bool
+	SpreadCargo bool
 }
 
 func (c *GeneralFlag) GetBytes() int {
@@ -16,6 +17,11 @@ func (c *GeneralFlag) GetBytes() int {
 
 func (c *GeneralFlag) GetString() string {
 	value := 0
+
+	if c.SpreadCargo {
+		value += 2
+	}
+
 	if c.HasCustomFoundations {
 		value += 8
 	}

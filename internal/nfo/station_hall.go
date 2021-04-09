@@ -168,8 +168,8 @@ func (s *StationHall) WriteToFile(file *output_file.File) {
 
 	file.AddElement(&StationSet{
 		SetID:         0,
-		NumLittleSets: LITTLE_SETS * 3,
-		NumLotsSets:   LOTS_SETS * 3,
+		NumLittleSets: LITTLE_SETS,
+		NumLotsSets:   LOTS_SETS,
 		SpriteSets:    GetSpriteSets(s.MaxLoadState),
 	})
 
