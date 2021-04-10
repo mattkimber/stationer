@@ -26,8 +26,8 @@ type StationClass struct {
 
 const (
 	// This is not the actual number, but the number leaving some room for expansion
-	PLATFORM_TYPES  = 20
-	CLASS_PLATFORMS = (PLATFORM_TYPES * 3) + 10
+	PLATFORM_TYPES  = 21
+	CLASS_PLATFORMS = (PLATFORM_TYPES * 3) + 4
 )
 
 func main() {
@@ -98,6 +98,7 @@ func main() {
 				{Filename: "benches", HasFences: true, MaxLoadState: 6},
 				{Filename: "bare_shelter_traditional", HasFences: true, MaxLoadState: 5},
 				{Filename: "bare_shelter_tiled_wall", HasFences: true, MaxLoadState: 5},
+				{Filename: "bare_shelter_curved", HasFences: true, MaxLoadState: 5},
 				{Filename: "ramp_ne", HasFences: true, MaxLoadState: 5},
 				{Filename: "ramp_sw", HasFences: true, MaxLoadState: 5},
 				{Filename: "bare_footbridge", HasFences: true, MaxLoadState: 5},
@@ -278,6 +279,19 @@ func main() {
 					ClassName:        class.ClassName,
 					ObjectName:       "Shelter (with wall" + commaName + ")",
 					YearAvailable:    max(class.Available, 1890),
+					MaxLoadState:     5,
+					UseCompanyColour: true,
+					HasFences:        true,
+					InnerPlatform:    inner,
+					OuterPlatform:    outer,
+				},
+				{
+					ID:               baseObjectID + 20,
+					BaseSpriteID:     classSprites.SpriteMap["bare_shelter_curved"],
+					ClassID:          class.ClassID,
+					ClassName:        class.ClassName,
+					ObjectName:       "Shelter (curved" + commaName + ")",
+					YearAvailable:    max(class.Available, 1926),
 					MaxLoadState:     5,
 					UseCompanyColour: true,
 					HasFences:        true,
@@ -610,7 +624,7 @@ func main() {
 		if class.ClassID != "TWF0" {
 
 			hall := nfo.StationHall{
-				ID:                    class.BaseObjectID + 31,
+				ID:                    class.BaseObjectID + (PLATFORM_TYPES * 3) + 1,
 				BarePlatformSprite:    class.EmptySprite,
 				RoofPlatformSprite:    class.RoofPlatform,
 				RoofBaseSprite:        class.RoofSprite,
@@ -628,7 +642,7 @@ func main() {
 		}
 
 		buffers := nfo.BufferStop{
-			ID:               class.BaseObjectID + 32,
+			ID:               class.BaseObjectID + (PLATFORM_TYPES * 3) + 2,
 			SpriteFilename:   fmt.Sprintf("%s_bufferstop", class.Filename),
 			ClassID:          class.ClassID,
 			ClassName:        class.ClassName,
@@ -682,6 +696,14 @@ func main() {
 			ClassName:        "Buildings",
 			ObjectName:       "Rural Station",
 			YearAvailable:    1840,
+			UseCompanyColour: true,
+		},
+		{
+			SpriteFilename:   "suburban",
+			ClassID:          "TWFB",
+			ClassName:        "Buildings",
+			ObjectName:       "Suburban Station",
+			YearAvailable:    1912,
 			UseCompanyColour: true,
 		},
 		{

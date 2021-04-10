@@ -24,7 +24,7 @@ func (d *Definition) AddProperty(property properties2.Property) {
 }
 
 func (d *Definition) GetLines() []string {
-	bytes := 5
+	bytes := 7
 	output := ""
 
 	for _, p := range d.properties {
@@ -34,10 +34,10 @@ func (d *Definition) GetLines() []string {
 		output += "\n    " + p.GetString()
 	}
 
-	result := fmt.Sprintf("* %d 00 04 %s 01 %s %s",
+	result := fmt.Sprintf("* %d 00 04 %s 01 FF %s %s",
 		bytes,
 		bytes2.GetByte(len(d.properties)),
-		bytes2.GetByte(d.StationID),
+		bytes2.GetWord(d.StationID),
 		output)
 
 	return []string{result}
