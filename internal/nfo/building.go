@@ -18,6 +18,7 @@ type Building struct {
 	Height           int
 	UseCompanyColour bool
 	YearAvailable    int
+	LoadStates       int
 	Reversed         bool
 }
 
@@ -68,13 +69,17 @@ func (s *Building) WriteToFile(file *output_file.File) {
 		s.Width = 1
 	}
 
-	s.addSprites(file)
+	for i := 0; i <= s.LoadStates; i++ {
+		s.addSprites(i, file)
+	}
 
 	def := &Definition{StationID: s.ID}
 	def.AddProperty(&properties.ClassID{ID: s.ClassID})
 
-	// This is irrelevant?
-	// def.AddProperty(&properties.LittleLotsThreshold{Amount: 200})
+	if s.LoadStates > 0 {
+		def.AddProperty(&properties.LittleLotsThreshold{Amount: 20})
+		def.AddProperty(&properties.GeneralFlag{SpreadCargo: true})
+	}
 
 	layoutEntries := make([]properties.LayoutEntry, 0)
 
@@ -109,11 +114,17 @@ func (s *Building) WriteToFile(file *output_file.File) {
 
 	file.AddElement(def)
 
+
+	spritesets := []int{0}
+	for i := 1; i <= s.LoadStates; i++ {
+		spritesets = append(spritesets, i)
+	}
+
 	file.AddElement(&StationSet{
 		SetID:         0,
-		NumLittleSets: 0,
+		NumLittleSets: s.LoadStates,
 		NumLotsSets:   1,
-		SpriteSets:    []int{0},
+		SpriteSets:    spritesets,
 	})
 
 	spriteset := 0
@@ -159,18 +170,23 @@ func (s *Building) WriteToFile(file *output_file.File) {
 	})
 }
 
-func (s *Building) addSprites(file *output_file.File) {
+func (s *Building) addSprites(loadState int, file *output_file.File) {
 	buildingSprites := 2 * s.Width
 	spriteOffset := 0
 	if s.Reversed {
 		spriteOffset = 2
 	}
 
-	file.AddElement(&sprites.Spritesets{ID: 0, NumSets: 1, NumSprites: buildingSprites})
+	file.AddElement(&sprites.Spritesets{ID: loadState, NumSets: 1, NumSprites: buildingSprites})
+
+	loadStateString := ""
+	if s.LoadStates > 0 {
+		loadStateString = fmt.Sprintf("%d_", loadState)
+	}
 
 	// Non-fence sprites
 	if !s.Reversed {
-		filename := fmt.Sprintf("%s_8bpp.png", s.SpriteFilename)
+		filename := fmt.Sprintf("%s_%s8bpp.png", s.SpriteFilename, loadStateString)
 
 		file.AddElement(&sprites.Sprites{
 			GetBuildingSprite(filename, spriteOffset+0),
@@ -179,7 +195,7 @@ func (s *Building) addSprites(file *output_file.File) {
 
 		for i := 2; i <= s.Width; i++ {
 			// Additional sprites for long buildings
-			filename = fmt.Sprintf("%s_%d_8bpp.png", s.SpriteFilename, i)
+			filename = fmt.Sprintf("%s_%d_%s8bpp.png", s.SpriteFilename, i, loadStateString)
 
 			file.AddElement(&sprites.Sprites{
 				GetBuildingSprite(filename, spriteOffset+0),
@@ -190,7 +206,7 @@ func (s *Building) addSprites(file *output_file.File) {
 		// Reversed sprites go in the opposite order
 		for i := s.Width; i >= 2; i-- {
 			// Additional sprites for long buildings
-			filename := fmt.Sprintf("%s_%d_8bpp.png", s.SpriteFilename, i)
+			filename := fmt.Sprintf("%s_%d_%s8bpp.png", s.SpriteFilename, i, loadStateString)
 
 			file.AddElement(&sprites.Sprites{
 				GetBuildingSprite(filename, spriteOffset+0),
@@ -198,7 +214,7 @@ func (s *Building) addSprites(file *output_file.File) {
 			})
 		}
 
-		filename := fmt.Sprintf("%s_8bpp.png", s.SpriteFilename)
+		filename := fmt.Sprintf("%s_%s8bpp.png", s.SpriteFilename, loadStateString)
 
 		file.AddElement(&sprites.Sprites{
 			GetBuildingSprite(filename, spriteOffset+0),

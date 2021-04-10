@@ -7,6 +7,9 @@ import (
 
 const (
 	STATION_FENCE_OFFSET = 3
+	FIRST_CAR_PARK_ID = 212
+	FIRST_REVERSE_CAR_PARK_ID = 224
+	NUM_CAR_PARKS = 4
 )
 
 type StationFenceCallback struct {
@@ -22,7 +25,7 @@ func (s *StationFenceCallback) GetComment() string {
 }
 
 func (s *StationFenceCallback) getAction(checkValue, ifTrueValue, ifFalseValue string, setIDOffset int) string {
-	length := 18
+	length := 30
 
 	// 85 = access lowest word of station variable
 	// 68 = station info of nearby tile
@@ -30,16 +33,24 @@ func (s *StationFenceCallback) getAction(checkValue, ifTrueValue, ifFalseValue s
 	return fmt.Sprintf("* %d 02 04 %s\n"+
 		"    85 68 %s\n"+ // Check variable 68 for tile to -1/0
 		"    00 %s\n"+ // mask bits
-		"    01\n"+ // 1 non-default option
-		"    %s %s %s\n"+
+		"    03\n"+ // 3 non-default options
+		"    %s %s %s\n"+ // Everything is FF
+		"    %s %s %s\n" + // Line for car parks to still get fences
+		"    %s %s %s\n" + // Line for reversed car parks to still get fences
 		"    %s\n", // 80 - set bit 15 to show this is a final return value
 		length,
 		bytes.GetByte(s.SetID+setIDOffset),
 		checkValue,
-		bytes.GetWord(65535),
+		bytes.GetWord(255),
 		ifTrueValue,
-		bytes.GetWord(65535), // If the tile is not a station the value of the lower bits is 0xFFFF
-		bytes.GetWord(65535),
+		bytes.GetWord(255), // If the tile is not a station the value of the lower bits is 0xFFFF
+		bytes.GetWord(255),
+		ifTrueValue,
+		bytes.GetWord(FIRST_CAR_PARK_ID),
+		bytes.GetWord((FIRST_CAR_PARK_ID + NUM_CAR_PARKS)-1),
+		ifTrueValue,
+		bytes.GetWord(FIRST_REVERSE_CAR_PARK_ID),
+		bytes.GetWord((FIRST_REVERSE_CAR_PARK_ID + NUM_CAR_PARKS)-1),
 		ifFalseValue)
 }
 

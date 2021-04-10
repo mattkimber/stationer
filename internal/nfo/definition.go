@@ -12,7 +12,7 @@ type Definition struct {
 }
 
 func (d *Definition) GetComment() string {
-	return "Station definition"
+	return fmt.Sprintf("Station definition for ID %d", d.StationID)
 }
 
 func (d *Definition) AddProperty(property properties2.Property) {

@@ -27,7 +27,7 @@ type StationClass struct {
 const (
 	// This is not the actual number, but the number leaving some room for expansion
 	PLATFORM_TYPES  = 21
-	CLASS_PLATFORMS = (PLATFORM_TYPES * 3) + 4
+	CLASS_PLATFORMS = (PLATFORM_TYPES * 3) + 5
 )
 
 func main() {
@@ -746,6 +746,38 @@ func main() {
 			ObjectName:       "J.M. Easton Station",
 			YearAvailable:    1935,
 			UseCompanyColour: true,
+		},
+		{
+			SpriteFilename:   "straight_car_park",
+			ClassID:          "TWFB",
+			ClassName:        "Buildings",
+			ObjectName:       "Car Park (straight)",
+			YearAvailable:    1960,
+			LoadStates:       3,
+		},
+		{
+			SpriteFilename:   "corner_car_park",
+			ClassID:          "TWFB",
+			ClassName:        "Buildings",
+			ObjectName:       "Car Park (corner)",
+			YearAvailable:    1960,
+			LoadStates:       3,
+		},
+		{
+			SpriteFilename:   "entrance_car_park",
+			ClassID:          "TWFB",
+			ClassName:        "Buildings",
+			ObjectName:       "Car Park (entrance)",
+			YearAvailable:    1960,
+			LoadStates:       3,
+		},
+		{
+			SpriteFilename:   "end_car_park",
+			ClassID:          "TWFB",
+			ClassName:        "Buildings",
+			ObjectName:       "Car Park (end)",
+			YearAvailable:    1960,
+			LoadStates:       3,
 		},
 	}
 
