@@ -97,7 +97,7 @@ func (s *StationHall) WriteToFile(file *output_file.File) {
 
 	def := &Definition{StationID: s.ID}
 	def.AddProperty(&properties.ClassID{ID: s.ClassID})
-	def.AddProperty(&properties.LittleLotsThreshold{Amount: 200})
+	def.AddProperty(&properties.LittleLotsThreshold{Amount: 40})
 
 	if s.YearAvailable != 0 {
 		def.AddProperty(&properties.CallbackFlag{Availability: s.YearAvailable != 0})
@@ -168,7 +168,7 @@ func (s *StationHall) WriteToFile(file *output_file.File) {
 
 	file.AddElement(&StationSet{
 		SetID:         0,
-		NumLittleSets: LITTLE_SETS,
+		NumLittleSets: LITTLE_SETS * 2,
 		NumLotsSets:   LOTS_SETS,
 		SpriteSets:    GetSpriteSets(s.MaxLoadState),
 	})

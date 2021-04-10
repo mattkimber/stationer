@@ -8,7 +8,7 @@ import (
 // CLass ID
 type GeneralFlag struct {
 	HasCustomFoundations bool
-	SpreadCargo bool
+	SpreadCargo          bool
 }
 
 func (c *GeneralFlag) GetBytes() int {

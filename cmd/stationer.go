@@ -38,7 +38,7 @@ func main() {
 		SetName:     "Timberwolf's Stations 1.1.5",
 		Description: "A set of British-style railway stations feature multiple eras of platforms, buildings and waypoints in 2x zoom",
 		Version:     10,
-		MinVersion:  4,
+		MinVersion:  10,
 	})
 
 	file.AddElement(&nfo.CargoTypeTable{Cargos: []string{"PASS", "MAIL"}})
@@ -153,6 +153,18 @@ func main() {
 				{
 					BaseSpriteID:   classSprites.LastSpriteNumber + 8,
 					SpriteFilename: "footbridge_pillar_covered_b",
+					MaxLoadState:   5,
+					IsStatic:       true,
+				},
+				{
+					BaseSpriteID:   classSprites.LastSpriteNumber + 10,
+					SpriteFilename: "footbridge_pillar_covered_brick",
+					MaxLoadState:   5,
+					IsStatic:       true,
+				},
+				{
+					BaseSpriteID:   classSprites.LastSpriteNumber + 12,
+					SpriteFilename: "footbridge_pillar_covered_brick_b",
 					MaxLoadState:   5,
 					IsStatic:       true,
 				},
@@ -451,50 +463,42 @@ func main() {
 							},
 						},
 					}}...)
-
-				if class.ClassID != "TWF0" {
-					thisClass = append(thisClass, []nfo.Station{
-						{
-							ID:                    baseObjectID + 17,
-							BaseSpriteID:          classSprites.SpriteMap["bare_footbridge_covered_brick"],
-							ClassID:               class.ClassID,
-							ClassName:             class.ClassName,
-							YearAvailable:         max(class.Available, 1910),
-							ObjectName:            "Footbridge (covered)",
-							UseCompanyColour:      true,
-							HasFences:             true,
-							MaxLoadState:          5,
-							PlatformHeight:        16,
-							InnerPlatform:         inner,
-							OuterPlatform:         outer,
-							PlatformConfiguration: rampConfiguration,
-							AdditionalObjects: []nfo.AdditionalObject{
-								{
-									X:            6,
-									Y:            2,
-									Z:            14,
-									SizeX:        5,
-									SizeY:        8,
-									SizeZ:        3,
-									BaseSpriteID: footbridgeSprites[2].BaseSpriteID,
-								},
-							},
-						}}...)
-				}
 			}
 
 			if class.ClassID != "TWF0" {
-				footbridgeObjects := []nfo.AdditionalObject{
-					{
-						X:            6,
-						Y:            2,
-						Z:            14,
-						SizeX:        5,
-						SizeY:        8,
-						SizeZ:        3,
-						BaseSpriteID: footbridgeSprites[1].BaseSpriteID,
-					},
+				footbridgeObjects := getFootbridgeBaseObject(footbridgeSprites[2].BaseSpriteID)
+
+				if !inner || !outer {
+					y := 0
+					pillarSprite := 5
+					if inner {
+						y = 12
+						pillarSprite = 6
+					}
+
+					footbridgeObjects = append(footbridgeObjects, getFootbridgeObject(y, footbridgeSprites[pillarSprite].BaseSpriteID))
 				}
+
+				thisClass = append(thisClass, []nfo.Station{
+					{
+						ID:                    baseObjectID + 17,
+						BaseSpriteID:          classSprites.SpriteMap["bare_footbridge_covered_brick"],
+						ClassID:               class.ClassID,
+						ClassName:             class.ClassName,
+						YearAvailable:         max(class.Available, 1910),
+						ObjectName:            "Footbridge (covered)",
+						UseCompanyColour:      true,
+						HasFences:             true,
+						MaxLoadState:          5,
+						PlatformHeight:        16,
+						InnerPlatform:         inner,
+						OuterPlatform:         outer,
+						PlatformConfiguration: rampConfiguration,
+						AdditionalObjects:     footbridgeObjects,
+					}}...)
+
+
+				footbridgeObjects = getFootbridgeBaseObject(footbridgeSprites[1].BaseSpriteID)
 
 				if !inner || !outer {
 					y := 0
@@ -504,15 +508,7 @@ func main() {
 						pillarSprite = 4
 					}
 
-					footbridgeObjects = append(footbridgeObjects, nfo.AdditionalObject{
-						X:            6,
-						Y:            y,
-						Z:            0,
-						SizeX:        3,
-						SizeY:        3,
-						SizeZ:        15,
-						BaseSpriteID: footbridgeSprites[pillarSprite].BaseSpriteID,
-					})
+					footbridgeObjects = append(footbridgeObjects, getFootbridgeObject(y, footbridgeSprites[pillarSprite].BaseSpriteID))
 				}
 
 				thisClass = append(thisClass, []nfo.Station{
@@ -787,6 +783,32 @@ func main() {
 	}
 
 	file.Output()
+}
+
+func getFootbridgeBaseObject(footbridgeSpriteID int) []nfo.AdditionalObject {
+	return []nfo.AdditionalObject{
+		{
+			X:            6,
+			Y:            2,
+			Z:            14,
+			SizeX:        5,
+			SizeY:        8,
+			SizeZ:        3,
+			BaseSpriteID: footbridgeSpriteID,
+		},
+	}
+}
+
+func getFootbridgeObject(y int, footbridgeSpriteID int) nfo.AdditionalObject {
+	return nfo.AdditionalObject{
+		X:            6,
+		Y:            y,
+		Z:            0,
+		SizeX:        3,
+		SizeY:        3,
+		SizeZ:        15,
+		BaseSpriteID: footbridgeSpriteID,
+	}
 }
 
 func getGlassObjects(inner, outer bool, baseSpriteID int, isTransparent bool) []nfo.AdditionalObject {
