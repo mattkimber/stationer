@@ -7,6 +7,7 @@ import (
 	"github.com/mattkimber/stationer/internal/nfo/output_file"
 	"github.com/mattkimber/stationer/internal/nfo/properties"
 	"github.com/mattkimber/stationer/internal/nfo/sprites"
+	"sort"
 )
 
 func init() {
@@ -26,11 +27,14 @@ type StationClass struct {
 
 const (
 	// This is not the actual number, but the number leaving some room for expansion
-	PLATFORM_TYPES  = 21
+	PLATFORM_TYPES  = 22
 	CLASS_PLATFORMS = (PLATFORM_TYPES * 3) + 5
 )
 
 func main() {
+	outputObjects := make([]output_file.SortableFileWriter, 0)
+	currentID := 0
+
 	file := output_file.File{}
 	file.AddElement(&nfo.Header{
 		Initials:    "TWF",
@@ -98,7 +102,7 @@ func main() {
 				{Filename: "benches", HasFences: true, MaxLoadState: 6},
 				{Filename: "bare_shelter_traditional", HasFences: true, MaxLoadState: 5},
 				{Filename: "bare_shelter_tiled_wall", HasFences: true, MaxLoadState: 5},
-				{Filename: "bare_shelter_curved", HasFences: true, MaxLoadState: 5},
+				{Filename: "bare_hut", HasFences: true, MaxLoadState: 5},
 				{Filename: "ramp_ne", HasFences: true, MaxLoadState: 5},
 				{Filename: "ramp_sw", HasFences: true, MaxLoadState: 5},
 				{Filename: "bare_footbridge", HasFences: true, MaxLoadState: 5},
@@ -111,6 +115,7 @@ func main() {
 		}
 
 		if class.ClassID != "TWF0" {
+			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "bare_shelter_curved", HasFences: true, MaxLoadState: 5})
 			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "bare_footbridge_covered", HasFences: true, MaxLoadState: 5})
 			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "bare_footbridge_covered_brick", HasFences: true, MaxLoadState: 5})
 			classSprites.Sprites = append(classSprites.Sprites, sprites.StationSprite{Filename: "bare_shelter_glass", HasFences: true, MaxLoadState: 5})
@@ -286,17 +291,19 @@ func main() {
 					OuterPlatform:    outer,
 				},
 				{
-					ID:               baseObjectID + 20,
-					BaseSpriteID:     classSprites.SpriteMap["bare_shelter_curved"],
+					ID:               baseObjectID + 21,
+					BaseSpriteID:     classSprites.SpriteMap["bare_hut"],
 					ClassID:          class.ClassID,
 					ClassName:        class.ClassName,
-					ObjectName:       "Shelter (curved" + commaName + ")",
-					YearAvailable:    max(class.Available, 1926),
+					ObjectName:       "Hut" + bracketName,
+					YearAvailable:    max(class.Available, 1890),
 					MaxLoadState:     5,
 					UseCompanyColour: true,
 					HasFences:        true,
 					InnerPlatform:    inner,
 					OuterPlatform:    outer,
+					OverrideOuter:    true,
+					OuterPlatformSprite: classSprites.SpriteMap["sign"],
 				},
 				{
 					ID:                    baseObjectID + 4,
@@ -346,6 +353,19 @@ func main() {
 						HasFences:             true,
 						InnerPlatform:         inner,
 						OuterPlatform:         outer,
+					},
+					{
+						ID:               baseObjectID + 20,
+						BaseSpriteID:     classSprites.SpriteMap["bare_shelter_curved"],
+						ClassID:          class.ClassID,
+						ClassName:        class.ClassName,
+						ObjectName:       "Shelter (curved" + commaName + ")",
+						YearAvailable:    max(class.Available, 1926),
+						MaxLoadState:     5,
+						UseCompanyColour: true,
+						HasFences:        true,
+						InnerPlatform:    inner,
+						OuterPlatform:    outer,
 					},
 					{
 						ID:                baseObjectID + 15,
@@ -616,7 +636,8 @@ func main() {
 			}
 
 			for _, station := range thisClass {
-				station.WriteToFile(&file)
+				thisStation := station
+				outputObjects = append(outputObjects, &thisStation)
 			}
 		}
 
@@ -638,7 +659,7 @@ func main() {
 				YearAvailable:         max(class.Available, 1870),
 			}
 
-			hall.WriteToFile(&file)
+			outputObjects = append(outputObjects, &hall)
 		}
 
 		buffers := nfo.BufferStop{
@@ -651,7 +672,7 @@ func main() {
 			UseCompanyColour: true,
 		}
 
-		buffers.WriteToFile(&file)
+		outputObjects = append(outputObjects, &buffers)
 
 		platforms := []nfo.FullTilePlatform{
 			{
@@ -675,9 +696,19 @@ func main() {
 		}
 
 		for _, platform := range platforms {
-			platform.WriteToFile(&file)
+			thisPlatform := platform
+			outputObjects = append(outputObjects, &thisPlatform)
 		}
 
+		sort.Slice(outputObjects, func(i,j int) bool { return outputObjects[i].GetID() < outputObjects[j].GetID() })
+
+		for _, object := range outputObjects {
+			object.SetID(currentID)
+			object.WriteToFile(&file)
+			currentID = currentID + 1
+		}
+
+		outputObjects = make([]output_file.SortableFileWriter, 0)
 	}
 
 	objectID := CLASS_PLATFORMS * 3
@@ -782,17 +813,19 @@ func main() {
 	}
 
 	for _, building := range buildings {
-		building.ID = objectID
-		building.WriteToFile(&file)
+		thisBuilding := building
+		thisBuilding.ID = objectID
+		outputObjects = append(outputObjects, &thisBuilding)
 		objectID = objectID + 1
 	}
 
 	for _, building := range buildings {
-		building.ID = objectID
-		building.Reversed = true
-		building.ClassID = "TWFC"
-		building.ClassName = "Buildings (Reversed)"
-		building.WriteToFile(&file)
+		thisBuilding := building
+		thisBuilding.ID = objectID
+		thisBuilding.Reversed = true
+		thisBuilding.ClassID = "TWFC"
+		thisBuilding.ClassName = "Buildings (Reversed)"
+		outputObjects = append(outputObjects, &thisBuilding)
 		objectID = objectID + 1
 	}
 
@@ -831,9 +864,18 @@ func main() {
 	}
 
 	for _, waypoint := range waypoints {
-		waypoint.ID = objectID
-		waypoint.WriteToFile(&file)
+		thisWaypoint := waypoint
+		thisWaypoint.ID = objectID
+		outputObjects = append(outputObjects, &thisWaypoint)
 		objectID = objectID + 1
+	}
+
+	sort.Slice(outputObjects, func(i,j int) bool { return outputObjects[i].GetID() < outputObjects[j].GetID() })
+
+	for _, object := range outputObjects {
+		object.SetID(currentID)
+		object.WriteToFile(&file)
+		currentID = currentID + 1
 	}
 
 	file.Output()

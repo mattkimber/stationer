@@ -23,6 +23,14 @@ const (
 	WAYPOINT_BASE_SPRITE_HEIGHT = 35
 )
 
+func (wp *Waypoint) SetID(id int) {
+	wp.ID = id
+}
+
+func (wp *Waypoint) GetID() int {
+	return wp.ID
+}
+
 func GetWaypointSprite(filename string, num int, swap bool) sprites.Sprite {
 	xrel := -(BUILDING_SPRITE_WIDTH / 2) - 10
 	yrel := -(WAYPOINT_SPRITE_HEIGHT / 2) - 1

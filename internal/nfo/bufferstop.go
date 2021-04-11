@@ -27,6 +27,15 @@ const (
 	BUFFERSTOP_SPRITE_HEIGHT             = 55
 )
 
+
+func (s *BufferStop) SetID(id int) {
+	s.ID = id
+}
+
+func (s *BufferStop) GetID() int {
+	return s.ID
+}
+
 func (s *BufferStop) GetBaseSpriteNumber() int {
 	if s.UseCompanyColour {
 		return COMPANY_COLOUR_SPRITE

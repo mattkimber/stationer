@@ -43,6 +43,14 @@ func GetBuildingSprite(filename string, num int) sprites.Sprite {
 	}
 }
 
+func (s *Building) GetID() int {
+	return s.ID
+}
+
+func (s *Building) SetID(id int) {
+	s.ID = id
+}
+
 func (s *Building) GetBaseSpriteNumber() int {
 	if s.UseCompanyColour {
 		return COMPANY_COLOUR_SPRITE

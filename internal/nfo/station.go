@@ -46,6 +46,14 @@ const (
 	GROUND_SPRITE_RAIL_NS = 1011
 )
 
+func (s *Station) GetID() int {
+	return s.ID
+}
+
+func (s *Station) SetID(id int) {
+	s.ID = id
+}
+
 func (s *Station) GetBaseSpriteNumber() int {
 	// The sprite number is a relative offset from the spriteset.
 	// e.g. even if you are using set ID 20, the base sprite in it

@@ -21,6 +21,15 @@ type FullTilePlatform struct {
 	YearAvailable        int
 }
 
+
+func (s *FullTilePlatform) SetID(id int) {
+	s.ID = id
+}
+
+func (s *FullTilePlatform) GetID() int {
+	return s.ID
+}
+
 func (s *FullTilePlatform) GetBaseSpriteNumber() int {
 	if s.UseCompanyColour {
 		return COMPANY_COLOUR_SPRITE

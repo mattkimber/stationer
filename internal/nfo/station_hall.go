@@ -21,6 +21,15 @@ type StationHall struct {
 	YearAvailable         int
 }
 
+
+func (s *StationHall) SetID(id int) {
+	s.ID = id
+}
+
+func (s *StationHall) GetID() int {
+	return s.ID
+}
+
 func (s *StationHall) GetBaseSpriteNumber() int {
 	if s.UseCompanyColour {
 		return COMPANY_COLOUR_SPRITE

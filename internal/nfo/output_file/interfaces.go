@@ -8,3 +8,9 @@ type Element interface {
 type FileWriter interface {
 	WriteToFile(file *File)
 }
+
+type SortableFileWriter interface {
+	FileWriter
+	SetID(int)
+	GetID() int
+}
