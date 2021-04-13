@@ -730,6 +730,15 @@ func main() {
 			UseCompanyColour: true,
 		},
 		{
+			SpriteFilename:   "sir_william_tite",
+			ClassID:          "TWFB",
+			ClassName:        "Buildings",
+			ObjectName:       "Sir William Tite Station",
+			YearAvailable:    1849,
+			Width:            2,
+			UseCompanyColour: true,
+		},
+		{
 			SpriteFilename:   "suburban",
 			ClassID:          "TWFB",
 			ClassName:        "Buildings",
