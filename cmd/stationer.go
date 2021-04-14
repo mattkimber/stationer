@@ -739,6 +739,14 @@ func main() {
 			UseCompanyColour: true,
 		},
 		{
+			SpriteFilename:   "w_n_ashbee",
+			ClassID:          "TWFB",
+			ClassName:        "Buildings",
+			ObjectName:       "W.N. Ashbee Station",
+			YearAvailable:    1862,
+			UseCompanyColour: true,
+		},
+		{
 			SpriteFilename:   "suburban",
 			ClassID:          "TWFB",
 			ClassName:        "Buildings",
