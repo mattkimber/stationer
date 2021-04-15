@@ -308,7 +308,7 @@ func (s *Station) WriteToFile(file *output_file.File) {
 				DefaultSpriteSet: 0,
 				YearCallbackID:   yearCallbackID,
 				HasDecider:       !s.HasLargeCentralObject,
-				UseRailPresenceForNorth: !s.InnerPlatform,
+				UseRailPresenceForNorth: (!s.InnerPlatform) || s.HasLargeCentralObject,
 				UseRailPresenceForSouth: !s.OuterPlatform,
 				BaseLayoutOffset: i * 24,
 			})
@@ -328,8 +328,8 @@ func (s *Station) WriteToFile(file *output_file.File) {
 					SetID:            20 + (i * 50),
 					DefaultSpriteSet: 0,
 					YearCallbackID:   yearCallbackID,
-					UseRailPresenceForNorth: !s.InnerPlatform,
-					UseRailPresenceForSouth: !s.OuterPlatform,
+					UseRailPresenceForNorth: true,
+					UseRailPresenceForSouth: false,
 					BaseLayoutOffset: 8 + (i * 24),
 				})
 
@@ -337,8 +337,8 @@ func (s *Station) WriteToFile(file *output_file.File) {
 					SetID:            25 + (i * 50),
 					DefaultSpriteSet: 1,
 					YearCallbackID:   yearCallbackID,
-					UseRailPresenceForNorth: !s.InnerPlatform,
-					UseRailPresenceForSouth: !s.OuterPlatform,
+					UseRailPresenceForNorth: true,
+					UseRailPresenceForSouth: false,
 					BaseLayoutOffset: 8 + (i * 24),
 				})
 
@@ -346,8 +346,8 @@ func (s *Station) WriteToFile(file *output_file.File) {
 					SetID:            30 + (i * 50),
 					DefaultSpriteSet: 0,
 					YearCallbackID:   yearCallbackID,
-					UseRailPresenceForNorth: !s.InnerPlatform,
-					UseRailPresenceForSouth: !s.OuterPlatform,
+					UseRailPresenceForNorth: false,
+					UseRailPresenceForSouth: false,
 					BaseLayoutOffset: 16 + (i * 24),
 				})
 
@@ -355,8 +355,8 @@ func (s *Station) WriteToFile(file *output_file.File) {
 					SetID:            35 + (i * 50),
 					DefaultSpriteSet: 1,
 					YearCallbackID:   yearCallbackID,
-					UseRailPresenceForNorth: !s.InnerPlatform,
-					UseRailPresenceForSouth: !s.OuterPlatform,
+					UseRailPresenceForNorth: false,
+					UseRailPresenceForSouth: false,
 					BaseLayoutOffset: 16 + (i * 24),
 				})
 

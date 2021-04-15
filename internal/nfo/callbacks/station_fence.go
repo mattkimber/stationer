@@ -125,7 +125,6 @@ func (s *StationFenceCallback) GetLines() []string {
 	if s.UseRailPresenceForSouth {
 		result[0] = s.getRailPresenceAction("04", bytes.GetCallbackResultByte(s.BaseLayoutOffset+4), bytes.GetCallbackResultByte(s.BaseLayoutOffset+0), 1) // N: true, S: check
 		result[1] = s.getRailPresenceAction("04", bytes.GetCallbackResultByte(s.BaseLayoutOffset+6), bytes.GetCallbackResultByte(s.BaseLayoutOffset+2), 2) // N: false, S: check
-
 	} else {
 		result[0] = s.getStationPresenceAction("10", bytes.GetCallbackResultByte(s.BaseLayoutOffset+4), bytes.GetCallbackResultByte(s.BaseLayoutOffset+0), 1) // N: true, S: check
 		result[1] = s.getStationPresenceAction("10", bytes.GetCallbackResultByte(s.BaseLayoutOffset+6), bytes.GetCallbackResultByte(s.BaseLayoutOffset+2), 2) // N: false, S: check
