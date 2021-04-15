@@ -97,6 +97,7 @@ func main() {
 		// so they can be mixed and matched
 		classSprites := sprites.StationSprites{
 			Sprites: []sprites.StationSprite{
+				{Filename: "fence", MaxLoadState: 5, IsStatic: true, IsRailFence: true, SingleSided: true},
 				{Filename: "empty", HasFences: true, MaxLoadState: 6},
 				{Filename: "sign", HasFences: true, MaxLoadState: 6},
 				{Filename: "benches", HasFences: true, MaxLoadState: 6},
@@ -239,6 +240,7 @@ func main() {
 					HasFences:        true,
 					InnerPlatform:    inner,
 					OuterPlatform:    outer,
+					RailFenceSpriteID: classSprites.SpriteMap["fence"],
 				},
 				{
 					ID:               baseObjectID + 1,
@@ -251,6 +253,7 @@ func main() {
 					HasFences:        true,
 					InnerPlatform:    inner,
 					OuterPlatform:    outer,
+					RailFenceSpriteID: classSprites.SpriteMap["fence"],
 				},
 				{
 					ID:               baseObjectID + 2,
@@ -263,6 +266,7 @@ func main() {
 					HasFences:        true,
 					InnerPlatform:    inner,
 					OuterPlatform:    outer,
+					RailFenceSpriteID: classSprites.SpriteMap["fence"],
 				},
 				{
 					ID:               baseObjectID + 3,
@@ -276,6 +280,7 @@ func main() {
 					HasFences:        true,
 					InnerPlatform:    inner,
 					OuterPlatform:    outer,
+					RailFenceSpriteID: classSprites.SpriteMap["fence"],
 				},
 				{
 					ID:               baseObjectID + 14,
@@ -289,21 +294,7 @@ func main() {
 					HasFences:        true,
 					InnerPlatform:    inner,
 					OuterPlatform:    outer,
-				},
-				{
-					ID:               baseObjectID + 21,
-					BaseSpriteID:     classSprites.SpriteMap["bare_hut"],
-					ClassID:          class.ClassID,
-					ClassName:        class.ClassName,
-					ObjectName:       "Hut" + bracketName,
-					YearAvailable:    max(class.Available, 1890),
-					MaxLoadState:     5,
-					UseCompanyColour: true,
-					HasFences:        true,
-					InnerPlatform:    inner,
-					OuterPlatform:    outer,
-					OverrideOuter:    true,
-					OuterPlatformSprite: classSprites.SpriteMap["sign"],
+					RailFenceSpriteID: classSprites.SpriteMap["fence"],
 				},
 				{
 					ID:                    baseObjectID + 4,
@@ -318,6 +309,7 @@ func main() {
 					HasFences:             true,
 					InnerPlatform:         inner,
 					OuterPlatform:         outer,
+					RailFenceSpriteID: classSprites.SpriteMap["fence"],
 				},
 				{
 					ID:                    baseObjectID + 5,
@@ -332,7 +324,27 @@ func main() {
 					HasFences:             true,
 					InnerPlatform:         inner,
 					OuterPlatform:         outer,
+					RailFenceSpriteID:     classSprites.SpriteMap["fence"],
 				},
+			}
+
+			if inner {
+				thisClass = append(thisClass, nfo.Station{
+				ID:               baseObjectID + 21,
+					BaseSpriteID:     classSprites.SpriteMap["bare_hut"],
+						ClassID:          class.ClassID,
+						ClassName:        class.ClassName,
+						ObjectName:       "Hut" + bracketName,
+						YearAvailable:    max(class.Available, 1890),
+						MaxLoadState:     5,
+						UseCompanyColour: true,
+						HasFences:        true,
+						InnerPlatform:    inner,
+						OuterPlatform:    outer,
+						OverrideOuter:    true,
+						OuterPlatformSprite: classSprites.SpriteMap["sign"],
+					    RailFenceSpriteID: classSprites.SpriteMap["fence"],
+				})
 			}
 
 			if class.ClassID != "TWF0" {
@@ -353,6 +365,7 @@ func main() {
 						HasFences:             true,
 						InnerPlatform:         inner,
 						OuterPlatform:         outer,
+						RailFenceSpriteID: classSprites.SpriteMap["fence"],
 					},
 					{
 						ID:               baseObjectID + 20,
@@ -366,6 +379,7 @@ func main() {
 						HasFences:        true,
 						InnerPlatform:    inner,
 						OuterPlatform:    outer,
+						RailFenceSpriteID: classSprites.SpriteMap["fence"],
 					},
 					{
 						ID:                baseObjectID + 15,
@@ -380,6 +394,7 @@ func main() {
 						HasFences:         true,
 						InnerPlatform:     inner,
 						OuterPlatform:     outer,
+						RailFenceSpriteID: classSprites.SpriteMap["fence"],
 					},
 					{
 						ID:                baseObjectID + 16,
@@ -394,6 +409,7 @@ func main() {
 						HasFences:         true,
 						InnerPlatform:     inner,
 						OuterPlatform:     outer,
+						RailFenceSpriteID: classSprites.SpriteMap["fence"],
 					},
 				}...)
 			}
@@ -425,6 +441,7 @@ func main() {
 						ObjectIsSingleSided:   true,
 						OuterPlatformSprite:   classSprites.SpriteMap["empty"],
 						PlatformConfiguration: largeObjectConfiguration,
+						RailFenceSpriteID: classSprites.SpriteMap["fence"],
 					},
 				}...)
 
@@ -447,6 +464,7 @@ func main() {
 							OverrideOuter:         true,
 							OuterPlatformSprite:   classSprites.SpriteMap["empty"],
 							PlatformConfiguration: largeObjectConfiguration,
+							RailFenceSpriteID: classSprites.SpriteMap["fence"],
 						},
 						{
 							ID:                    baseObjectID + 9,
@@ -464,6 +482,7 @@ func main() {
 							OverrideOuter:         true,
 							OuterPlatformSprite:   classSprites.SpriteMap["empty"],
 							PlatformConfiguration: largeObjectConfiguration,
+							RailFenceSpriteID: classSprites.SpriteMap["fence"],
 						},
 					}...)
 				}
@@ -484,12 +503,13 @@ func main() {
 						PlatformHeight:        16,
 						InnerPlatform:         true,
 						OuterPlatform:         true,
+						RailFenceSpriteID: classSprites.SpriteMap["fence"],
 						PlatformConfiguration: rampConfiguration,
 						AdditionalObjects: []nfo.AdditionalObject{
 							{
 								X:            5,
 								Y:            4,
-								Z:            13,
+								Z:            12,
 								SizeX:        5,
 								SizeY:        8,
 								SizeZ:        3,
@@ -529,6 +549,7 @@ func main() {
 						OuterPlatform:         outer,
 						PlatformConfiguration: rampConfiguration,
 						AdditionalObjects:     footbridgeObjects,
+						RailFenceSpriteID: classSprites.SpriteMap["fence"],
 					}}...)
 
 
@@ -561,6 +582,7 @@ func main() {
 						OuterPlatform:         outer,
 						PlatformConfiguration: rampConfiguration,
 						AdditionalObjects:     footbridgeObjects,
+						RailFenceSpriteID: classSprites.SpriteMap["fence"],
 					},
 				}...)
 			}
@@ -583,6 +605,7 @@ func main() {
 						OverrideOuter:         true,
 						OuterPlatformSprite:   classSprites.SpriteMap["empty"],
 						PlatformConfiguration: rampConfiguration,
+						RailFenceSpriteID: classSprites.SpriteMap["fence"],
 					},
 					{
 						ID:                    baseObjectID + 11,
@@ -599,6 +622,7 @@ func main() {
 						OverrideOuter:         true,
 						OuterPlatformSprite:   classSprites.SpriteMap["ramp_ne"],
 						PlatformConfiguration: rampConfiguration,
+						RailFenceSpriteID: classSprites.SpriteMap["fence"],
 					},
 					{
 						ID:                    baseObjectID + 12,
@@ -615,6 +639,7 @@ func main() {
 						OverrideOuter:         true,
 						OuterPlatformSprite:   classSprites.SpriteMap["empty"],
 						PlatformConfiguration: rampConfiguration,
+						RailFenceSpriteID: classSprites.SpriteMap["fence"],
 					},
 					{
 						ID:                    baseObjectID + 13,
@@ -631,6 +656,7 @@ func main() {
 						OverrideOuter:         true,
 						OuterPlatformSprite:   classSprites.SpriteMap["ramp_sw"],
 						PlatformConfiguration: rampConfiguration,
+						RailFenceSpriteID: classSprites.SpriteMap["fence"],
 					},
 				}...)
 			}
@@ -903,7 +929,7 @@ func getFootbridgeBaseObject(footbridgeSpriteID int) []nfo.AdditionalObject {
 		{
 			X:            6,
 			Y:            2,
-			Z:            14,
+			Z:            13,
 			SizeX:        5,
 			SizeY:        8,
 			SizeZ:        3,

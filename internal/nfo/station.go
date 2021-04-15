@@ -10,6 +10,7 @@ type Station struct {
 	ID                    int
 	BaseSpriteID          int
 	RandomSpriteIDs       []int
+	RailFenceSpriteID     int
 	ClassID               string
 	ClassName             string
 	ObjectName            string
@@ -70,6 +71,14 @@ func (s *Station) GetBaseSpriteNumber() int {
 	return CUSTOM_SPRITE + s.BaseSpriteID
 }
 
+func (s *Station) GetFenceSpriteNumber() int {
+	if s.UseCompanyColour {
+		return COMPANY_COLOUR_SPRITE + s.RailFenceSpriteID
+	}
+
+	return CUSTOM_SPRITE + s.RailFenceSpriteID
+}
+
 func (s *Station) GetRandomSpriteNumber(number int) int {
 
 	if s.UseCompanyColour {
@@ -101,14 +110,22 @@ func GetSpriteSets(max int) []int {
 func (s *Station) GetObjects(direction int, fenceInside, fenceOutside bool, iteration int) []properties.BoundingBox {
 	yOffset := 16 - 5
 	xOffset := 0
+	fenceYOffset := 16
+	fenceXOffset := 0
+	fenceYOffsetInner, fenceXOffsetInner := 1, 0
 	x, y := 16, 5
+	fenceX, fenceY := 16, 1
 	base := 0
 
 	if direction == NORTH_SOUTH {
-		xOffset = 16 - 5
 		yOffset = 0
+		xOffset = 16 - 5
+		fenceYOffset = 0
+		fenceXOffset = 16
+		fenceYOffsetInner, fenceXOffsetInner = 0, 1
 		x = 5
 		y = 16
+		fenceX, fenceY = 1, 16
 		base = base + 2
 	}
 
@@ -136,6 +153,15 @@ func (s *Station) GetObjects(direction int, fenceInside, fenceOutside bool, iter
 		} else {
 			result = append(result, properties.BoundingBox{YOffset: yOffset, XOffset: xOffset, X: x, Y: y, Z: s.PlatformHeight, SpriteNumber: baseSprite + base + 0})
 		}
+	} else if s.HasFences {
+		// Add the base rail fence
+		baseSprite := s.GetFenceSpriteNumber()
+		// +1 as same sprite is used for both inner and outer, +4 if this is treated as a "has fences" tile
+		if fenceOutside {
+			result = append(result, properties.BoundingBox{YOffset: fenceYOffset, XOffset: fenceXOffset, ZOffset: 1, X: fenceX, Y: fenceY, Z: 2, SpriteNumber: baseSprite + base + 5})
+		} else {
+			result = append(result, properties.BoundingBox{YOffset: fenceYOffset, XOffset: fenceXOffset, ZOffset: 1, X: fenceX, Y: fenceY, Z: 2, SpriteNumber: baseSprite + base + 1})
+		}
 	}
 
 	if s.InnerPlatform && !(!s.OuterPlatform && s.HasLargeCentralObject && platform == 1) {
@@ -153,6 +179,15 @@ func (s *Station) GetObjects(direction int, fenceInside, fenceOutside bool, iter
 			result = append(result, properties.BoundingBox{X: x, Y: y, Z: s.PlatformHeight, SpriteNumber: baseSprite + base + 5})
 		} else {
 			result = append(result, properties.BoundingBox{X: x, Y: y, Z: s.PlatformHeight, SpriteNumber: baseSprite + base + 1})
+		}
+	} else if s.HasFences {
+		// Add the base rail fence
+		baseSprite := s.GetFenceSpriteNumber()
+		// +1 as same sprite is used for both inner and outer, +4 if this is treated as a "has fences" tile
+		if fenceInside {
+			result = append(result, properties.BoundingBox{XOffset: fenceXOffsetInner, YOffset: fenceYOffsetInner, X: fenceX, Y: fenceY, Z: 2, SpriteNumber: baseSprite + base + 5})
+		} else {
+			result = append(result, properties.BoundingBox{XOffset: fenceXOffsetInner, YOffset: fenceYOffsetInner, X: fenceX, Y: fenceY, Z: 2, SpriteNumber: baseSprite + base + 1})
 		}
 	}
 
@@ -273,6 +308,8 @@ func (s *Station) WriteToFile(file *output_file.File) {
 				DefaultSpriteSet: 0,
 				YearCallbackID:   yearCallbackID,
 				HasDecider:       !s.HasLargeCentralObject,
+				UseRailPresenceForNorth: !s.InnerPlatform,
+				UseRailPresenceForSouth: !s.OuterPlatform,
 				BaseLayoutOffset: i * 24,
 			})
 
@@ -281,6 +318,8 @@ func (s *Station) WriteToFile(file *output_file.File) {
 				DefaultSpriteSet: 1,
 				YearCallbackID:   yearCallbackID,
 				HasDecider:       !s.HasLargeCentralObject,
+				UseRailPresenceForNorth: !s.InnerPlatform,
+				UseRailPresenceForSouth: !s.OuterPlatform,
 				BaseLayoutOffset: i * 24,
 			})
 
@@ -289,6 +328,8 @@ func (s *Station) WriteToFile(file *output_file.File) {
 					SetID:            20 + (i * 50),
 					DefaultSpriteSet: 0,
 					YearCallbackID:   yearCallbackID,
+					UseRailPresenceForNorth: !s.InnerPlatform,
+					UseRailPresenceForSouth: !s.OuterPlatform,
 					BaseLayoutOffset: 8 + (i * 24),
 				})
 
@@ -296,6 +337,8 @@ func (s *Station) WriteToFile(file *output_file.File) {
 					SetID:            25 + (i * 50),
 					DefaultSpriteSet: 1,
 					YearCallbackID:   yearCallbackID,
+					UseRailPresenceForNorth: !s.InnerPlatform,
+					UseRailPresenceForSouth: !s.OuterPlatform,
 					BaseLayoutOffset: 8 + (i * 24),
 				})
 
@@ -303,6 +346,8 @@ func (s *Station) WriteToFile(file *output_file.File) {
 					SetID:            30 + (i * 50),
 					DefaultSpriteSet: 0,
 					YearCallbackID:   yearCallbackID,
+					UseRailPresenceForNorth: !s.InnerPlatform,
+					UseRailPresenceForSouth: !s.OuterPlatform,
 					BaseLayoutOffset: 16 + (i * 24),
 				})
 
@@ -310,6 +355,8 @@ func (s *Station) WriteToFile(file *output_file.File) {
 					SetID:            35 + (i * 50),
 					DefaultSpriteSet: 1,
 					YearCallbackID:   yearCallbackID,
+					UseRailPresenceForNorth: !s.InnerPlatform,
+					UseRailPresenceForSouth: !s.OuterPlatform,
 					BaseLayoutOffset: 16 + (i * 24),
 				})
 

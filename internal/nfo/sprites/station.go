@@ -12,6 +12,7 @@ type StationSprite struct {
 	DedicatedFlipSprite bool // If the sprite has its own file for flipped sprites
 	SingleSided         bool // Only one side is needed - the rear side is never displayed
 	IsStatic            bool // Is a single static sprite for all load states
+	IsRailFence         bool // Use the class filename even if the sprite is static
 }
 
 type StationSprites struct {
@@ -48,7 +49,7 @@ func (s *StationSprites) SetStatistics() {
 
 		total += 4
 
-		if sprite.HasFences {
+		if sprite.HasFences || sprite.IsRailFence {
 			// Add another 4 for the fences
 			total += 4
 		}
@@ -71,7 +72,12 @@ func (s *StationSprites) WriteToFile(file *output_file.File, loadState int) {
 		if spr.IsStatic {
 			// Ignore all load states and platform types
 			// This is slightly wasteful as we repeat the same sprite multiple times.
-			filename = fmt.Sprintf("%s_8bpp.png", spr.Filename)
+			if spr.IsRailFence {
+				// Note the fences are the other way round from normal sprite naming convention
+				filename = fmt.Sprintf("%s_%s_8bpp.png", spr.Filename, s.BaseFilename)
+			} else {
+				filename = fmt.Sprintf("%s_8bpp.png", spr.Filename)
+			}
 		}
 
 		filenameFlip := filename
@@ -79,7 +85,14 @@ func (s *StationSprites) WriteToFile(file *output_file.File, loadState int) {
 			filenameFlip = fmt.Sprintf("%s_%s_flip_%d_8bpp.png", s.BaseFilename, spr.Filename, loadState)
 		}
 
+
 		if loadState <= spr.MaxLoadState {
+			if spr.IsRailFence {
+				// Add 4x transparent sprites for the "non-fence" appearance of rail-side
+				// fences on single side platforms
+				file.AddElement(&Sprites{Sprite{},Sprite{},Sprite{},Sprite{}})
+			}
+
 			if spr.SingleSided {
 				// Non-fence sprites for single-sided object
 				// Uses blank sprites in between to keep the same relative sprite offsets
@@ -116,7 +129,6 @@ func (s *StationSprites) WriteToFile(file *output_file.File, loadState int) {
 				// Add blank pseudosprites
 				file.AddElement(&Blank{Size: 4})
 			}
-
 		}
 	}
 }
