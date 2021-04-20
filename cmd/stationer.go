@@ -765,6 +765,15 @@ func main() {
 			UseCompanyColour: true,
 		},
 		{
+			SpriteFilename:   "george_berkley",
+			ClassID:          "TWFB",
+			ClassName:        "Buildings",
+			ObjectName:       "Sir George Berkley Station",
+			YearAvailable:    1853,
+			Width:            2,
+			UseCompanyColour: true,
+		},
+		{
 			SpriteFilename:   "w_n_ashbee",
 			ClassID:          "TWFB",
 			ClassName:        "Buildings",
