@@ -304,60 +304,60 @@ func (s *Station) WriteToFile(file *output_file.File) {
 	for i := 0; i < iterations; i++ {
 		if s.HasFences {
 			file.AddElement(&callbacks.StationFenceCallback{
-				SetID:            10 + (i * 50),
-				DefaultSpriteSet: 0,
-				YearCallbackID:   yearCallbackID,
-				HasDecider:       !s.HasLargeCentralObject,
+				SetID:                   10 + (i * 50),
+				DefaultSpriteSet:        0,
+				YearCallbackID:          yearCallbackID,
+				HasDecider:              !s.HasLargeCentralObject,
 				UseRailPresenceForNorth: (!s.InnerPlatform) || s.HasLargeCentralObject,
 				UseRailPresenceForSouth: !s.OuterPlatform,
-				BaseLayoutOffset: i * 24,
+				BaseLayoutOffset:        i * 24,
 			})
 
 			file.AddElement(&callbacks.StationFenceCallback{
-				SetID:            15 + (i * 50),
-				DefaultSpriteSet: 1,
-				YearCallbackID:   yearCallbackID,
-				HasDecider:       !s.HasLargeCentralObject,
+				SetID:                   15 + (i * 50),
+				DefaultSpriteSet:        1,
+				YearCallbackID:          yearCallbackID,
+				HasDecider:              !s.HasLargeCentralObject,
 				UseRailPresenceForNorth: !s.InnerPlatform,
 				UseRailPresenceForSouth: !s.OuterPlatform,
-				BaseLayoutOffset: i * 24,
+				BaseLayoutOffset:        i * 24,
 			})
 
 			if s.HasLargeCentralObject {
 				file.AddElement(&callbacks.StationFenceCallback{
-					SetID:            20 + (i * 50),
-					DefaultSpriteSet: 0,
-					YearCallbackID:   yearCallbackID,
+					SetID:                   20 + (i * 50),
+					DefaultSpriteSet:        0,
+					YearCallbackID:          yearCallbackID,
 					UseRailPresenceForNorth: true,
 					UseRailPresenceForSouth: false,
-					BaseLayoutOffset: 8 + (i * 24),
+					BaseLayoutOffset:        8 + (i * 24),
 				})
 
 				file.AddElement(&callbacks.StationFenceCallback{
-					SetID:            25 + (i * 50),
-					DefaultSpriteSet: 1,
-					YearCallbackID:   yearCallbackID,
+					SetID:                   25 + (i * 50),
+					DefaultSpriteSet:        1,
+					YearCallbackID:          yearCallbackID,
 					UseRailPresenceForNorth: true,
 					UseRailPresenceForSouth: false,
-					BaseLayoutOffset: 8 + (i * 24),
+					BaseLayoutOffset:        8 + (i * 24),
 				})
 
 				file.AddElement(&callbacks.StationFenceCallback{
-					SetID:            30 + (i * 50),
-					DefaultSpriteSet: 0,
-					YearCallbackID:   yearCallbackID,
+					SetID:                   30 + (i * 50),
+					DefaultSpriteSet:        0,
+					YearCallbackID:          yearCallbackID,
 					UseRailPresenceForNorth: false,
 					UseRailPresenceForSouth: false,
-					BaseLayoutOffset: 16 + (i * 24),
+					BaseLayoutOffset:        16 + (i * 24),
 				})
 
 				file.AddElement(&callbacks.StationFenceCallback{
-					SetID:            35 + (i * 50),
-					DefaultSpriteSet: 1,
-					YearCallbackID:   yearCallbackID,
+					SetID:                   35 + (i * 50),
+					DefaultSpriteSet:        1,
+					YearCallbackID:          yearCallbackID,
 					UseRailPresenceForNorth: false,
 					UseRailPresenceForSouth: false,
-					BaseLayoutOffset: 16 + (i * 24),
+					BaseLayoutOffset:        16 + (i * 24),
 				})
 
 				file.AddElement(&callbacks.LargeCentralObjectCallback{

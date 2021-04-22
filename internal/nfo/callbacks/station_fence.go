@@ -6,10 +6,10 @@ import (
 )
 
 const (
-	STATION_FENCE_OFFSET = 3
-	FIRST_CAR_PARK_ID = 156
-	FIRST_REVERSE_CAR_PARK_ID = 170
-	NUM_CAR_PARKS = 4
+	STATION_FENCE_OFFSET      = 3
+	FIRST_CAR_PARK_ID         = 157
+	FIRST_REVERSE_CAR_PARK_ID = 172
+	NUM_CAR_PARKS             = 4
 
 	FIRST_WOODEN_INNER_PLATFORM = 14
 	FIRST_WOODEN_OUTER_PLATFORM = 23
@@ -21,11 +21,11 @@ const (
 )
 
 type StationFenceCallback struct {
-	SetID            int
-	BaseLayoutOffset int
-	DefaultSpriteSet int
-	YearCallbackID   int
-	HasDecider       bool
+	SetID                   int
+	BaseLayoutOffset        int
+	DefaultSpriteSet        int
+	YearCallbackID          int
+	HasDecider              bool
 	UseRailPresenceForNorth bool
 	UseRailPresenceForSouth bool
 }
@@ -41,7 +41,7 @@ func (s *StationFenceCallback) getRailPresenceAction(mask, ifTrueValue, ifFalseV
 	// 45 = rail continuation info of nearby tile
 	return fmt.Sprintf("* %d 02 04 %s\n"+
 		"    85 45\n"+ // Check variable 45
-		"    00\n" + // No variable adjustment
+		"    00\n"+ // No variable adjustment
 		"    00 %s\n"+ // mask higher bits
 		"    01\n"+ // 1 non-default option
 		"    %s %s %s\n"+ // Everything is FF
@@ -66,7 +66,6 @@ func (s *StationFenceCallback) getStationPresenceAction(checkValue, ifTrueValue,
 	modernPlatformExclusionStart := FIRST_MODERN_INNER_PLATFORM
 	platformExclusionCount := FIRST_CONCRETE_OUTER_PLATFORM - FIRST_CONCRETE_INNER_PLATFORM - 1
 
-
 	if checkValue == "10" {
 		// South should show fences against outer platforms
 		woodenPlatformExclusionStart = FIRST_WOODEN_OUTER_PLATFORM
@@ -86,11 +85,11 @@ func (s *StationFenceCallback) getStationPresenceAction(checkValue, ifTrueValue,
 		"    00 %s\n"+ // mask bits
 		"    06\n"+ // 6 non-default options
 		"    %s %s %s\n"+ // Everything is FF
-		"    %s %s %s\n" + // Line for car parks to still get fences
-		"    %s %s %s\n" + // Line for wooden inner/outer to still get fences
-		"    %s %s %s\n" + // Line for concrete inner/outer to still get fences
-		"    %s %s %s\n" + // Line for modern inner/outer to still get fences
-		"    %s %s %s\n" + // Line for reversed car parks to still get fences
+		"    %s %s %s\n"+ // Line for car parks to still get fences
+		"    %s %s %s\n"+ // Line for wooden inner/outer to still get fences
+		"    %s %s %s\n"+ // Line for concrete inner/outer to still get fences
+		"    %s %s %s\n"+ // Line for modern inner/outer to still get fences
+		"    %s %s %s\n"+ // Line for reversed car parks to still get fences
 		"    %s\n", // 80 - set bit 15 to show this is a final return value
 		length,
 		bytes.GetByte(s.SetID+setIDOffset),
@@ -101,19 +100,19 @@ func (s *StationFenceCallback) getStationPresenceAction(checkValue, ifTrueValue,
 		bytes.GetWord(255),
 		ifTrueValue,
 		bytes.GetWord(FIRST_CAR_PARK_ID),
-		bytes.GetWord((FIRST_CAR_PARK_ID + NUM_CAR_PARKS)-1),
+		bytes.GetWord((FIRST_CAR_PARK_ID+NUM_CAR_PARKS)-1),
 		ifTrueValue,
 		bytes.GetWord(woodenPlatformExclusionStart),
-		bytes.GetWord(woodenPlatformExclusionStart + woodenPlatformExclusionCount),
+		bytes.GetWord(woodenPlatformExclusionStart+woodenPlatformExclusionCount),
 		ifTrueValue,
 		bytes.GetWord(concretePlatformExclusionStart),
-		bytes.GetWord(concretePlatformExclusionStart + platformExclusionCount),
+		bytes.GetWord(concretePlatformExclusionStart+platformExclusionCount),
 		ifTrueValue,
 		bytes.GetWord(modernPlatformExclusionStart),
-		bytes.GetWord(modernPlatformExclusionStart + platformExclusionCount),
+		bytes.GetWord(modernPlatformExclusionStart+platformExclusionCount),
 		ifTrueValue,
 		bytes.GetWord(FIRST_REVERSE_CAR_PARK_ID),
-		bytes.GetWord((FIRST_REVERSE_CAR_PARK_ID + NUM_CAR_PARKS)-1),
+		bytes.GetWord((FIRST_REVERSE_CAR_PARK_ID+NUM_CAR_PARKS)-1),
 		ifFalseValue)
 }
 

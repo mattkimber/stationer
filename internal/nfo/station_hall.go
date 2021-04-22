@@ -21,7 +21,6 @@ type StationHall struct {
 	YearAvailable         int
 }
 
-
 func (s *StationHall) SetID(id int) {
 	s.ID = id
 }

@@ -21,7 +21,6 @@ type FullTilePlatform struct {
 	YearAvailable        int
 }
 
-
 func (s *FullTilePlatform) SetID(id int) {
 	s.ID = id
 }

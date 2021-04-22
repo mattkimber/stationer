@@ -1,11 +1,14 @@
 package sprites
 
+import "fmt"
+
 type Blank struct {
 	Size int
+	Name string
 }
 
 func (b *Blank) GetComment() string {
-	return "Blank pseudosprite"
+	return fmt.Sprintf("Blank pseudosprite (%s)", b.Name)
 }
 
 func (b *Blank) GetLines() []string {

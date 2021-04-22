@@ -6,7 +6,9 @@ import (
 )
 
 type BufferStopCallback struct {
-	YearCallbackID int
+	YearCallbackID          int
+	UseRailPresenceForNorth bool
+	UseRailPresenceForSouth bool
 }
 
 func (mtb *BufferStopCallback) GetComment() string {
@@ -19,25 +21,85 @@ func (mtb *BufferStopCallback) GetComment() string {
 // Both = callbacks for fence n or !n, then combinations of fences
 // N/S = additionally check front or back fence
 
-func (s *BufferStopCallback) getFenceCallback(checkValue, ifTrueValue, ifFalseValue string, callbackID int) string {
-	length := 18
+func (mtb *BufferStopCallback) getRailPresenceAction(mask, ifTrueValue, ifFalseValue string, callbackID int) string {
+	length := 17
+
+	// 85 = access lowest word of station variable
+	// 45 = rail continuation info of nearby tile
+	return fmt.Sprintf("* %d 02 04 %s\n"+
+		"    85 45\n"+ // Check variable 45
+		"    00\n"+ // No variable adjustment
+		"    00 %s\n"+ // mask higher bits
+		"    01\n"+ // 1 non-default option
+		"    %s %s %s\n"+ // Everything is FF
+		"    %s\n", // 80 - set bit 15 to show this is a final return value
+		length,
+		bytes.GetByte(callbackID),
+		mask,
+		ifFalseValue,
+		bytes.GetWord(1), // Any non-zero value indicates track continuation
+		bytes.GetWord(65535),
+		ifTrueValue)
+}
+
+func (mtb *BufferStopCallback) getStationPresenceAction(checkValue, ifTrueValue, ifFalseValue string, callbackID int) string {
+	length := 48
+
+	// North should show fences against inner platforms
+	woodenPlatformExclusionStart := FIRST_WOODEN_INNER_PLATFORM
+	woodenPlatformExclusionCount := FIRST_WOODEN_OUTER_PLATFORM - FIRST_WOODEN_INNER_PLATFORM - 1
+
+	concretePlatformExclusionStart := FIRST_CONCRETE_INNER_PLATFORM
+	modernPlatformExclusionStart := FIRST_MODERN_INNER_PLATFORM
+	platformExclusionCount := FIRST_CONCRETE_OUTER_PLATFORM - FIRST_CONCRETE_INNER_PLATFORM - 1
+
+	if checkValue == "10" {
+		// South should show fences against outer platforms
+		woodenPlatformExclusionStart = FIRST_WOODEN_OUTER_PLATFORM
+		concretePlatformExclusionStart = FIRST_CONCRETE_OUTER_PLATFORM
+		modernPlatformExclusionStart = FIRST_MODERN_INNER_PLATFORM + platformExclusionCount
+
+		// No hut or billboard for outer platforms
+		woodenPlatformExclusionCount = woodenPlatformExclusionCount - 2
+		// + No cafe or planter for modern outer platforms
+		platformExclusionCount = platformExclusionCount - 4
+	}
 
 	// 85 = access lowest word of station variable
 	// 68 = station info of nearby tile
-	// 1024 = get bit 10 (tile belongs to current station)
 	return fmt.Sprintf("* %d 02 04 %s\n"+
 		"    85 68 %s\n"+ // Check variable 68 for tile to -1/0
 		"    00 %s\n"+ // mask bits
-		"    01\n"+ // 1 non-default option
-		"    %s %s %s\n"+
+		"    06\n"+ // 6 non-default options
+		"    %s %s %s\n"+ // Everything is FF
+		"    %s %s %s\n"+ // Line for car parks to still get fences
+		"    %s %s %s\n"+ // Line for wooden inner/outer to still get fences
+		"    %s %s %s\n"+ // Line for concrete inner/outer to still get fences
+		"    %s %s %s\n"+ // Line for modern inner/outer to still get fences
+		"    %s %s %s\n"+ // Line for reversed car parks to still get fences
 		"    %s\n", // 80 - set bit 15 to show this is a final return value
 		length,
 		bytes.GetByte(callbackID),
 		checkValue,
-		bytes.GetWord(65535),
+		bytes.GetWord(255),
 		ifTrueValue,
-		bytes.GetWord(65535), // If the tile is not a station the value of the lower bits is 0xFFFF
-		bytes.GetWord(65535),
+		bytes.GetWord(255), // If the tile is not a station the value of the lower bits is 0xFFFF
+		bytes.GetWord(255),
+		ifTrueValue,
+		bytes.GetWord(FIRST_CAR_PARK_ID),
+		bytes.GetWord((FIRST_CAR_PARK_ID+NUM_CAR_PARKS)-1),
+		ifTrueValue,
+		bytes.GetWord(woodenPlatformExclusionStart),
+		bytes.GetWord(woodenPlatformExclusionStart+woodenPlatformExclusionCount),
+		ifTrueValue,
+		bytes.GetWord(concretePlatformExclusionStart),
+		bytes.GetWord(concretePlatformExclusionStart+platformExclusionCount),
+		ifTrueValue,
+		bytes.GetWord(modernPlatformExclusionStart),
+		bytes.GetWord(modernPlatformExclusionStart+platformExclusionCount),
+		ifTrueValue,
+		bytes.GetWord(FIRST_REVERSE_CAR_PARK_ID),
+		bytes.GetWord((FIRST_REVERSE_CAR_PARK_ID+NUM_CAR_PARKS)-1),
 		ifFalseValue)
 }
 
@@ -82,36 +144,50 @@ func (mtb *BufferStopCallback) getCallback() string {
 }
 
 func (mtb *BufferStopCallback) GetLines() []string {
+	northAction := mtb.getStationPresenceAction
+	southAction := mtb.getStationPresenceAction
+	checkValueN, checkValueS := "F0", "10"
+
+	if mtb.UseRailPresenceForNorth {
+		northAction = mtb.getRailPresenceAction
+		checkValueN = "08"
+	}
+
+	if mtb.UseRailPresenceForSouth {
+		southAction = mtb.getRailPresenceAction
+		checkValueS = "04"
+	}
+
 	return []string{
 		// Callbacks for "both"
 		// 20 = no fences, 22 = fence to N, 24 = fence to S, 26 = fence to N/S
-		mtb.getFenceCallback("10", "26 80", "22 80", 11),                     // N: true, S: check
-		mtb.getFenceCallback("10", "24 80", "20 80", 12),                     // N: false, S: check
-		mtb.getFenceCallback("F0", bytes.GetWord(11), bytes.GetWord(12), 10), // N: check, S: unknown
+		southAction(checkValueS, "26 80", "22 80", 11),                     // N: true, S: check
+		southAction(checkValueS, "24 80", "20 80", 12),                     // N: false, S: check
+		northAction(checkValueN, bytes.GetWord(11), bytes.GetWord(12), 10), // N: check, S: unknown
 
 		// Callbacks for "N"
 		// 10 = no fences, 12 = fence to N, 14 = fence to S, 16 = n/s, 18 = fence to rear, 1A = rear/n, 1C = rear/s, 1E = rear/n/s
-		mtb.getFenceCallback("10", "1E 80", "1A 80", 21),                     // R: true, N: true, S: check
-		mtb.getFenceCallback("10", "1C 80", "18 80", 22),                     // R: true, N: false, S: check
-		mtb.getFenceCallback("F0", bytes.GetWord(21), bytes.GetWord(22), 23), // R: true, N: check, S: unknown
+		southAction(checkValueS, "1E 80", "1A 80", 21),                     // R: true, N: true, S: check
+		southAction(checkValueS, "1C 80", "18 80", 22),                     // R: true, N: false, S: check
+		northAction(checkValueN, bytes.GetWord(21), bytes.GetWord(22), 23), // R: true, N: check, S: unknown
 
-		mtb.getFenceCallback("10", "16 80", "12 80", 24),                     // R: false, N: true, S: check
-		mtb.getFenceCallback("10", "14 80", "10 80", 25),                     // R: false, N: false, S: check
-		mtb.getFenceCallback("F0", bytes.GetWord(24), bytes.GetWord(25), 26), // R: false, N: check, S: unknown
+		southAction(checkValueS, "16 80", "12 80", 24),                     // R: false, N: true, S: check
+		southAction(checkValueS, "14 80", "10 80", 25),                     // R: false, N: false, S: check
+		northAction(checkValueN, bytes.GetWord(24), bytes.GetWord(25), 26), // R: false, N: check, S: unknown
 
-		mtb.getFenceCallback("01", bytes.GetWord(23), bytes.GetWord(26), 20), // R: check, N: unknown, S: unknown
+		mtb.getStationPresenceAction("01", bytes.GetWord(23), bytes.GetWord(26), 20), // R: check, N: unknown, S: unknown
 
 		// Callbacks for "S"
 		// 00 = no fences, 02 = fence to N, 04 = fence to S, 06 = n/s, 08 = fence to rear, 0A = rear/n, 0C = rear/s, 0E = rear/n/s
-		mtb.getFenceCallback("10", "0E 80", "0A 80", 31),                     // R: true, N: true, S: check
-		mtb.getFenceCallback("10", "0C 80", "08 80", 32),                     // R: true, N: false, S: check
-		mtb.getFenceCallback("F0", bytes.GetWord(31), bytes.GetWord(32), 33), // R: true, N: check, S: unknown
+		southAction(checkValueS, "0E 80", "0A 80", 31),                     // R: true, N: true, S: check
+		southAction(checkValueS, "0C 80", "08 80", 32),                     // R: true, N: false, S: check
+		northAction(checkValueN, bytes.GetWord(31), bytes.GetWord(32), 33), // R: true, N: check, S: unknown
 
-		mtb.getFenceCallback("10", "06 80", "02 80", 34),                     // R: false, N: true, S: check
-		mtb.getFenceCallback("10", "04 80", "00 80", 35),                     // R: false, N: false, S: check
-		mtb.getFenceCallback("F0", bytes.GetWord(34), bytes.GetWord(35), 36), // R: false, N: check, S: unknown
+		southAction(checkValueS, "06 80", "02 80", 34),                     // R: false, N: true, S: check
+		southAction(checkValueS, "04 80", "00 80", 35),                     // R: false, N: false, S: check
+		northAction(checkValueN, bytes.GetWord(34), bytes.GetWord(35), 36), // R: false, N: check, S: unknown
 
-		mtb.getFenceCallback("0F", bytes.GetWord(33), bytes.GetWord(36), 30), // R: check, N: unknown, S: unknown
+		mtb.getStationPresenceAction("0F", bytes.GetWord(33), bytes.GetWord(36), 30), // R: check, N: unknown, S: unknown
 
 		mtb.getCallback(),
 		GetDecider(0, 1, mtb.YearCallbackID, 0),

@@ -53,6 +53,7 @@ func (s *StationSprites) SetStatistics() {
 			// Add another 4 for the fences
 			total += 4
 		}
+
 	}
 
 	s.LastSpriteNumber = total
@@ -85,12 +86,11 @@ func (s *StationSprites) WriteToFile(file *output_file.File, loadState int) {
 			filenameFlip = fmt.Sprintf("%s_%s_flip_%d_8bpp.png", s.BaseFilename, spr.Filename, loadState)
 		}
 
-
 		if loadState <= spr.MaxLoadState {
 			if spr.IsRailFence {
 				// Add 4x transparent sprites for the "non-fence" appearance of rail-side
 				// fences on single side platforms
-				file.AddElement(&Sprites{Sprite{},Sprite{},Sprite{},Sprite{}})
+				file.AddElement(&Sprites{Sprite{}, Sprite{}, Sprite{}, Sprite{}})
 			}
 
 			if spr.SingleSided {
@@ -112,7 +112,11 @@ func (s *StationSprites) WriteToFile(file *output_file.File, loadState int) {
 
 		} else {
 			// Add blank pseudosprites
-			file.AddElement(&Blank{Size: 4})
+			file.AddElement(&Blank{Size: 4, Name: filename})
+			if spr.IsRailFence {
+				// Blank equivalent of transparent fence sprites
+				file.AddElement(&Blank{Size: 4, Name: filename})
+			}
 		}
 
 		// Fence sprites

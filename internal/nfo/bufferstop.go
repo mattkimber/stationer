@@ -19,6 +19,8 @@ type BufferStop struct {
 	UseCompanyColour     bool
 	HasCustomFoundations bool
 	YearAvailable        int
+	UseRailPresenceForNorth bool
+	UseRailPresenceForSouth bool
 }
 
 const (
@@ -129,7 +131,11 @@ func (s *BufferStop) WriteToFile(file *output_file.File) {
 	}
 
 	// Add the callback
-	file.AddElement(&callbacks.BufferStopCallback{YearCallbackID: yearCallbackID})
+	file.AddElement(&callbacks.BufferStopCallback{
+		YearCallbackID: yearCallbackID,
+		UseRailPresenceForSouth: s.UseRailPresenceForSouth,
+		UseRailPresenceForNorth: s.UseRailPresenceForNorth,
+	})
 
 	file.AddElement(&GraphicSetAssignment{
 		IDs:        []int{s.ID},

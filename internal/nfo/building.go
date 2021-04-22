@@ -122,7 +122,6 @@ func (s *Building) WriteToFile(file *output_file.File) {
 
 	file.AddElement(def)
 
-
 	spritesets := []int{0}
 	for i := 1; i <= s.LoadStates; i++ {
 		spritesets = append(spritesets, i)
