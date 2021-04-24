@@ -39,10 +39,10 @@ func main() {
 	file.AddElement(&nfo.Header{
 		Initials:    "TWF",
 		SetID:       8,
-		SetName:     "Timberwolf's Stations 1.1.5",
+		SetName:     "Timberwolf's Stations 1.2.0",
 		Description: "A set of British-style railway stations feature multiple eras of platforms, buildings and waypoints in 2x zoom",
-		Version:     10,
-		MinVersion:  10,
+		Version:     12,
+		MinVersion:  12,
 	})
 
 	file.AddElement(&nfo.CargoTypeTable{Cargos: []string{"PASS", "MAIL"}})
@@ -688,44 +688,45 @@ func main() {
 		}
 
 		buffers := nfo.BufferStop{
-			ID:               class.BaseObjectID + (PLATFORM_TYPES * 3) + 2,
+			ID:               class.BaseObjectID + (PLATFORM_TYPES * 1) - 1,
 			SpriteFilename:   fmt.Sprintf("%s_bufferstop", class.Filename),
 			ClassID:          class.ClassID,
 			ClassName:        class.ClassName,
 			YearAvailable:    class.Available,
+			BaseSpriteID:     classSprites.LastSpriteNumber + 14,
 			ObjectName:       "Buffer Stop",
 			UseCompanyColour: true,
 		}
 
 		outputObjects = append(outputObjects, &buffers)
 
-		if class.ClassID == "TWF1" || class.ClassID == "TWF2" {
-			innerBuffers := nfo.BufferStop{
-				ID:               class.BaseObjectID + (PLATFORM_TYPES * 3) + 3,
-				SpriteFilename:   fmt.Sprintf("inner_%s_bufferstop", class.Filename),
-				ClassID:          class.ClassID,
-				ClassName:        class.ClassName,
-				YearAvailable:    class.Available,
-				ObjectName:       "Buffer Stop (inner)",
-				UseCompanyColour: true,
-				UseRailPresenceForNorth: true,
-			}
-
-			outputObjects = append(outputObjects, &innerBuffers)
-
-			outerBuffers := nfo.BufferStop{
-				ID:               class.BaseObjectID + (PLATFORM_TYPES * 3) + 4,
-				SpriteFilename:   fmt.Sprintf("outer_%s_bufferstop", class.Filename),
-				ClassID:          class.ClassID,
-				ClassName:        class.ClassName,
-				YearAvailable:    class.Available,
-				ObjectName:       "Buffer Stop (outer)",
-				UseCompanyColour: true,
-				UseRailPresenceForNorth: true,
-			}
-
-			outputObjects = append(outputObjects, &outerBuffers)
+		innerBuffers := nfo.BufferStop{
+			ID:               class.BaseObjectID + (PLATFORM_TYPES * 2) - 1,
+			SpriteFilename:   fmt.Sprintf("inner_%s_bufferstop", class.Filename),
+			ClassID:          class.ClassID,
+			ClassName:        class.ClassName,
+			YearAvailable:    class.Available,
+			BaseSpriteID:     classSprites.LastSpriteNumber + 14,
+			ObjectName:       "Buffer Stop (inner)",
+			UseCompanyColour: true,
+			UseRailPresenceForSouth: true,
 		}
+
+		outputObjects = append(outputObjects, &innerBuffers)
+
+		outerBuffers := nfo.BufferStop{
+			ID:               class.BaseObjectID + (PLATFORM_TYPES * 3) - 1,
+			SpriteFilename:   fmt.Sprintf("outer_%s_bufferstop", class.Filename),
+			ClassID:          class.ClassID,
+			ClassName:        class.ClassName,
+			YearAvailable:    class.Available,
+			BaseSpriteID:     classSprites.LastSpriteNumber + 14,
+			ObjectName:       "Buffer Stop (outer)",
+			UseCompanyColour: true,
+			UseRailPresenceForNorth: true,
+		}
+
+		outputObjects = append(outputObjects, &outerBuffers)
 
 		platforms := []nfo.FullTilePlatform{
 			{
@@ -809,11 +810,27 @@ func main() {
 			UseCompanyColour: true,
 		},
 		{
+			SpriteFilename:   "leslie_green",
+			ClassID:          "TWFB",
+			ClassName:        "Buildings",
+			ObjectName:       "Leslie Green Station",
+			YearAvailable:    1904,
+			UseCompanyColour: true,
+		},
+		{
 			SpriteFilename:   "suburban",
 			ClassID:          "TWFB",
 			ClassName:        "Buildings",
 			ObjectName:       "Suburban Station",
 			YearAvailable:    1912,
+			UseCompanyColour: true,
+		},
+		{
+			SpriteFilename:   "j_m_easton",
+			ClassID:          "TWFB",
+			ClassName:        "Buildings",
+			ObjectName:       "J.M. Easton Station",
+			YearAvailable:    1935,
 			UseCompanyColour: true,
 		},
 		{
@@ -839,22 +856,6 @@ func main() {
 			ClassName:        "Buildings",
 			ObjectName:       "City Station",
 			YearAvailable:    1965,
-			UseCompanyColour: true,
-		},
-		{
-			SpriteFilename:   "leslie_green",
-			ClassID:          "TWFB",
-			ClassName:        "Buildings",
-			ObjectName:       "Leslie Green Station",
-			YearAvailable:    1904,
-			UseCompanyColour: true,
-		},
-		{
-			SpriteFilename:   "j_m_easton",
-			ClassID:          "TWFB",
-			ClassName:        "Buildings",
-			ObjectName:       "J.M. Easton Station",
-			YearAvailable:    1935,
 			UseCompanyColour: true,
 		},
 		{
@@ -917,6 +918,14 @@ func main() {
 			UseCompanyColour: true,
 		},
 		{
+			SpriteFilename:   "wp_arnside",
+			ClassID:          "WAYP",
+			ClassName:        "Waypoints",
+			ObjectName:       "Arnside",
+			YearAvailable:    1870,
+			UseCompanyColour: true,
+		},
+		{
 			SpriteFilename:   "wp_hebden_bridge",
 			ClassID:          "WAYP",
 			ClassName:        "Waypoints",
@@ -933,11 +942,11 @@ func main() {
 			UseCompanyColour: true,
 		},
 		{
-			SpriteFilename:   "wp_arnside",
+			SpriteFilename:   "wp_shiplake",
 			ClassID:          "WAYP",
 			ClassName:        "Waypoints",
-			ObjectName:       "Arnside",
-			YearAvailable:    1870,
+			ObjectName:       "Shiplake",
+			YearAvailable:    1950,
 			UseCompanyColour: true,
 		},
 	}

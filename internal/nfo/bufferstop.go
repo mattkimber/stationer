@@ -10,6 +10,7 @@ import (
 
 type BufferStop struct {
 	ID                   int
+	BaseSpriteID         int
 	SpriteFilename       string
 	ClassID              string
 	ClassName            string
@@ -116,7 +117,7 @@ func (s *BufferStop) WriteToFile(file *output_file.File) {
 		SetID:         0,
 		NumLittleSets: 0,
 		NumLotsSets:   1,
-		SpriteSets:    []int{0},
+		SpriteSets:    []int{s.BaseSpriteID},
 	})
 
 	spriteset, yearCallbackID := 0, 0
@@ -161,7 +162,7 @@ func (s *BufferStop) addSprites(file *output_file.File) {
 	// 3 sprites: N, S and both - 3 for Both fences - 7 each for N/S fence combinations
 	// 2 directions so all are doubled
 	numSprites := 2 * (3 + 3 + (7 * 2))
-	file.AddElement(&sprites.Spritesets{ID: 0, NumSets: 1, NumSprites: numSprites})
+	file.AddElement(&sprites.Spritesets{ID: s.BaseSpriteID, NumSets: 1, NumSprites: numSprites})
 
 	elements := []string{"s", "n", "both"}
 	for _, element := range elements {

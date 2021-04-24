@@ -143,6 +143,10 @@ func (mtb *BufferStopCallback) getCallback() string {
 	return callback
 }
 
+func (mtb *BufferStopCallback) getBytes(offset int) string {
+	return bytes.GetCallbackResultByte(offset)
+}
+
 func (mtb *BufferStopCallback) GetLines() []string {
 	northAction := mtb.getStationPresenceAction
 	southAction := mtb.getStationPresenceAction
@@ -160,31 +164,31 @@ func (mtb *BufferStopCallback) GetLines() []string {
 
 	return []string{
 		// Callbacks for "both"
-		// 20 = no fences, 22 = fence to N, 24 = fence to S, 26 = fence to N/S
-		southAction(checkValueS, "26 80", "22 80", 11),                     // N: true, S: check
-		southAction(checkValueS, "24 80", "20 80", 12),                     // N: false, S: check
+		// 0x20 = no fences, 0x22 = fence to N, 0x24 = fence to S, 0x26 = fence to N/S
+		southAction(checkValueS, mtb.getBytes(38), mtb.getBytes(34), 11),                     // N: true, S: check
+		southAction(checkValueS, mtb.getBytes(36), mtb.getBytes(32), 12),                     // N: false, S: check
 		northAction(checkValueN, bytes.GetWord(11), bytes.GetWord(12), 10), // N: check, S: unknown
 
 		// Callbacks for "N"
-		// 10 = no fences, 12 = fence to N, 14 = fence to S, 16 = n/s, 18 = fence to rear, 1A = rear/n, 1C = rear/s, 1E = rear/n/s
-		southAction(checkValueS, "1E 80", "1A 80", 21),                     // R: true, N: true, S: check
-		southAction(checkValueS, "1C 80", "18 80", 22),                     // R: true, N: false, S: check
+		// 0x10 = no fences, 0x12 = fence to N, 0x14 = fence to S, 0x16 = n/s, 0x18 = fence to rear, 0x1A = rear/n, 0x1C = rear/s, 0x1E = rear/n/s
+		southAction(checkValueS, mtb.getBytes(30), mtb.getBytes(26), 21),                     // R: true, N: true, S: check
+		southAction(checkValueS, mtb.getBytes(28), mtb.getBytes(24), 22),                     // R: true, N: false, S: check
 		northAction(checkValueN, bytes.GetWord(21), bytes.GetWord(22), 23), // R: true, N: check, S: unknown
 
-		southAction(checkValueS, "16 80", "12 80", 24),                     // R: false, N: true, S: check
-		southAction(checkValueS, "14 80", "10 80", 25),                     // R: false, N: false, S: check
+		southAction(checkValueS, mtb.getBytes(22), mtb.getBytes(18), 24),                     // R: false, N: true, S: check
+		southAction(checkValueS, mtb.getBytes(20), mtb.getBytes(16), 25),                     // R: false, N: false, S: check
 		northAction(checkValueN, bytes.GetWord(24), bytes.GetWord(25), 26), // R: false, N: check, S: unknown
 
 		mtb.getStationPresenceAction("01", bytes.GetWord(23), bytes.GetWord(26), 20), // R: check, N: unknown, S: unknown
 
 		// Callbacks for "S"
-		// 00 = no fences, 02 = fence to N, 04 = fence to S, 06 = n/s, 08 = fence to rear, 0A = rear/n, 0C = rear/s, 0E = rear/n/s
-		southAction(checkValueS, "0E 80", "0A 80", 31),                     // R: true, N: true, S: check
-		southAction(checkValueS, "0C 80", "08 80", 32),                     // R: true, N: false, S: check
+		// 0x00 = no fences, 0x02 = fence to N, 0x04 = fence to S, 0x06 = n/s, 0x08 = fence to rear, 0x0A = rear/n, 0x0C = rear/s, 0x0E = rear/n/s
+		southAction(checkValueS, mtb.getBytes(14), mtb.getBytes(10), 31),                     // R: true, N: true, S: check
+		southAction(checkValueS, mtb.getBytes(12), mtb.getBytes(8), 32),                     // R: true, N: false, S: check
 		northAction(checkValueN, bytes.GetWord(31), bytes.GetWord(32), 33), // R: true, N: check, S: unknown
 
-		southAction(checkValueS, "06 80", "02 80", 34),                     // R: false, N: true, S: check
-		southAction(checkValueS, "04 80", "00 80", 35),                     // R: false, N: false, S: check
+		southAction(checkValueS, mtb.getBytes(6), mtb.getBytes(2), 34),                     // R: false, N: true, S: check
+		southAction(checkValueS, mtb.getBytes(4), mtb.getBytes(0), 35),                     // R: false, N: false, S: check
 		northAction(checkValueN, bytes.GetWord(34), bytes.GetWord(35), 36), // R: false, N: check, S: unknown
 
 		mtb.getStationPresenceAction("0F", bytes.GetWord(33), bytes.GetWord(36), 30), // R: check, N: unknown, S: unknown
