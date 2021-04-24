@@ -104,6 +104,7 @@ func main() {
 				{Filename: "bare_shelter_traditional", HasFences: true, MaxLoadState: 5},
 				{Filename: "bare_shelter_tiled_wall", HasFences: true, MaxLoadState: 5},
 				{Filename: "bare_hut", HasFences: true, MaxLoadState: 5},
+				{Filename: "bare_stairs", HasFences: true, MaxLoadState: 5},
 				{Filename: "ramp_ne", HasFences: true, MaxLoadState: 5},
 				{Filename: "ramp_sw", HasFences: true, MaxLoadState: 5},
 				{Filename: "bare_footbridge", HasFences: true, MaxLoadState: 5},
@@ -326,6 +327,58 @@ func main() {
 					OuterPlatform:         outer,
 					RailFenceSpriteID:     classSprites.SpriteMap["fence"],
 				},
+				{
+					ID:                    baseObjectID + 22,
+					BaseSpriteID:          classSprites.SpriteMap["bare_stairs"],
+					ClassID:               class.ClassID,
+					ClassName:             class.ClassName,
+					YearAvailable:         max(class.Available, 1860),
+					MaxLoadState:          5,
+					ObjectName:            "Stairs" + bracketName,
+					PlatformConfiguration: rampConfiguration,
+					UseCompanyColour:      true,
+					HasFences:             true,
+					InnerPlatform:         inner,
+					OuterPlatform:         outer,
+					RailFenceSpriteID:     classSprites.SpriteMap["fence"],
+				},
+			}
+
+			if inner && outer {
+				thisClass = append(thisClass, []nfo.Station{{
+				ID:                    baseObjectID + 23,
+					BaseSpriteID:          classSprites.SpriteMap["bare_stairs"],
+					ClassID:               class.ClassID,
+					ClassName:             class.ClassName,
+					YearAvailable:         max(class.Available, 1860),
+					MaxLoadState:          5,
+					ObjectName:            "Stairs (NE" + commaName + ")",
+					PlatformConfiguration: rampConfiguration,
+					UseCompanyColour:      true,
+					HasFences:             true,
+					OverrideOuter:         true,
+					InnerPlatform:         inner,
+					OuterPlatform:         outer,
+					RailFenceSpriteID:     classSprites.SpriteMap["fence"],
+					OuterPlatformSprite:   classSprites.SpriteMap["empty"],
+				},
+				{
+				ID:                    baseObjectID + 24,
+					BaseSpriteID:          classSprites.SpriteMap["empty"],
+					ClassID:               class.ClassID,
+					ClassName:             class.ClassName,
+					YearAvailable:         max(class.Available, 1860),
+					MaxLoadState:          5,
+					ObjectName:            "Stairs (SW" + commaName + ")",
+					PlatformConfiguration: rampConfiguration,
+					UseCompanyColour:      true,
+					HasFences:             true,
+					OverrideOuter:         true,
+					InnerPlatform:         inner,
+					OuterPlatform:         outer,
+					RailFenceSpriteID:     classSprites.SpriteMap["fence"],
+					OuterPlatformSprite:   classSprites.SpriteMap["bare_stairs"],
+				}}...)
 			}
 
 			if inner {
@@ -889,6 +942,14 @@ func main() {
 			ObjectName:     "Car Park (end)",
 			YearAvailable:  1960,
 			LoadStates:     3,
+		},
+		{
+			SpriteFilename: "shops",
+			ClassID:        "TWFB",
+			ClassName:      "Buildings",
+			ObjectName:     "Shops",
+			YearAvailable:  1970,
+			LoadStates:     2,
 		},
 	}
 
