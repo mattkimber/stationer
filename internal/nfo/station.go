@@ -308,7 +308,7 @@ func (s *Station) WriteToFile(file *output_file.File) {
 				DefaultSpriteSet:        0,
 				YearCallbackID:          yearCallbackID,
 				HasDecider:              !s.HasLargeCentralObject,
-				UseRailPresenceForNorth: (!s.InnerPlatform) || s.HasLargeCentralObject,
+				UseRailPresenceForNorth: !s.InnerPlatform,
 				UseRailPresenceForSouth: !s.OuterPlatform,
 				BaseLayoutOffset:        i * 24,
 			})
@@ -328,7 +328,7 @@ func (s *Station) WriteToFile(file *output_file.File) {
 					SetID:                   20 + (i * 50),
 					DefaultSpriteSet:        0,
 					YearCallbackID:          yearCallbackID,
-					UseRailPresenceForNorth: true,
+					UseRailPresenceForNorth: !s.OuterPlatform,
 					UseRailPresenceForSouth: false,
 					BaseLayoutOffset:        8 + (i * 24),
 				})
@@ -337,7 +337,7 @@ func (s *Station) WriteToFile(file *output_file.File) {
 					SetID:                   25 + (i * 50),
 					DefaultSpriteSet:        1,
 					YearCallbackID:          yearCallbackID,
-					UseRailPresenceForNorth: true,
+					UseRailPresenceForNorth: !s.OuterPlatform,
 					UseRailPresenceForSouth: false,
 					BaseLayoutOffset:        8 + (i * 24),
 				})
