@@ -39,9 +39,9 @@ func main() {
 	file.AddElement(&nfo.Header{
 		Initials:    "TWF",
 		SetID:       8,
-		SetName:     "Timberwolf's Stations 1.2.4",
+		SetName:     "Timberwolf's Stations 1.3.0",
 		Description: "A set of British-style railway stations feature multiple eras of platforms, buildings and waypoints in 2x zoom",
-		Version:     16,
+		Version:     17,
 		MinVersion:  12,
 	})
 
@@ -229,7 +229,7 @@ func main() {
 				commaName = ", " + names[i]
 			}
 
-			thisClass := []nfo.Station{
+			stations := []nfo.Station{
 				{
 					ID:                baseObjectID + 0,
 					BaseSpriteID:      classSprites.SpriteMap["empty"],
@@ -242,6 +242,8 @@ func main() {
 					InnerPlatform:     inner,
 					OuterPlatform:     outer,
 					RailFenceSpriteID: classSprites.SpriteMap["fence"],
+
+					MinClearance: 1,
 				},
 				{
 					ID:                baseObjectID + 1,
@@ -255,6 +257,8 @@ func main() {
 					InnerPlatform:     inner,
 					OuterPlatform:     outer,
 					RailFenceSpriteID: classSprites.SpriteMap["fence"],
+
+					MinClearance: 1,
 				},
 				{
 					ID:                baseObjectID + 2,
@@ -268,6 +272,8 @@ func main() {
 					InnerPlatform:     inner,
 					OuterPlatform:     outer,
 					RailFenceSpriteID: classSprites.SpriteMap["fence"],
+
+					MinClearance: 1,
 				},
 				{
 					ID:                baseObjectID + 3,
@@ -282,6 +288,9 @@ func main() {
 					InnerPlatform:     inner,
 					OuterPlatform:     outer,
 					RailFenceSpriteID: classSprites.SpriteMap["fence"],
+
+					MinClearance:    2,
+					SuppressPillars: true,
 				},
 				{
 					ID:                baseObjectID + 14,
@@ -296,6 +305,8 @@ func main() {
 					InnerPlatform:     inner,
 					OuterPlatform:     outer,
 					RailFenceSpriteID: classSprites.SpriteMap["fence"],
+
+					MinClearance: 2,
 				},
 				{
 					ID:                    baseObjectID + 4,
@@ -311,6 +322,8 @@ func main() {
 					InnerPlatform:         inner,
 					OuterPlatform:         outer,
 					RailFenceSpriteID:     classSprites.SpriteMap["fence"],
+
+					MinClearance: 1,
 				},
 				{
 					ID:                    baseObjectID + 5,
@@ -326,6 +339,8 @@ func main() {
 					InnerPlatform:         inner,
 					OuterPlatform:         outer,
 					RailFenceSpriteID:     classSprites.SpriteMap["fence"],
+
+					MinClearance: 1,
 				},
 				{
 					ID:                    baseObjectID + 22,
@@ -341,12 +356,16 @@ func main() {
 					InnerPlatform:         inner,
 					OuterPlatform:         outer,
 					RailFenceSpriteID:     classSprites.SpriteMap["fence"],
+
+					MinClearance:    2,
+					SuppressPillars: true,
 				},
 			}
+			thisClass := stations
 
 			if inner && outer {
 				thisClass = append(thisClass, []nfo.Station{{
-				ID:                    baseObjectID + 23,
+					ID:                    baseObjectID + 23,
 					BaseSpriteID:          classSprites.SpriteMap["bare_stairs"],
 					ClassID:               class.ClassID,
 					ClassName:             class.ClassName,
@@ -361,24 +380,30 @@ func main() {
 					OuterPlatform:         outer,
 					RailFenceSpriteID:     classSprites.SpriteMap["fence"],
 					OuterPlatformSprite:   classSprites.SpriteMap["empty"],
+
+					MinClearance:    2,
+					SuppressPillars: true,
 				},
-				{
-				ID:                    baseObjectID + 24,
-					BaseSpriteID:          classSprites.SpriteMap["empty"],
-					ClassID:               class.ClassID,
-					ClassName:             class.ClassName,
-					YearAvailable:         max(class.Available, 1860),
-					MaxLoadState:          5,
-					ObjectName:            "Stairs (SW" + commaName + ")",
-					PlatformConfiguration: rampConfiguration,
-					UseCompanyColour:      true,
-					HasFences:             true,
-					OverrideOuter:         true,
-					InnerPlatform:         inner,
-					OuterPlatform:         outer,
-					RailFenceSpriteID:     classSprites.SpriteMap["fence"],
-					OuterPlatformSprite:   classSprites.SpriteMap["bare_stairs"],
-				}}...)
+					{
+						ID:                    baseObjectID + 24,
+						BaseSpriteID:          classSprites.SpriteMap["empty"],
+						ClassID:               class.ClassID,
+						ClassName:             class.ClassName,
+						YearAvailable:         max(class.Available, 1860),
+						MaxLoadState:          5,
+						ObjectName:            "Stairs (SW" + commaName + ")",
+						PlatformConfiguration: rampConfiguration,
+						UseCompanyColour:      true,
+						HasFences:             true,
+						OverrideOuter:         true,
+						InnerPlatform:         inner,
+						OuterPlatform:         outer,
+						RailFenceSpriteID:     classSprites.SpriteMap["fence"],
+						OuterPlatformSprite:   classSprites.SpriteMap["bare_stairs"],
+
+						MinClearance:    2,
+						SuppressPillars: true,
+					}}...)
 			}
 
 			if inner {
@@ -397,6 +422,9 @@ func main() {
 					OverrideOuter:       true,
 					OuterPlatformSprite: classSprites.SpriteMap["sign"],
 					RailFenceSpriteID:   classSprites.SpriteMap["fence"],
+
+					MinClearance:    2,
+					SuppressPillars: true,
 				})
 			}
 
@@ -419,6 +447,8 @@ func main() {
 						InnerPlatform:         inner,
 						OuterPlatform:         outer,
 						RailFenceSpriteID:     classSprites.SpriteMap["fence"],
+
+						MinClearance: 1,
 					},
 					{
 						ID:                baseObjectID + 20,
@@ -433,6 +463,9 @@ func main() {
 						InnerPlatform:     inner,
 						OuterPlatform:     outer,
 						RailFenceSpriteID: classSprites.SpriteMap["fence"],
+
+						MinClearance:    2,
+						SuppressPillars: true,
 					},
 					{
 						ID:                baseObjectID + 15,
@@ -448,6 +481,9 @@ func main() {
 						InnerPlatform:     inner,
 						OuterPlatform:     outer,
 						RailFenceSpriteID: classSprites.SpriteMap["fence"],
+
+						MinClearance:    2,
+						SuppressPillars: true,
 					},
 					{
 						ID:                baseObjectID + 16,
@@ -463,6 +499,9 @@ func main() {
 						InnerPlatform:     inner,
 						OuterPlatform:     outer,
 						RailFenceSpriteID: classSprites.SpriteMap["fence"],
+
+						MinClearance:    2,
+						SuppressPillars: true,
 					},
 				}...)
 			}
@@ -495,6 +534,8 @@ func main() {
 						OuterPlatformSprite:   classSprites.SpriteMap["empty"],
 						PlatformConfiguration: largeObjectConfiguration,
 						RailFenceSpriteID:     classSprites.SpriteMap["fence"],
+
+						MinClearance: 2,
 					},
 				}...)
 
@@ -518,6 +559,9 @@ func main() {
 							OuterPlatformSprite:   classSprites.SpriteMap["empty"],
 							PlatformConfiguration: largeObjectConfiguration,
 							RailFenceSpriteID:     classSprites.SpriteMap["fence"],
+
+							MinClearance:    2,
+							SuppressPillars: true,
 						},
 						{
 							ID:                    baseObjectID + 9,
@@ -536,6 +580,8 @@ func main() {
 							OuterPlatformSprite:   classSprites.SpriteMap["empty"],
 							PlatformConfiguration: largeObjectConfiguration,
 							RailFenceSpriteID:     classSprites.SpriteMap["fence"],
+
+							MinClearance: 1,
 						},
 					}...)
 				}
@@ -569,6 +615,9 @@ func main() {
 								BaseSpriteID: footbridgeSprites[0].BaseSpriteID,
 							},
 						},
+
+						MinClearance:    3,
+						SuppressPillars: true,
 					}}...)
 			}
 
@@ -603,6 +652,9 @@ func main() {
 						PlatformConfiguration: rampConfiguration,
 						AdditionalObjects:     footbridgeObjects,
 						RailFenceSpriteID:     classSprites.SpriteMap["fence"],
+
+						MinClearance:    3,
+						SuppressPillars: true,
 					}}...)
 
 				footbridgeObjects = getFootbridgeBaseObject(footbridgeSprites[1].BaseSpriteID)
@@ -635,6 +687,9 @@ func main() {
 						PlatformConfiguration: rampConfiguration,
 						AdditionalObjects:     footbridgeObjects,
 						RailFenceSpriteID:     classSprites.SpriteMap["fence"],
+
+						MinClearance:    3,
+						SuppressPillars: true,
 					},
 				}...)
 			}
@@ -754,28 +809,28 @@ func main() {
 		outputObjects = append(outputObjects, &buffers)
 
 		innerBuffers := nfo.BufferStop{
-			ID:               class.BaseObjectID + (PLATFORM_TYPES * 2) - 1,
-			SpriteFilename:   fmt.Sprintf("inner_%s_bufferstop", class.Filename),
-			ClassID:          class.ClassID,
-			ClassName:        class.ClassName,
-			YearAvailable:    class.Available,
-			BaseSpriteID:     classSprites.LastSpriteNumber + 14,
-			ObjectName:       "Buffer Stop (inner)",
-			UseCompanyColour: true,
+			ID:                      class.BaseObjectID + (PLATFORM_TYPES * 2) - 1,
+			SpriteFilename:          fmt.Sprintf("inner_%s_bufferstop", class.Filename),
+			ClassID:                 class.ClassID,
+			ClassName:               class.ClassName,
+			YearAvailable:           class.Available,
+			BaseSpriteID:            classSprites.LastSpriteNumber + 14,
+			ObjectName:              "Buffer Stop (inner)",
+			UseCompanyColour:        true,
 			UseRailPresenceForSouth: true,
 		}
 
 		outputObjects = append(outputObjects, &innerBuffers)
 
 		outerBuffers := nfo.BufferStop{
-			ID:               class.BaseObjectID + (PLATFORM_TYPES * 3) - 1,
-			SpriteFilename:   fmt.Sprintf("outer_%s_bufferstop", class.Filename),
-			ClassID:          class.ClassID,
-			ClassName:        class.ClassName,
-			YearAvailable:    class.Available,
-			BaseSpriteID:     classSprites.LastSpriteNumber + 14,
-			ObjectName:       "Buffer Stop (outer)",
-			UseCompanyColour: true,
+			ID:                      class.BaseObjectID + (PLATFORM_TYPES * 3) - 1,
+			SpriteFilename:          fmt.Sprintf("outer_%s_bufferstop", class.Filename),
+			ClassID:                 class.ClassID,
+			ClassName:               class.ClassName,
+			YearAvailable:           class.Available,
+			BaseSpriteID:            classSprites.LastSpriteNumber + 14,
+			ObjectName:              "Buffer Stop (outer)",
+			UseCompanyColour:        true,
 			UseRailPresenceForNorth: true,
 		}
 
@@ -799,6 +854,9 @@ func main() {
 				YearAvailable:    max(class.Available, 1860),
 				ObjectName:       "Concourse with shelters",
 				UseCompanyColour: true,
+
+				MinClearance:    2,
+				SuppressPillars: true,
 			},
 		}
 
@@ -827,6 +885,7 @@ func main() {
 			ClassName:        "Buildings",
 			ObjectName:       "Wooden Station",
 			UseCompanyColour: true,
+			MinClearance:     2,
 		},
 		{
 			SpriteFilename:   "rural",
@@ -835,6 +894,7 @@ func main() {
 			ObjectName:       "Rural Station",
 			YearAvailable:    1840,
 			UseCompanyColour: true,
+			MinClearance:     3,
 		},
 		{
 			SpriteFilename:   "sir_william_tite",
@@ -844,6 +904,7 @@ func main() {
 			YearAvailable:    1849,
 			Width:            2,
 			UseCompanyColour: true,
+			MinClearance:     3,
 		},
 		{
 			SpriteFilename:   "george_berkley",
@@ -853,6 +914,7 @@ func main() {
 			YearAvailable:    1853,
 			Width:            2,
 			UseCompanyColour: true,
+			MinClearance:     4,
 		},
 		{
 			SpriteFilename:   "w_n_ashbee",
@@ -861,6 +923,7 @@ func main() {
 			ObjectName:       "W.N. Ashbee Station",
 			YearAvailable:    1862,
 			UseCompanyColour: true,
+			MinClearance:     3,
 		},
 		{
 			SpriteFilename:   "leslie_green",
@@ -869,6 +932,7 @@ func main() {
 			ObjectName:       "Leslie Green Station",
 			YearAvailable:    1904,
 			UseCompanyColour: true,
+			MinClearance:     3,
 		},
 		{
 			SpriteFilename:   "suburban",
@@ -877,6 +941,7 @@ func main() {
 			ObjectName:       "Suburban Station",
 			YearAvailable:    1912,
 			UseCompanyColour: true,
+			MinClearance:     3,
 		},
 		{
 			SpriteFilename:   "j_m_easton",
@@ -885,6 +950,7 @@ func main() {
 			ObjectName:       "J.M. Easton Station",
 			YearAvailable:    1935,
 			UseCompanyColour: true,
+			MinClearance:     3,
 		},
 		{
 			SpriteFilename:   "art_deco",
@@ -894,6 +960,7 @@ func main() {
 			YearAvailable:    1935,
 			Width:            2,
 			UseCompanyColour: true,
+			MinClearance:     4,
 		},
 		{
 			SpriteFilename:   "suburban_flat_roof",
@@ -902,6 +969,7 @@ func main() {
 			ObjectName:       "Suburban Flat Roof Station",
 			YearAvailable:    1962,
 			UseCompanyColour: true,
+			MinClearance:     2,
 		},
 		{
 			SpriteFilename:   "small_city",
@@ -910,6 +978,7 @@ func main() {
 			ObjectName:       "City Station",
 			YearAvailable:    1965,
 			UseCompanyColour: true,
+			MinClearance:     2,
 		},
 		{
 			SpriteFilename: "straight_car_park",
@@ -918,6 +987,7 @@ func main() {
 			ObjectName:     "Car Park (straight)",
 			YearAvailable:  1960,
 			LoadStates:     3,
+			MinClearance:   1,
 		},
 		{
 			SpriteFilename: "corner_car_park",
@@ -926,6 +996,7 @@ func main() {
 			ObjectName:     "Car Park (corner)",
 			YearAvailable:  1960,
 			LoadStates:     3,
+			MinClearance:   1,
 		},
 		{
 			SpriteFilename: "entrance_car_park",
@@ -934,6 +1005,7 @@ func main() {
 			ObjectName:     "Car Park (entrance)",
 			YearAvailable:  1960,
 			LoadStates:     3,
+			MinClearance:   1,
 		},
 		{
 			SpriteFilename: "end_car_park",
@@ -942,6 +1014,7 @@ func main() {
 			ObjectName:     "Car Park (end)",
 			YearAvailable:  1960,
 			LoadStates:     3,
+			MinClearance:   1,
 		},
 		{
 			SpriteFilename: "shops",
@@ -950,6 +1023,7 @@ func main() {
 			ObjectName:     "Shops",
 			YearAvailable:  1970,
 			LoadStates:     2,
+			MinClearance:   2,
 		},
 	}
 

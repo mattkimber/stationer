@@ -19,6 +19,9 @@ type FullTilePlatform struct {
 	UseCompanyColour     bool
 	HasCustomFoundations bool
 	YearAvailable        int
+
+	MinClearance    int  // min clearance for bridges
+	SuppressPillars bool // whether to prevent bridges drawing pillars on this tile
 }
 
 func (s *FullTilePlatform) SetID(id int) {
@@ -73,6 +76,11 @@ func (s *FullTilePlatform) WriteToFile(file *output_file.File) {
 
 	// Prevent train entering
 	def.AddProperty(&properties.PreventTrainEntryFlag{})
+
+	def.AddProperty(&properties.MinimumBridgeClearance{Clearance: s.MinClearance, Layouts: 8})
+	if s.SuppressPillars {
+		def.AddProperty(&properties.BlockedPillarInformation{IsBlocked: true, Layouts: 8})
+	}
 
 	// Add flag for sprite layout callback
 	def.AddProperty(&properties.CallbackFlag{SpriteLayout: true, Availability: s.YearAvailable != 0})

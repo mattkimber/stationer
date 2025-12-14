@@ -20,6 +20,8 @@ type Building struct {
 	YearAvailable    int
 	LoadStates       int
 	Reversed         bool
+
+	MinClearance int
 }
 
 const (
@@ -88,6 +90,9 @@ func (s *Building) WriteToFile(file *output_file.File) {
 		def.AddProperty(&properties.LittleLotsThreshold{Amount: 20})
 		def.AddProperty(&properties.GeneralFlag{SpreadCargo: true})
 	}
+
+	def.AddProperty(&properties.MinimumBridgeClearance{Clearance: s.MinClearance, Layouts: s.Width * 2})
+	def.AddProperty(&properties.BlockedPillarInformation{IsBlocked: true, Layouts: s.Width * 2})
 
 	layoutEntries := make([]properties.LayoutEntry, 0)
 

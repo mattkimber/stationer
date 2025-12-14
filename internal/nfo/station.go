@@ -27,6 +27,9 @@ type Station struct {
 	OuterPlatformSprite   int  // and if so, which sprite.
 	HasLargeCentralObject bool // If the central object covers two tiles
 	ObjectIsSingleSided   bool // if the central object is "single sided" - only present on one platform tile.
+
+	MinClearance    int  // min clearance for bridges
+	SuppressPillars bool // whether to prevent bridges drawing pillars on this tile
 }
 
 const (
@@ -238,6 +241,11 @@ func (s *Station) WriteToFile(file *output_file.File) {
 	}
 
 	def.AddProperty(&properties.LittleLotsThreshold{Amount: 40})
+
+	def.AddProperty(&properties.MinimumBridgeClearance{Clearance: s.MinClearance, Layouts: 8})
+	if s.SuppressPillars {
+		def.AddProperty(&properties.BlockedPillarInformation{IsBlocked: true, Layouts: 8})
+	}
 
 	iterations := 1
 	if len(s.RandomSpriteIDs) > 0 {

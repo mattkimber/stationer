@@ -107,6 +107,9 @@ func (s *StationHall) WriteToFile(file *output_file.File) {
 	def.AddProperty(&properties.ClassID{ID: s.ClassID})
 	def.AddProperty(&properties.LittleLotsThreshold{Amount: 40})
 
+	def.AddProperty(&properties.MinimumBridgeClearance{Clearance: 5, Layouts: 8})
+	def.AddProperty(&properties.BlockedPillarInformation{IsBlocked: true, Layouts: 8})
+
 	if s.YearAvailable != 0 {
 		def.AddProperty(&properties.CallbackFlag{Availability: s.YearAvailable != 0})
 	}

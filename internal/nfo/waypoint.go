@@ -109,6 +109,8 @@ func (wp *Waypoint) WriteToFile(file *output_file.File) {
 	def := &Definition{StationID: wp.ID}
 	def.AddProperty(&properties.ClassID{ID: wp.ClassID})
 
+	def.AddProperty(&properties.MinimumBridgeClearance{Clearance: 2, Layouts: 4})
+
 	// This is irrelevant?
 	// def.AddProperty(&properties.LittleLotsThreshold{Amount: 200})
 
