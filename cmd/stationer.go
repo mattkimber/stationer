@@ -39,9 +39,9 @@ func main() {
 	file.AddElement(&nfo.Header{
 		Initials:    "TWF",
 		SetID:       8,
-		SetName:     "Timberwolf's Stations 1.3.1",
+		SetName:     "Timberwolf's Stations 1.4.0",
 		Description: "A set of British-style railway stations feature multiple eras of platforms, buildings and waypoints in 2x zoom",
-		Version:     18,
+		Version:     19,
 		MinVersion:  12,
 	})
 
@@ -1044,6 +1044,67 @@ func main() {
 		objectID = objectID + 1
 	}
 
+    bridgeWaypoints := []nfo.BridgeWaypoint{
+		{
+			ClassID:          "WAYP",
+			ClassName:        "Waypoints",
+			ObjectName:       "Brick Footbridge",
+			YearAvailable:    1910,
+			UseCompanyColour: true,
+			AdditionalSprites: []sprites.PlatformObject{
+               {
+                   BaseSpriteID:   0,
+                   SpriteFilename: "footbridge_covered_brick",
+                   IsStatic:       true,
+               },
+               {
+                   BaseSpriteID:   2,
+                   SpriteFilename: "footbridge_pillar_covered_brick",
+                   IsStatic:       true,
+               },
+               {
+                   BaseSpriteID:   4,
+                   SpriteFilename: "footbridge_pillar_covered_brick_b",
+                   IsStatic:       true,
+               },
+            },
+			AdditionalObjects: append(
+			    getFootbridgeBaseObject(0),
+			    // Y Values for these objects probably want to match with the values for the platforms they go with.
+			    getFootbridgeObject(0, 2),
+                getFootbridgeObject(12, 4)),
+		},
+		{
+			ClassID:          "WAYP",
+			ClassName:        "Waypoints",
+			ObjectName:       "Covered Footbridge",
+			YearAvailable:    1932,
+			UseCompanyColour: true,
+			AdditionalSprites: []sprites.PlatformObject{
+               {
+                   BaseSpriteID:   0,
+                   SpriteFilename: "footbridge_covered",
+                   IsStatic:       true,
+               },
+               {
+                   BaseSpriteID:   2,
+                   SpriteFilename: "footbridge_pillar_covered",
+                   IsStatic:       true,
+               },
+               {
+                   BaseSpriteID:   4,
+                   SpriteFilename: "footbridge_pillar_covered_b",
+                   IsStatic:       true,
+               },
+            },
+			AdditionalObjects: append(
+			    getFootbridgeBaseObject(0),
+                // Y Values for these objects probably want to match with the values for the platforms they go with.
+                getFootbridgeObject(0, 2),
+                getFootbridgeObject(12, 4)),
+		},
+    }
+
 	waypoints := []nfo.Waypoint{
 		{
 			SpriteFilename:   "wp_kilby_bridge",
@@ -1087,6 +1148,13 @@ func main() {
 	}
 
 	for _, waypoint := range waypoints {
+		thisWaypoint := waypoint
+		thisWaypoint.ID = objectID
+		outputObjects = append(outputObjects, &thisWaypoint)
+		objectID = objectID + 1
+	}
+
+	for _, waypoint := range bridgeWaypoints {
 		thisWaypoint := waypoint
 		thisWaypoint.ID = objectID
 		outputObjects = append(outputObjects, &thisWaypoint)
